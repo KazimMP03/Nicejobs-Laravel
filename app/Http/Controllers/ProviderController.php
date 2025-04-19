@@ -7,6 +7,7 @@ use App\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 
 class ProviderController extends Controller
 {
@@ -17,6 +18,7 @@ class ProviderController extends Controller
             'user_type' => 'required|in:PF,PJ',
             'tax_id' => 'required|string|unique:providers,tax_id',
             'email' => 'required|email|unique:providers,email',
+            'password' => 'required|string|min:8|confirmed',
             'phone' => 'required|string',
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'birth_date' => 'nullable|date',
@@ -42,6 +44,12 @@ class ProviderController extends Controller
         }
 
         $data = $validator->validated();
+        
+        // Criptografa a senha antes de armazenar
+        $data['password'] = Hash::make($data['password']);
+        
+        // Remove o campo password_confirmation se existir
+        unset($data['password_confirmation']);
 
         // Upload da foto de perfil
         if ($request->hasFile('profile_photo')) {
@@ -59,6 +67,12 @@ class ProviderController extends Controller
             }
         }
 
-        return response()->json($provider, 201);
+        // Remove a senha da resposta
+        $provider->makeHidden(['password']);
+
+        return response()->json([
+            'message' => 'Provider created successfully',
+            'data' => $provider
+        ], 201);
     }
 }

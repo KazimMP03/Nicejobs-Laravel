@@ -7,6 +7,7 @@ use App\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 
 class CustomUserController extends Controller
 {
@@ -17,6 +18,7 @@ class CustomUserController extends Controller
             'user_type' => 'required|in:PF,PJ',
             'tax_id' => 'required|string|unique:custom_users,tax_id',
             'email' => 'required|email|unique:custom_users,email',
+            'password' => 'required|string|min:8|confirmed',
             'phone' => 'required|string',
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'birth_date' => 'nullable|date',
@@ -37,6 +39,12 @@ class CustomUserController extends Controller
         }
 
         $data = $validator->validated();
+        
+        // Criptografa a senha antes de armazenar
+        $data['password'] = Hash::make($data['password']);
+        
+        // Remove o campo password_confirmation se existir
+        unset($data['password_confirmation']);
 
         // Upload da foto de perfil
         if ($request->hasFile('profile_photo')) {
@@ -54,6 +62,12 @@ class CustomUserController extends Controller
             }
         }
 
-        return response()->json($customUser, 201);
+        // Remove a senha da resposta
+        $customUser->makeHidden(['password']);
+
+        return response()->json([
+            'message' => 'User created successfully',
+            'data' => $customUser
+        ], 201);
     }
 }

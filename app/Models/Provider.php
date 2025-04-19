@@ -15,6 +15,7 @@ class Provider extends Model
         'tax_id',
         'email',
         'phone',
+        'password',
         'profile_photo',
         'birth_date',
         'foundation_date',
@@ -26,6 +27,11 @@ class Provider extends Model
         'availability',
     ];
 
+    // Adicione isso para ocultar o password nos arrays/JSON
+    protected $hidden = [
+        'password',
+    ];
+    
     /**
      * Relação muitos-para-muitos com Address.
      */

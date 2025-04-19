@@ -10,19 +10,20 @@ class CreateProvidersTable extends Migration
     {
         Schema::create('providers', function (Blueprint $table) {
             $table->id();
-            $table->string('user_name');
-            $table->enum('user_type', ['PF', 'PJ']);
-            $table->string('tax_id')->unique();
-            $table->string('email')->unique();
-            $table->string('phone');
-            $table->string('profile_photo')->nullable();
-            $table->date('birth_date')->nullable();
-            $table->date('foundation_date')->nullable();
-            $table->boolean('status')->default(true);
-            $table->text('provider_description');
-            $table->string('service_category');
-            $table->text('service_description');
-            $table->integer('work_radius'); // em km
+            $table->string('user_name'); // Nome ou Razão Social
+            $table->enum('user_type', ['PF', 'PJ']); // Pessoa Física ou Pessoa Jurídica
+            $table->string('tax_id')->unique(); // CPF ou CNPJ
+            $table->string('email')->unique(); // Email
+            $table->string('password');  // Senha
+            $table->string('phone'); // Telefone
+            $table->string('profile_photo')->nullable(); // Foto de Perfil
+            $table->date('birth_date')->nullable(); // Data de Nascimento (se PF)
+            $table->date('foundation_date')->nullable(); // Data de Fundação (se PJ)
+            $table->boolean('status')->default(true); // Ativo ou Inativo
+            $table->text('provider_description'); // Descrição do Prestador
+            $table->string('service_category'); // Categoria de Serviço
+            $table->text('service_description'); // Descrição do Serviço
+            $table->integer('work_radius'); // Distância em km
             $table->json('availability'); // ou use uma tabela separada se quiser algo mais detalhado
             $table->timestamps();
         });

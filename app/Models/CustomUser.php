@@ -15,12 +15,18 @@ class CustomUser extends Model
         'tax_id',
         'email',
         'phone',
+        'password',
         'profile_photo',
         'birth_date',
         'foundation_date',
         'status',
     ];
 
+    // Adicione isso para ocultar o password nos arrays/JSON
+    protected $hidden = [
+        'password',
+    ];
+    
     /**
      * Relação muitos-para-muitos com Address.
      */
