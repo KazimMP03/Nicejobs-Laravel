@@ -1,0 +1,51 @@
+/* Estilos do Footer - versão refinada */
+.site-footer {
+    background-color: #2c3e50;
+    color: #ffffff; /* Branco puro */
+    padding: 0.8rem 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 100;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.copyright {
+    margin: 0;
+    font-size: 0.9rem; /* Aumentei o tamanho */
+    color: #ffffff; /* Branco puro */
+    font-weight: 400; /* Peso regular para melhor legibilidade */
+}
+
+/* Ajuste do padding-bottom do body */
+body {
+    padding-bottom: 60px;
+}
+
+/* Versão mobile */
+@media (max-width: 768px) {
+    .site-footer {
+        padding: 0.7rem 0; /* Leve ajuste */
+    }
+    
+    .copyright {
+        font-size: 0.85rem; /* Um pouco maior no mobile */
+    }
+    
+    body {
+        padding-bottom: 55px;
+    }
+}
