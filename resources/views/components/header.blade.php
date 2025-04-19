@@ -33,7 +33,7 @@
 
     <!-- Perfil -->
     <a href="" class="profile">
-    <img src="{{ asset('images/logo.png') }}" class="profile-img"/>
+        <img src="{{ asset('images/logo.png') }}" class="profile-img" />
         <span class="profile-name">Caio</span>
     </a>
 
@@ -44,8 +44,11 @@
     </a>
 
     <!-- Botão de Logout -->
-    <a href="">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Sair</span>
-    </a>
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" class="logout-button">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Sair</span>
+        </button>
+    </form>
 </header>

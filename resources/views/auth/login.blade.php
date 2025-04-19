@@ -15,8 +15,17 @@
         <div class="lado-direito">
             <h1>Login</h1>
             <h2>Faça login no NiceJobs</h2>
+            
+            <!-- Mensagens de Sucesso -->
+            @if(session('success'))
+                <div class="alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+            
+            <!-- Mensagens de Erro -->
             @if($errors->any())
-                <div style="color: red;">
+                <div class="alert-error">
                     <ul>
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -24,17 +33,25 @@
                     </ul>
                 </div>
             @endif
-            <form action="{{ route('login') }}" method="POST">
+            
+            <form action="{{ route('login.post') }}" method="POST">
                 @csrf
-                <input type="text" name="email" placeholder="Digite seu email" required>
-                <input type="password" name="senha" placeholder="Digite sua senha" required>
+                <input type="email" name="email" placeholder="Digite seu email" required value="{{ old('email') }}">
+                <input type="password" name="password" placeholder="Digite sua senha" required>
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">Lembrar de mim</label>
+                </div>
                 <button type="submit">Entrar</button>
             </form>
 
             <div class="separador"></div>
             
             <div class="cadastro-container">
-                <p>Não tem uma conta? <a href="">Cadastre-se</a></p>
+                <p>Não tem uma conta? 
+                    <a href="{{ route('register.provider.form') }}">Sou Prestador</a> ou 
+                    <a href="{{ route('register.custom-user.form') }}">Sou Cliente</a>
+                </p>
             </div>
         </div>
     </div>

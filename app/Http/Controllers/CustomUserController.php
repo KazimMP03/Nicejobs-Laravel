@@ -21,8 +21,8 @@ class CustomUserController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'phone' => 'required|string',
             'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'birth_date' => 'nullable|date',
-            'foundation_date' => 'nullable|date',
+            'birth_date' => 'nullable|date|required_if:user_type,PF',
+            'foundation_date' => 'nullable|date|required_if:user_type,PJ',
             'status' => 'required|boolean',
             'addresses' => 'nullable|array',
             'addresses.*.cep' => 'required|string',
@@ -32,18 +32,24 @@ class CustomUserController extends Controller
             'addresses.*.cidade' => 'required|string',
             'addresses.*.estado' => 'required|string',
             'addresses.*.complemento' => 'nullable|string',
+        ], [
+            'birth_date.required_if' => 'A data de nascimento é obrigatória para pessoa física',
+            'foundation_date.required_if' => 'A data de fundação é obrigatória para pessoa jurídica',
+            'tax_id.unique' => 'Este CPF/CNPJ já está cadastrado',
+            'email.unique' => 'Este e-mail já está em uso'
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return redirect()
+                ->back()
+                ->withErrors($validator)
+                ->withInput();
         }
 
         $data = $validator->validated();
         
         // Criptografa a senha antes de armazenar
         $data['password'] = Hash::make($data['password']);
-        
-        // Remove o campo password_confirmation se existir
         unset($data['password_confirmation']);
 
         // Upload da foto de perfil
@@ -62,12 +68,8 @@ class CustomUserController extends Controller
             }
         }
 
-        // Remove a senha da resposta
-        $customUser->makeHidden(['password']);
-
-        return response()->json([
-            'message' => 'User created successfully',
-            'data' => $customUser
-        ], 201);
+        return redirect()
+            ->route('login')
+            ->with('success', 'Cadastro realizado com sucesso! Faça login para continuar.');
     }
 }

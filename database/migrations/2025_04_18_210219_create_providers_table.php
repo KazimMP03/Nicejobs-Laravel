@@ -25,6 +25,7 @@ class CreateProvidersTable extends Migration
             $table->text('service_description'); // Descrição do Serviço
             $table->integer('work_radius'); // Distância em km
             $table->json('availability'); // ou use uma tabela separada se quiser algo mais detalhado
+            $table->rememberToken();  // Adicionado para funcionalidade "Lembrar-me"
             $table->timestamps();
         });
     }
