@@ -1,0 +1,154 @@
+/* ======================= */
+/* COMUM: BODY E CONTAINER */
+/* ======================= */
+
+/* Definições gerais do corpo da página */
+body {
+    font-family: Arial, sans-serif; /* Definindo a fonte padrão do corpo */
+    background-color: #F9F9F9; /* Cor de fundo clara para o corpo */
+    display: flex; /* Usando Flexbox para layout */
+    justify-content: center; /* Centraliza horizontalmente o conteúdo */
+    align-items: center; /* Centraliza verticalmente o conteúdo */
+    height: 100vh; /* O corpo ocupa toda a altura da janela */
+    margin: 0; /* Remover margens padrão */
+}
+
+/* Container principal que envolve todo o conteúdo */
+.container {
+    display: flex; /* Usando Flexbox para organizar os elementos dentro do container */
+    background-color: #ffffff; /* Cor de fundo branca */
+    border: 1px solid #ddd; /* Borda fina e clara */
+    border-radius: 8px; /* Bordas arredondadas */
+    overflow: hidden; /* Impede que o conteúdo transborde do container */
+    width: 500px; /* Largura fixa de 500px */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave ao redor do container */
+}
+
+/* ============= */
+/* LADO ESQUERDO */
+/* ============= */
+
+/* Estiliza o lado esquerdo do container (35% da largura) */
+.lado-esquerdo {
+    display: flex; /* Flexbox para organização interna */
+    flex-direction: column; /* Organiza os itens verticalmente */
+    align-items: center; /* Alinha os itens no centro horizontalmente */
+    background-color: #2c3e50; /* Cor de fundo azul escuro */
+    padding: 20px; /* Espaçamento interno de 20px */
+    width: 35%; /* O lado esquerdo ocupa 35% da largura do container */
+}
+
+/* Estilo do título (h1) no lado esquerdo */
+.lado-esquerdo h1 {
+    color: white; /* Cor do texto branca */
+    margin-bottom: 10px; /* Margem inferior de 10px */
+    font-size: 24px; /* Tamanho da fonte */
+}
+
+/* Estilo da imagem circular no lado esquerdo */
+.lado-esquerdo img {
+    width: 110px; /* Largura da imagem */
+    height: 110px; /* Altura da imagem */
+    border-radius: 50%; /* Torna a imagem circular */
+    object-fit: cover; /* Ajusta a imagem para cobrir a área sem distorção */
+    margin-top: 30%; /* Margem superior de 30% para distanciamento */
+}
+
+/* ============ */
+/* LADO DIREITO */
+/* ============ */
+
+/* Estiliza o lado direito do container (65% da largura) */
+.lado-direito {
+    display: flex; /* Flexbox para organizar os elementos internamente */
+    flex-direction: column; /* Organiza os itens verticalmente */
+    justify-content: center; /* Alinha os itens verticalmente ao centro */
+    padding: 20px; /* Espaçamento interno de 20px */
+    width: 65%; /* O lado direito ocupa 65% da largura do container */
+}
+
+/* Estilo do título principal (h1) no lado direito */
+.lado-direito h1 {
+    font-size: 27px; /* Tamanho da fonte maior */
+    margin-bottom: 2px; /* Margem inferior de 2px */
+    color: #000000; /* Cor do texto preta */
+}
+
+/* Estilos para subtítulos no lado direito */
+.lado-direito h2 {
+    color: black; /* Cor do texto preta */
+    font-size: 16px; /* Tamanho da fonte */
+    margin-bottom: 20px; /* Espaçamento abaixo do subtítulo */
+    font-weight: 400; /* Peso da fonte (normal) */
+    letter-spacing: 0.5px; /* Espaçamento entre letras */
+}
+
+/* Estilo do formulário dentro do lado direito */
+.lado-direito form {
+    display: flex; /* Flexbox para organizar os campos do formulário */
+    flex-direction: column; /* Organiza os campos em coluna */
+    gap: 15px; /* Espaçamento entre os campos */
+}
+
+/* Estilo dos campos de input, botões e selects no lado direito */
+.lado-direito input, .lado-direito button, .lado-direito select {
+    padding: 10px; /* Espaçamento interno de 10px */
+    font-size: 16px; /* Tamanho de fonte de 16px */
+    border-radius: 8px; /* Bordas arredondadas */
+    border: 1px solid #ddd; /* Borda fina e clara */
+    width: 100%; /* Preenche toda a largura disponível */
+    box-sizing: border-box; /* Considera o padding e border no cálculo da largura */
+}
+
+/* Estilo do botão no lado direito */
+.lado-direito button {
+    background-color: #2c3e50; /* Azul escuro para o botão */
+    color: #fff; /* Texto branco */
+    font-weight: 550; /* Peso da fonte mais forte */
+    font-size: 16px; /* Tamanho da fonte */
+    padding: 10px; /* Espaçamento interno de 10px */
+    border-radius: 8px; /* Bordas arredondadas */
+    border: 1px solid #ddd; /* Borda fina e clara */
+    width: 100%; /* Preenche toda a largura disponível */
+    box-sizing: border-box; /* Considera o padding e border no cálculo da largura */
+}
+
+/* Efeito de hover para o botão */
+.lado-direito button:hover {
+    background-color: #1d2b36; /* Azul claro para o hover */
+    cursor: pointer; /* Muda o cursor para indicar que é clicável */
+}
+
+/* ========================== */
+/* LINK PARA TELA DE CADASTRO */
+/* ========================== */
+
+/* Estiliza a seção de cadastro */
+.cadastro-container {
+    text-align: center; /* Alinha o texto ao centro */
+}
+
+/* Estilo do parágrafo no link de cadastro */
+.cadastro-container p {
+    font-size: 14px; /* Tamanho da fonte pequeno */
+}
+
+/* Estilo do link para a tela de cadastro */
+.cadastro-container a {
+    color: #2c3e50; /* Azul escuro do link */
+    text-decoration: none; /* Remove o sublinhado do link */
+    font-weight: bold; /* Torna o texto em negrito */
+}
+
+/* Efeito de hover no link de cadastro */
+.cadastro-container a:hover {
+    text-decoration: none; /* Garante que o sublinhado não apareça */
+    color: #1d2b36; /* Azul mais claro para o hover do link */
+}
+
+/* Estilo do separador entre seções no lado direito */
+.lado-direito .separador {
+    margin: 20px 0; /* Margem superior e inferior de 20px */
+    border-bottom: 1px solid #ddd; /* Linha separadora com borda inferior */
+    width: 100%; /* Largura total */
+}
