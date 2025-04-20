@@ -116,38 +116,73 @@ body, html {
     margin-right: 30px;
 }
 
-.logout {
-    margin-right: 20px;
+/* Botão de Logout */
+.logout-form {
+    margin-left: 15px;
+}
+
+.logout-button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 25px;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+.logout-button i {
+    font-size: 20px;
 }
 
 /* Responsividade */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     .header {
         flex-wrap: wrap;
-        justify-content: center;
         padding: 15px;
+        gap: 15px;
     }
-
+    
     .search-container {
+        order: 1;
         width: 100%;
         margin: 10px 0;
+        max-width: 100%;
     }
-
-    .profile-name {
-        display: none; /* Oculta o nome do usuário para economizar espaço */
+    
+    .profile-name, .header-link span {
+        display: none;
+    }
+    
+    .header-link, .logout-button {
+        padding: 10px;
     }
 }
 
-@media (max-width: 480px) {
-    .header a span {
-        display: none; /* Apenas ícones serão exibidos em telas menores */
+@media (max-width: 576px) {
+    .header {
+        justify-content: space-around;
     }
-
-    .search-bar {
-        font-size: 14px;
+    
+    .logo {
+        margin-right: 0;
     }
-
-    .search-button {
-        font-size: 14px;
+    
+    .header-nav {
+        gap: 10px;
+    }
+    
+    .profile {
+        margin-left: 0;
     }
 }

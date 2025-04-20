@@ -12,9 +12,9 @@
     </div>
 
     <!-- Endereços -->
-    <a href="" class="address">
+    <a href="{{ route('addresses.index') }}" class="nav-link">
         <i class="fas fa-map-marker-alt"></i>
-        <span>Endereços</span>
+        <span class="nav-text">Endereços</span>
     </a>
 
     <!-- Chat -->
