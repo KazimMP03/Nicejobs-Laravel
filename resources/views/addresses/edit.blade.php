@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <link rel="stylesheet" href="{{ asset('css/edit-address.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/address/edit.css') }}">
     <div class="address-container">
         <div class="form-header">
             <h1 class="form-title">Editar Endereço</h1>

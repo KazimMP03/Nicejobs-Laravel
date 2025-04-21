@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <link rel="stylesheet" href="{{ asset('css/create-address.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/address/create.css') }}">
 
     <div class="address-container">
         <div class="form-header">
