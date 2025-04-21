@@ -25,6 +25,7 @@ class CustomUser extends Model
     // Adicione isso para ocultar o password nos arrays/JSON
     protected $hidden = [
         'password',
+        'remember_token',
     ];
     
     /**
