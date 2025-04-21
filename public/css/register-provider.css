@@ -1,0 +1,302 @@
+/* ======================= */
+/* ESTILOS GERAIS DO FORMULÁRIO */
+/* ======================= */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #F9F9F9;
+    padding: 20px;
+    padding-bottom: 100px; /* Espaço para o footer */
+}
+
+.register-container {
+    max-width: 900px;
+    margin: 30px auto;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.register-header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 25px;
+    text-align: center;
+}
+
+.register-header .logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 3px solid white;
+}
+
+.register-header h2 {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.register-header p {
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+.register-body {
+    padding: 25px;
+}
+
+/* ======================= */
+/* INDICADOR DE PASSOS */
+/* ======================= */
+
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.step-indicator::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #ddd;
+    z-index: 1;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #ddd;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 8px;
+    border: 3px solid white;
+}
+
+.step-title {
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    max-width: 100px;
+}
+
+.step.active .step-number {
+    background-color: #2c3e50;
+    color: white;
+    border-color: #2c3e50;
+}
+
+.step.active .step-title {
+    color: #2c3e50;
+    font-weight: bold;
+}
+
+/* ======================= */
+/* SEÇÕES DO FORMULÁRIO */
+/* ======================= */
+
+.form-section h4 {
+    color: #2c3e50;
+    font-size: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 25px;
+}
+
+.form-section h4 i {
+    color: #2c3e50;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    font-size: 15px;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #2c3e50;
+    box-shadow: 0 0 0 0.25rem rgba(44, 62, 80, 0.25);
+}
+
+.invalid-feedback {
+    color: #c62828;
+    font-size: 14px;
+}
+
+.is-invalid {
+    border-color: #f44336;
+}
+
+.text-muted {
+    font-size: 13px;
+    color: #777 !important;
+}
+
+/* ======================= */
+/* BOTÕES */
+/* ======================= */
+
+.btn {
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background-color: #2c3e50;
+    border-color: #2c3e50;
+}
+
+.btn-primary:hover {
+    background-color: #1d2b36;
+    border-color: #1d2b36;
+}
+
+.btn-outline-secondary {
+    color: #666;
+    border-color: #ddd;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #f5f5f5;
+    border-color: #ccc;
+}
+
+.btn-success {
+    background-color: #4caf50;
+    border-color: #4caf50;
+}
+
+.btn-success:hover {
+    background-color: #3d8b40;
+    border-color: #3d8b40;
+}
+
+/* ======================= */
+/* CARD DE REVISÃO */
+/* ======================= */
+
+.card {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: none;
+}
+
+.card-title {
+    color: #2c3e50;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+/* ======================= */
+/* CHECKBOXES */
+/* ======================= */
+
+.form-check-input:checked {
+    background-color: #2c3e50;
+    border-color: #2c3e50;
+}
+
+.form-check-label {
+    font-size: 15px;
+}
+
+/* ======================= */
+/* LINKS */
+/* ======================= */
+
+a {
+    color: #2196f3;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #1d2b36;
+    text-decoration: underline;
+}
+
+/* ======================= */
+/* MODAL */
+/* ======================= */
+
+.modal-header {
+    background-color: #2c3e50;
+    color: white;
+    border-radius: 8px 8px 0 0;
+}
+
+.modal-title {
+    font-weight: 500;
+}
+
+/* ======================= */
+/* RESPONSIVIDADE */
+/* ======================= */
+
+@media (max-width: 768px) {
+    .register-container {
+        margin: 15px auto;
+        border-radius: 0;
+    }
+    
+    .step-title {
+        font-size: 12px;
+        max-width: 70px;
+    }
+    
+    .step-number {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+    
+    .register-header {
+        padding: 20px 15px;
+    }
+    
+    .register-body {
+        padding: 20px 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .step-indicator {
+        margin-bottom: 20px;
+    }
+    
+    .step-title {
+        display: none;
+    }
+    
+    .form-section h4 {
+        font-size: 18px;
+    }
+}
