@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <link rel="stylesheet" href="{{ asset('css/create-provider.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/create-address.css') }}">
+
     <div class="address-container">
         <div class="form-header">
             <h1 class="form-title">Cadastro de Endereço</h1>
@@ -13,21 +14,21 @@
 
             <!-- Linha 1 -->
             <div class="form-group">
-                <label for="cep" class="form-label">CEP*</label>
+                <label for="cep" class="form-label required">CEP</label>
                 <input id="cep" type="text" class="form-control @error('cep') is-invalid @enderror" name="cep"
                     value="{{ old('cep') }}" required oninput="formatarCEP(this)" onblur="buscarEnderecoViaCEP()">
                 @error('cep')<span class="invalid-feedback">{{ $message }}</span>@enderror
             </div>
 
             <div class="form-group">
-                <label for="logradouro" class="form-label">Logradouro*</label>
+                <label for="logradouro" class="form-label required">Logradouro</label>
                 <input id="logradouro" type="text" class="form-control @error('logradouro') is-invalid @enderror"
                     name="logradouro" value="{{ old('logradouro') }}" required>
                 @error('logradouro')<span class="invalid-feedback">{{ $message }}</span>@enderror
             </div>
 
             <div class="form-group">
-                <label for="numero" class="form-label">Número*</label>
+                <label for="numero" class="form-label required">Número</label>
                 <input id="numero" type="text" class="form-control @error('numero') is-invalid @enderror" name="numero"
                     value="{{ old('numero') }}" required>
                 @error('numero')<span class="invalid-feedback">{{ $message }}</span>@enderror
@@ -42,62 +43,47 @@
             </div>
 
             <div class="form-group">
-                <label for="bairro" class="form-label">Bairro*</label>
+                <label for="bairro" class="form-label required">Bairro</label>
                 <input id="bairro" type="text" class="form-control @error('bairro') is-invalid @enderror" name="bairro"
                     value="{{ old('bairro') }}" required>
                 @error('bairro')<span class="invalid-feedback">{{ $message }}</span>@enderror
             </div>
 
             <div class="form-group">
-                <label for="cidade" class="form-label">Cidade*</label>
+                <label for="cidade" class="form-label required">Cidade</label>
                 <input id="cidade" type="text" class="form-control @error('cidade') is-invalid @enderror" name="cidade"
                     value="{{ old('cidade') }}" required>
                 @error('cidade')<span class="invalid-feedback">{{ $message }}</span>@enderror
             </div>
 
-            <!-- Linha 3 - Versão simplificada -->
+            <!-- Linha 3 -->
             <div class="form-group">
-                <label for="estado" class="form-label">Estado*</label>
-                <select id="estado" class="form-control @error('estado') is-invalid @enderror" name="estado" required>
+                <label for="estado" class="form-label required">Estado</label>
+                <select id="estado" class="form-select @error('estado') is-invalid @enderror" name="estado" required>
                     <option value="">Selecione...</option>
-                    <option value="AC">Acre</option>
-                    <option value="AL">Alagoas</option>
-                    <option value="AP">Amapá</option>
-                    <option value="AM">Amazonas</option>
-                    <option value="BA">Bahia</option>
-                    <option value="CE">Ceará</option>
-                    <option value="DF">Distrito Federal</option>
-                    <option value="ES">Espírito Santo</option>
-                    <option value="GO">Goiás</option>
-                    <option value="MA">Maranhão</option>
-                    <option value="MT">Mato Grosso</option>
-                    <option value="MS">Mato Grosso do Sul</option>
-                    <option value="MG">Minas Gerais</option>
-                    <option value="PA">Pará</option>
-                    <option value="PB">Paraíba</option>
-                    <option value="PR">Paraná</option>
-                    <option value="PE">Pernambuco</option>
-                    <option value="PI">Piauí</option>
-                    <option value="RJ">Rio de Janeiro</option>
-                    <option value="RN">Rio Grande do Norte</option>
-                    <option value="RS">Rio Grande do Sul</option>
-                    <option value="RO">Rondônia</option>
-                    <option value="RR">Roraima</option>
-                    <option value="SC">Santa Catarina</option>
-                    <option value="SP">São Paulo</option>
-                    <option value="SE">Sergipe</option>
-                    <option value="TO">Tocantins</option>
+                    @foreach ([
+                        'AC'=>'Acre', 'AL'=>'Alagoas', 'AP'=>'Amapá', 'AM'=>'Amazonas', 'BA'=>'Bahia',
+                        'CE'=>'Ceará', 'DF'=>'Distrito Federal', 'ES'=>'Espírito Santo', 'GO'=>'Goiás',
+                        'MA'=>'Maranhão', 'MT'=>'Mato Grosso', 'MS'=>'Mato Grosso do Sul', 'MG'=>'Minas Gerais',
+                        'PA'=>'Pará', 'PB'=>'Paraíba', 'PR'=>'Paraná', 'PE'=>'Pernambuco', 'PI'=>'Piauí',
+                        'RJ'=>'Rio de Janeiro', 'RN'=>'Rio Grande do Norte', 'RS'=>'Rio Grande do Sul',
+                        'RO'=>'Rondônia', 'RR'=>'Roraima', 'SC'=>'Santa Catarina', 'SP'=>'São Paulo',
+                        'SE'=>'Sergipe', 'TO'=>'Tocantins'
+                    ] as $sigla => $estado)
+                        <option value="{{ $sigla }}" {{ old('estado') == $sigla ? 'selected' : '' }}>
+                            {{ $estado }}
+                        </option>
+                    @endforeach
                 </select>
+                @error('estado')<span class="invalid-feedback">{{ $message }}</span>@enderror
             </div>
-            @error('estado')<span class="invalid-feedback">{{ $message }}</span>@enderror
-    </div>
 
-    <!-- Botões centralizados -->
-    <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Salvar Endereço</button>
-        <a href="{{ route('addresses.index') }}" class="btn btn-secondary">Cancelar</a>
-    </div>
-    </form>
+            <!-- Botões -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <a href="{{ route('addresses.index') }}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
     </div>
 
     <script src="{{ asset('js/via-cep.js') }}"></script>

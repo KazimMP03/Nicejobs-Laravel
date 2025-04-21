@@ -1,10 +1,10 @@
-/* address-form-final-refined.css */
+/* create-address.css */
 /* ======================= */
 /* ESTRUTURA PRINCIPAL */
 /* ======================= */
 
 .address-container {
-    max-width: 900px; /* Reduzi a largura máxima */
+    max-width: 900px;
     margin: 2rem auto;
     padding: 0 1.5rem;
 }
@@ -35,8 +35,8 @@
 
 .address-form {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr)); /* Impede que os campos se estiquem demais */
-    gap: 1.5rem; /* Aumentei o espaçamento entre os campos */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
     margin-top: 1.5rem;
 }
 
@@ -56,14 +56,29 @@
     font-size: 0.9rem;
 }
 
+.form-label.required::after {
+    content: " *";
+    color: #e74c3c;
+    font-size: 1em;
+    margin-left: 2px;
+}
+
 .form-control, .form-select {
     width: 100%;
-    padding: 0.75rem; /* 12px */
+    padding: 0.75rem;
     border: 1px solid #ddd;
     border-radius: 6px;
     font-size: 0.95rem;
     transition: all 0.2s ease;
-    box-sizing: border-box; /* Garante que o padding não some à largura */
+    box-sizing: border-box;
+}
+
+.form-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: none;
+    cursor: pointer;
 }
 
 .form-control:focus, .form-select:focus {
@@ -72,25 +87,11 @@
     box-shadow: 0 0 0 2px rgba(44, 62, 80, 0.1);
 }
 
-.select-wrapper select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: none;
-    width: 100%;
-    /* Mantém o mesmo estilo dos inputs */
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    /* ... outros estilos iguais aos inputs */
-}
-
 /* ======================= */
 /* BOTÕES */
 /* ======================= */
 
 .form-actions {
-    font-weight: bold;
     grid-column: span 3;
     display: flex;
     justify-content: center;
@@ -99,25 +100,22 @@
 }
 
 .btn {
-    padding: 0.75rem 1.5rem; /* 12px 24px */
+    padding: 0.75rem 1.5rem;
     border-radius: 6px;
-    font-weight: 500;
+    font-weight: bold;
     font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.2s ease;
-    width: 180px; /* Largura igual para ambos */
+    width: 180px;
     text-align: center;
     text-decoration: none !important;
     box-sizing: border-box;
-    font-weight: bold;
 }
 
 .btn-primary {
     background-color: #2c3e50;
     color: white;
     border: none;
-    font-weight: bold;
-
 }
 
 .btn-primary:hover {
@@ -157,7 +155,7 @@
     .address-form {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .form-actions {
         grid-column: span 2;
     }
@@ -167,28 +165,28 @@
     .address-container {
         padding: 0 1rem;
     }
-    
+
     .address-form {
         grid-template-columns: 1fr;
         gap: 1.2rem;
     }
-    
+
     .form-actions {
         grid-column: span 1;
         flex-direction: column;
         align-items: center;
         gap: 0.75rem;
     }
-    
+
     .btn {
         width: 100%;
         max-width: 220px;
     }
-    
+
     .form-header {
         margin-bottom: 1.5rem;
     }
-    
+
     .form-title {
         font-size: 1.6rem;
     }
