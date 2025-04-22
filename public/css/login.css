@@ -180,13 +180,20 @@ body {
 .remember-me {
     display: flex;
     align-items: center;
-    margin: 10px 0;
+    margin: 5px 0 15px 0;
+    font-size: 14px;
+    color: #555;
 }
 
 .remember-me input {
+    width: auto;
     margin-right: 8px;
+    accent-color: #2c3e50;
 }
 
+.remember-me label {
+    cursor: pointer;
+}
 .cadastro-container a {
     color: #2196f3;
     text-decoration: none;

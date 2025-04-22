@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - NiceJobs</title>
+
+    <!-- Favicon (ícone da aba do navegador) -->
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
+    
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
 </head>
 <body>

@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>WorkHub</title>
+    <title>NiceJobs</title>
+    <!-- Favicon (ícone da aba do navegador) -->
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
 <body>
