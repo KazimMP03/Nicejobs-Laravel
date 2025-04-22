@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 class HomeController extends Controller
 {
+    /**
+     * Exibe a página inicial
+     */
     public function index()
     {
-        return view('home'); // Certifique-se de criar esta view
+        // Verifica se o usuário já está autenticado
+        if (auth()->check()) {
+            // Se o usuário estiver autenticado, redireciona para a página inicial
+            return redirect()->route('home');
+        }
+        // Se o usuário não estiver autenticado, redireciona para a página de login
+        return redirect()->route('login');
     }
 }

@@ -9,8 +9,7 @@ use Illuminate\Support\Facades\Validator;
 class AddressController extends Controller
 {
     /**
-     * Exibe a lista de endereços do usuário logado
-     * @return \Illuminate\View\View
+     * Exibe a listagem de endereços do usuário autenticado
      */
     public function index()
     {
@@ -21,8 +20,7 @@ class AddressController extends Controller
     }
 
     /**
-     * Mostra o formulário de criação de novo endereço
-     * @return \Illuminate\View\View
+     * Exibe o formulário de criação de um novo endereço
      */
     public function create()
     {
@@ -32,14 +30,13 @@ class AddressController extends Controller
 
     /**
      * Armazena um novo endereço no banco de dados
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @param Request $request
      */
     public function store(Request $request)
     {
         // Valida os dados do formulário
         $validator = Validator::make($request->all(), [
-            'cep' => 'required|string|max:9',
+            'cep' => 'required|string|max:9', // Formato: 00000-000
             'logradouro' => 'required|string|max:255',
             'bairro' => 'required|string|max:255',
             'numero' => 'required|string|max:20',
@@ -50,9 +47,8 @@ class AddressController extends Controller
 
         // Se a validação falhar, redireciona de volta com erros
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            // Retorna para a view anterior com os erros de validação
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
         // Cria um novo endereço com os dados validados
@@ -62,14 +58,12 @@ class AddressController extends Controller
         auth()->user()->addresses()->attach($address->id);
 
         // Redireciona para a listagem com mensagem de sucesso
-        return redirect()->route('addresses.index')
-            ->with('success', 'Endereço cadastrado com sucesso!');
+        return redirect()->route('addresses.index')->with('success', 'Endereço cadastrado com sucesso!');
     }
 
     /**
-     * Mostra o formulário para editar um endereço existente
-     * @param  Address  $address
-     * @return \Illuminate\View\View|\Illuminate\Http\Response
+     * Exibe o formulário de edição de um endereço existente
+     * @param Address $address
      */
     public function edit(Address $address)
     {
@@ -84,20 +78,19 @@ class AddressController extends Controller
 
     /**
      * Atualiza um endereço existente no banco de dados
-     * @param  \Illuminate\Http\Request  $request
-     * @param  Address  $address
-     * @return \Illuminate\Http\RedirectResponse
+     * @param Request $request
+     * @param Address $address
      */
     public function update(Request $request, Address $address)
     {
         // Verifica se o endereço pertence ao usuário logado
         if (!auth()->user()->addresses->contains($address->id)) {
-            abort(403, 'Acesso não autorizado');
-        }
+            abort(403, 'Acesso não autorizado'); // Retorna erro 403 se não pertencer
+        } 
 
         // Valida os dados do formulário
         $validator = Validator::make($request->all(), [
-            'cep' => 'required|string|max:9',
+            'cep' => 'required|string|max:9', // Formato: 00000-000
             'logradouro' => 'required|string|max:255',
             'bairro' => 'required|string|max:255',
             'numero' => 'required|string|max:20',
@@ -108,29 +101,26 @@ class AddressController extends Controller
 
         // Se a validação falhar, redireciona de volta com erros
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            // Retorna para a view anterior com os erros de validação
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
         // Atualiza o endereço com os dados validados
         $address->update($validator->validated());
 
         // Redireciona para a listagem com mensagem de sucesso
-        return redirect()->route('addresses.index')
-            ->with('success', 'Endereço atualizado com sucesso!');
+        return redirect()->route('addresses.index')->with('success', 'Endereço atualizado com sucesso!');
     }
 
     /**
      * Remove um endereço do banco de dados
-     * @param  Address  $address
-     * @return \Illuminate\Http\RedirectResponse
+     * @param Address $address
      */
     public function destroy(Address $address)
     {
         // Verifica se o endereço pertence ao usuário logado
         if (!auth()->user()->addresses->contains($address->id)) {
-            abort(403, 'Acesso não autorizado');
+            abort(403, 'Acesso não autorizado'); // Retorna erro 403 se não pertencer
         }
 
         // Remove a relação entre o usuário e o endereço
@@ -143,7 +133,6 @@ class AddressController extends Controller
         }
 
         // Redireciona para a listagem com mensagem de sucesso
-        return redirect()->route('addresses.index')
-            ->with('success', 'Endereço removido com sucesso!');
+        return redirect()->route('addresses.index')->with('success', 'Endereço removido com sucesso!');
     }
 }
