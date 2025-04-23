@@ -1,7 +1,9 @@
+{{-- resources/views/layouts/header.blade.php --}}
+
 <!-- FontAwesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <!-- Estilização do header -->
-<link rel="stylesheet" href="{{ asset('css/header.css') }}">
+<link rel="stylesheet" href="{{ asset('css/components/header.css') }}">
 
 <header class="header">
     <!-- Logo -->
@@ -18,9 +20,9 @@
     </a>
 
     <!-- Chat -->
-    <a href="" class="chat">
+    <a href="#" class="nav-link chat">
         <i class="fas fa-comment-alt"></i>
-        <span>Chats</span>
+        <span class="nav-text">Chats</span>
     </a>
 
     <!-- Barra de pesquisa -->
@@ -32,23 +34,25 @@
     </div>
 
     <!-- Perfil -->
-    <a href="" class="profile">
-        <img src="{{ asset('images/logo.png') }}" class="profile-img" />
-        <span class="profile-name">Caio</span>
+    <a href="#" class="nav-link profile">
+        <img src="{{ asset('images/logo.png') }}" class="profile-img" alt="Foto de perfil"/>
+        <span class="nav-text profile-name">
+            {{ strtok(auth()->user()->user_name, ' ') }}
+        </span>
     </a>
 
     <!-- Favoritos -->
-    <a href="" class="favorites">
+    <a href="#" class="nav-link favorites">
         <i class="fas fa-star"></i>
-        <span>Favoritos</span>
+        <span class="nav-text">Favoritos</span>
     </a>
 
     <!-- Botão de Logout -->
-    <form method="POST" action="{{ route('logout') }}">
+    <form method="POST" action="{{ route('logout') }}" class="logout-form">
         @csrf
-        <button type="submit" class="logout-button">
+        <button type="submit" class="logout-button nav-link">
             <i class="fas fa-sign-out-alt"></i>
-            <span>Sair</span>
+            <span class="nav-text">Sair</span>
         </button>
     </form>
 </header>

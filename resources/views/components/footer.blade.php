@@ -1,5 +1,5 @@
 <!-- Estilização do footer -->
-<link rel="stylesheet" href="{{ asset('css/footer.css') }}">
+<link rel="stylesheet" href="{{ asset('css/components/footer.css') }}">
 
 <footer class="site-footer">
     <div class="footer-content">

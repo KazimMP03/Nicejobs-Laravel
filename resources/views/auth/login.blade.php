@@ -8,7 +8,7 @@
     <!-- Favicon (ícone da aba do navegador) -->
     <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
     
-    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/auth/login.css') }}">
 </head>
 <body>
     <div class="container">
