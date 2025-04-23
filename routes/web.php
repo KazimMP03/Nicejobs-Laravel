@@ -56,6 +56,9 @@ Route::middleware('auth')->group(function () {
      Route::get('/addresses/create', [AddressController::class, 'create'])->name('addresses.create');
      Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
      
+     Route::resource('addresses', AddressController::class);
+     Route::post('/addresses/{address}/set-default', [AddressController::class, 'setDefault'])->name('addresses.setDefault');
+
      // Rotas RESTful completas (exceto visualização individual)
      Route::resource('addresses', AddressController::class)->except(['show']);
 });

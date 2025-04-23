@@ -12,6 +12,7 @@ class CreateAddressCustomUserTable extends Migration
             $table->id();
             $table->foreignId('custom_user_id')->constrained()->onDelete('cascade');
             $table->foreignId('address_id')->constrained()->onDelete('cascade');
+            $table->boolean('is_default')->default(false); // Adiciona o campo is_default na tabela Pivot
             $table->timestamps();
         });
     }

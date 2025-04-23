@@ -27,12 +27,14 @@ class CustomUser extends Model
         'password',
         'remember_token',
     ];
-    
+
     /**
      * Relação muitos-para-muitos com Address.
      */
     public function addresses()
     {
-        return $this->belongsToMany(Address::class, 'address_custom_user');
+        return $this->belongsToMany(Address::class, 'address_custom_user')
+            ->withPivot('is_default')
+            ->withTimestamps();
     }
 }

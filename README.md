@@ -1,9 +1,14 @@
 # 🎯 NiceJobs - Plataforma para conectar clientes a prestadores de serviço
 
 NiceJobs é uma aplicação web desenvolvida em Laravel com o objetivo de conectar clientes a prestadores de serviço, utilizando recursos modernos de estruturação e segurança.
-
 ---
+## ✅ Requisitos
+PHP >= 8.0
 
+Composer
+
+PostgreSQL
+---
 ## 🧱 Estrutura do Projeto
 app/ -> 
 Controladores e modelos da aplicação bootstrap/ -> 
@@ -16,7 +21,6 @@ Rotas web e API storage/ ->
 Cache, logs e uploads tests/ -> 
 Testes automatizados
 ---
-
 ## 🚀 Como Instalar e Rodar o Projeto
 
 ```bash

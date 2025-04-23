@@ -9,35 +9,56 @@ use Illuminate\Support\Facades\Validator;
 class AddressController extends Controller
 {
     /**
-     * Exibe a lista de endereços do usuário logado
+     * Exibe a lista de endereços do usuário logado.
+     *
      * @return \Illuminate\View\View
      */
     public function index()
     {
-        // Obtém todos os endereços associados ao usuário autenticado
-        $addresses = auth()->user()->addresses()->get();
-        // Retorna a view de listagem com os endereços
+        // Usuário autenticado
+        $user = auth()->user();
+
+        // Se o usuário da seção é um CustomUser ou Provider
+        if ($user instanceof \App\Models\CustomUser) {
+            // Obtém os endereços associados ao usuário e ordena por is_default
+            // Usando a tabela pivot address_custom_user
+            $addresses = $user->addresses()->withPivot('is_default')
+                ->orderByDesc('address_custom_user.is_default')->get();
+        } elseif ($user instanceof \App\Models\Provider) {
+            // Obtém os endereços associados ao usuário e ordena por is_default
+            // Usando a tabela pivot address_provider
+            $addresses = $user->addresses()->withPivot('is_default')
+                ->orderByDesc('address_provider.is_default')->get();
+        } else {
+            abort(403, 'Acesso não autorizado'); // Mensagem de erro genérica
+        }
+
+        // Retorna a view com a lista de endereços
         return view('addresses.index', compact('addresses'));
     }
 
     /**
-     * Mostra o formulário de criação de novo endereço
+     * Mostra o formulário para criação de um novo endereço.
+     *
      * @return \Illuminate\View\View
      */
     public function create()
     {
-        // Retorna a view com o formulário de criação
         return view('addresses.create');
     }
 
     /**
-     * Armazena um novo endereço no banco de dados
-     * @param  \Illuminate\Http\Request  $request
+     * Armazena um novo endereço e define a flag is_default conforme as regras:
+     * 1. Se for o primeiro, torna padrão.
+     * 2. Caso contrário, não-padrão.
+     * 3. Se for padrão, limpa qualquer outro padrão existente.
+     *
+     * @param  Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
-        // Valida os dados do formulário
+        // 1) Validação dos campos
         $validator = Validator::make($request->all(), [
             'cep' => 'required|string|max:9',
             'logradouro' => 'required|string|max:255',
@@ -48,54 +69,67 @@ class AddressController extends Controller
             'complemento' => 'nullable|string|max:255',
         ]);
 
-        // Se a validação falhar, redireciona de volta com erros
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
         }
 
-        // Cria um novo endereço com os dados validados
-        $address = Address::create($validator->validated());
-        
-        // Associa o novo endereço ao usuário logado
-        auth()->user()->addresses()->attach($address->id);
+        $data = $validator->validated();
+        $user = auth()->user();
 
-        // Redireciona para a listagem com mensagem de sucesso
+        // 2) Cria registro na tabela addresses
+        $address = Address::create($data);
+
+        // 3) Verifica existência de outros endereços
+        $hasOther = $user->addresses()->exists();
+        $isDefault = !$hasOther;
+
+        // 4) Associa via pivot e seta is_default
+        $user->addresses()->attach($address->id, ['is_default' => $isDefault]);
+
+        // 5) Se for padrão, limpa flags antigas
+        if ($isDefault) {
+            $user->addresses()
+                ->wherePivot('address_id', '!=', $address->id)
+                ->updateExistingPivot($user->addresses()->pluck('address_id')->toArray(), ['is_default' => false]);
+        }
+
         return redirect()->route('addresses.index')
             ->with('success', 'Endereço cadastrado com sucesso!');
     }
 
     /**
-     * Mostra o formulário para editar um endereço existente
+     * Formulário de edição de um endereço existente.
+     *
      * @param  Address  $address
      * @return \Illuminate\View\View|\Illuminate\Http\Response
      */
     public function edit(Address $address)
     {
-        // Verifica se o endereço pertence ao usuário logado
-        if (!auth()->user()->addresses->contains($address->id)) {
-            abort(403, 'Acesso não autorizado'); // Retorna erro 403 se não pertencer
+        $user = auth()->user();
+        if (!$user->addresses->contains($address->id)) {
+            abort(403, 'Acesso não autorizado');
         }
 
-        // Retorna a view de edição com os dados do endereço
         return view('addresses.edit', compact('address'));
     }
 
     /**
-     * Atualiza um endereço existente no banco de dados
-     * @param  \Illuminate\Http\Request  $request
+     * Atualiza um endereço e, se necessário, a lógica de is_default:
+     * - Se marcado manualmente como padrão, limpa os demais.
+     *
+     * @param  Request  $request
      * @param  Address  $address
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, Address $address)
     {
-        // Verifica se o endereço pertence ao usuário logado
-        if (!auth()->user()->addresses->contains($address->id)) {
+        $user = auth()->user();
+        if (!$user->addresses->contains($address->id)) {
             abort(403, 'Acesso não autorizado');
         }
 
-        // Valida os dados do formulário
         $validator = Validator::make($request->all(), [
             'cep' => 'required|string|max:9',
             'logradouro' => 'required|string|max:255',
@@ -104,46 +138,107 @@ class AddressController extends Controller
             'cidade' => 'required|string|max:255',
             'estado' => 'required|string|max:2',
             'complemento' => 'nullable|string|max:255',
+            'is_default' => 'sometimes|boolean',
         ]);
 
-        // Se a validação falhar, redireciona de volta com erros
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)
                 ->withInput();
         }
 
-        // Atualiza o endereço com os dados validados
-        $address->update($validator->validated());
+        $data = $validator->validated();
 
-        // Redireciona para a listagem com mensagem de sucesso
+        // Atualiza campos básicos
+        $address->update($data);
+
+        // Se marcou como padrão, limpa os demais
+        if (array_key_exists('is_default', $data) && $data['is_default']) {
+            $user->addresses()
+                ->wherePivot('address_id', '!=', $address->id)
+                ->updateExistingPivot($user->addresses()->pluck('address_id')->toArray(), ['is_default' => false]);
+            $user->addresses()->updateExistingPivot($address->id, ['is_default' => true]);
+        }
+
         return redirect()->route('addresses.index')
             ->with('success', 'Endereço atualizado com sucesso!');
     }
 
     /**
-     * Remove um endereço do banco de dados
+     * Remove um endereço e garante que sempre haja um padrão:
+     * - Se remover o padrão, o primeiro restante vira padrão.
+     *
      * @param  Address  $address
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Address $address)
     {
-        // Verifica se o endereço pertence ao usuário logado
-        if (!auth()->user()->addresses->contains($address->id)) {
+        $user = auth()->user();
+
+        // 1) Recupera o endereço via relação para ter o pivot carregado
+        $userAddress = $user
+            ->addresses()
+            ->withPivot('is_default')
+            ->find($address->id);
+
+        if (!$userAddress) {
             abort(403, 'Acesso não autorizado');
         }
 
-        // Remove a relação entre o usuário e o endereço
-        auth()->user()->addresses()->detach($address->id);
-        
-        // Verifica se o endereço não está sendo usado por outros usuários ou provedores
-        if ($address->customUsers()->count() === 0 && $address->providers()->count() === 0) {
-            // Se não estiver em uso, deleta o registro do endereço
+        // 2) Lê o flag is_default corretamente
+        $wasDefault = $userAddress->pivot->is_default;
+
+        // 3) Desanexa o endereço
+        $user->addresses()->detach($address->id);
+
+        // 4) Se era padrão, marca o próximo como padrão
+        if ($wasDefault) {
+            $next = $user->addresses()->first();
+            if ($next) {
+                $user->addresses()
+                    ->updateExistingPivot($next->id, ['is_default' => true]);
+            }
+        }
+
+        // 5) Remove o registro se não mais referenciado
+        if (
+            $address->customUsers()->count() === 0
+            && $address->providers()->count() === 0
+        ) {
             $address->delete();
         }
 
-        // Redireciona para a listagem com mensagem de sucesso
         return redirect()->route('addresses.index')
             ->with('success', 'Endereço removido com sucesso!');
     }
+
+    /**
+     * Define um endereço como padrão.
+     *
+     * @param  Address  $address
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function setDefault(Address $address)
+    {
+        // Verifica se o usuário autenticado tem acesso ao endereço
+        $user = auth()->user();
+
+        // Verifica se o endereço pertence ao usuário
+        if (!$user->addresses->contains($address->id)) {
+            abort(403, 'Acesso não autorizado'); // 403 Forbidden
+        }
+
+        // Se já for padrão, não faz nada
+        $user->addresses()->updateExistingPivot(
+            $user->addresses->pluck('id')->toArray(),
+            ['is_default' => false]
+        );
+
+        // Se não for padrão, define como padrão
+        $user->addresses()->updateExistingPivot($address->id, ['is_default' => true]);
+
+        // Retorna para a lista de endereços com mensagem de sucesso
+        return redirect()->route('addresses.index')->with('success', 'Endereço definido como padrão.');
+    }
+
 }

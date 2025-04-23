@@ -33,13 +33,15 @@ class Provider extends Authenticatable
         'password',
         'remember_token',
     ];
-    
+
     /**
      * Relação muitos-para-muitos com Address.
      */
     public function addresses()
     {
-        return $this->belongsToMany(Address::class, 'address_provider');
+        return $this->belongsToMany(Address::class, 'address_provider')
+            ->withPivot('is_default')
+            ->withTimestamps();
     }
 
     /**
