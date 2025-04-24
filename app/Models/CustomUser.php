@@ -2,35 +2,38 @@
 
 namespace App\Models;
 
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
-class CustomUser extends Model
+class CustomUser extends Authenticatable
 {
     use HasFactory;
 
     protected $fillable = [
         'user_name',
         'user_type',
-        'tax_id',
+        'tax_id', 
         'email',
         'phone',
         'password',
-        'profile_photo',
         'birth_date',
         'foundation_date',
         'status',
+        'availability'
     ];
 
-    // Adicione isso para ocultar o password nos arrays/JSON
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Relação muitos-para-muitos com Address.
-     */
+    protected $casts = [
+        'status' => 'boolean',
+        'availability' => 'array',
+        'birth_date' => 'date',
+        'foundation_date' => 'date'
+    ];
+
     public function addresses()
     {
         return $this->belongsToMany(Address::class, 'address_custom_user')

@@ -14,28 +14,35 @@ use App\Http\Controllers\AddressController;
 |--------------------------------------------------------------------------
 */
 
-// Redirecionamento raiz
-Route::get('/', function () {
-     return redirect()->route('login');
-});
+Route::redirect('/', '/login')->name('root');
 
-// Rotas de login
 Route::middleware('guest')->group(function () {
-     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    // Rotas de login
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
-     // Rotas de registro
-     Route::get('/register/custom-user', [RegisterController::class, 'showCustomUserRegistrationForm'])
-          ->name('register.custom-user.form');
+    // Rotas de registro
+    Route::prefix('register')->group(function () {
+        Route::get('/', [RegisterController::class, 'showRegistrationSelector'])
+             ->name('register.selector');
+        
+        // Cadastro de Cliente
+        Route::get('/client', [RegisterController::class, 'showCustomUserRegistrationForm'])
+             ->name('register.custom-user.form');
+        Route::post('/client', [CustomUserController::class, 'store'])
+             ->name('register.custom-user.post'); // Alterado para .post
 
-     Route::post('/register/custom-user', [CustomUserController::class, 'store'])
-          ->name('register.custom-user');
+        // Cadastro de Prestador
+        Route::get('/provider', [RegisterController::class, 'showProviderRegistrationForm'])
+             ->name('register.provider.form');
+        Route::post('/provider', [ProviderController::class, 'store'])
+             ->name('register.provider');
+    });
 
-     Route::get('/register/provider', [RegisterController::class, 'showProviderRegistrationForm'])
-          ->name('register.provider.form');
-
-     Route::post('/register/provider', [ProviderController::class, 'store'])
-          ->name('register.provider');
+    Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])
+         ->name('password.request');
+    Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])
+         ->name('password.email');
 });
 
 /*
@@ -45,36 +52,24 @@ Route::middleware('guest')->group(function () {
 */
 
 Route::middleware('auth')->group(function () {
-     // Rota de logout
-     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-     // Rota da home/dashboard
-     Route::get('/home', [HomeController::class, 'index'])->name('home');
-
-     // Gestão de endereços (rotas individuais + resource)
-     Route::get('/addresses', [AddressController::class, 'index'])->name('addresses.index');
-     Route::get('/addresses/create', [AddressController::class, 'create'])->name('addresses.create');
-     Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
-     
-     Route::resource('addresses', AddressController::class);
-     Route::post('/addresses/{address}/set-default', [AddressController::class, 'setDefault'])->name('addresses.setDefault');
-
-     // Rotas RESTful completas (exceto visualização individual)
-     Route::resource('addresses', AddressController::class)->except(['show']);
+    Route::prefix('addresses')->group(function () {
+        Route::get('/', [AddressController::class, 'index'])->name('addresses.index');
+        Route::get('/create', [AddressController::class, 'create'])->name('addresses.create');
+        Route::post('/', [AddressController::class, 'store'])->name('addresses.store');
+        Route::post('/{address}/set-default', [AddressController::class, 'setDefault'])
+             ->name('addresses.setDefault');
+        Route::delete('/{address}', [AddressController::class, 'destroy'])
+             ->name('addresses.destroy');
+    });
 });
 
-/*
-|--------------------------------------------------------------------------
-| Redirecionamentos Personalizados
-|--------------------------------------------------------------------------
-*/
+Route::get('/dashboard', fn() => redirect()->route('home'));
 
-// Redirecionamento após login bem-sucedido
-Route::get('/dashboard', function () {
-     return redirect()->route('home');
+Route::fallback(function () {
+    return auth()->check() 
+        ? redirect()->route('home')
+        : redirect()->route('login');
 });
-
-// Redirecionamento após registro bem-sucedido
-Route::get('/register/success', function () {
-     return redirect()->route('login')->with('success', 'Cadastro realizado com sucesso! Faça login para continuar.');
-})->name('register.success');

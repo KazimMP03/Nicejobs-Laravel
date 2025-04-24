@@ -1,0 +1,89 @@
+.register-container {
+    max-width: 800px;
+    margin: 30px auto;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.register-header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 25px;
+    text-align: center;
+}
+
+.register-header .logo {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 15px;
+}
+
+.register-header h2 {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.register-body {
+    padding: 25px;
+}
+
+.password-toggle {
+    position: relative;
+}
+
+.password-toggle .form-control {
+    padding-right: 40px;
+}
+
+.password-toggle-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6c757d;
+    z-index: 2;
+    cursor: pointer;
+    padding: 0 8px;
+}
+
+.password-toggle-icon i {
+    font-size: 1rem;
+}
+
+.conditional-field {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+.invalid-feedback {
+    color: #dc3545;
+    font-size: 0.875em;
+}
+
+.form-check-input.is-invalid {
+    border-color: #dc3545;
+}
+
+@media (max-width: 768px) {
+    .register-container {
+        margin: 15px;
+        border-radius: 0;
+    }
+    
+    .register-header {
+        padding: 20px 15px;
+    }
+    
+    .register-body {
+        padding: 20px 15px;
+    }
+}
