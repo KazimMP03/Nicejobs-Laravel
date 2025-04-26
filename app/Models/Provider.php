@@ -22,8 +22,6 @@ class Provider extends Authenticatable
         'foundation_date',
         'status',
         'provider_description',
-        'service_category',
-        'service_description',
         'work_radius',
         'availability',
     ];
@@ -32,6 +30,13 @@ class Provider extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+    ];
+
+    protected $casts = [
+        'availability' => 'string',
+        'status'       => 'boolean',
+        'birth_date'   => 'date',
+        'foundation_date' => 'date',
     ];
 
     /**

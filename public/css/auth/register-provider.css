@@ -133,14 +133,16 @@ body {
     margin-bottom: 5px;
 }
 
-.form-control, .form-select {
+.form-control,
+.form-select {
     border-radius: 8px;
     border: 1px solid #ddd;
     padding: 10px;
     font-size: 15px;
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
     border-color: #2c3e50;
     box-shadow: 0 0 0 0.25rem rgba(44, 62, 80, 0.25);
 }
@@ -151,12 +153,40 @@ body {
 }
 
 .is-invalid {
-    border-color: #f44336;
+    border-color: #f44336 !important;
 }
 
 .text-muted {
     font-size: 13px;
     color: #777 !important;
+}
+
+/* ======================= */
+/* RADIO E CHECKBOXES */
+/* ======================= */
+
+.form-check {
+    margin-bottom: 15px;
+}
+
+.form-check-input {
+    width: 20px;
+    height: 20px;
+    margin-top: 0.25rem;
+}
+
+.form-check-input:checked {
+    background-color: #2c3e50;
+    border-color: #2c3e50;
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.25rem rgba(44, 62, 80, 0.25);
+}
+
+.form-check-label {
+    font-size: 15px;
+    margin-left: 8px;
 }
 
 /* ======================= */
@@ -214,19 +244,6 @@ body {
     color: #2c3e50;
     font-size: 18px;
     margin-bottom: 15px;
-}
-
-/* ======================= */
-/* CHECKBOXES */
-/* ======================= */
-
-.form-check-input:checked {
-    background-color: #2c3e50;
-    border-color: #2c3e50;
-}
-
-.form-check-label {
-    font-size: 15px;
 }
 
 /* ======================= */

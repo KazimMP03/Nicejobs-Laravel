@@ -21,10 +21,10 @@ class CreateProvidersTable extends Migration
             $table->date('foundation_date')->nullable(); // Data de Fundação (se PJ)
             $table->boolean('status')->default(true); // Ativo ou Inativo
             $table->text('provider_description'); // Descrição do Prestador
-            $table->string('service_category'); // Categoria de Serviço
-            $table->text('service_description'); // Descrição do Serviço
             $table->integer('work_radius'); // Distância em km
-            $table->json('availability'); // ou use uma tabela separada se quiser algo mais detalhado
+            // Enum para disponibilidade (dias úteis, finais de semana ou ambos)
+            $table->enum('availability', ['weekdays', 'weekend', 'both'])
+                ->default('weekdays')->comment('Disponibilidade: dias úteis, finais de semana ou ambos'); 
             $table->rememberToken();  // Adicionado para funcionalidade "Lembrar-me"
             $table->timestamps();
         });
