@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Provider;
+use App\Models\CustomUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -14,7 +15,8 @@ class AuthController extends Controller
      */
     public function showLogin()
     {
-        if (Auth::check()) {
+        // Se qualquer um dos guards já estiver logado, redireciona
+        if (Auth::guard('web')->check() || Auth::guard('custom')->check()) {
             return redirect()->route('home');
         }
         
@@ -26,30 +28,44 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        // 1) validação
         $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string|min:8'
+            'email'    => 'required|email',
+            'password' => 'required|string|min:8',
         ], [
-            'email.required' => 'O campo e-mail é obrigatório.',
-            'email.email' => 'Por favor, insira um e-mail válido.',
+            'email.required'    => 'O campo e-mail é obrigatório.',
+            'email.email'       => 'Por favor, insira um e-mail válido.',
             'password.required' => 'O campo senha é obrigatório.',
-            'password.min' => 'A senha deve ter pelo menos 8 caracteres.'
+            'password.min'      => 'A senha deve ter pelo menos 8 caracteres.',
         ]);
 
-        $user = Provider::where('email', $credentials['email'])->first();
+        // 2) tenta achar primeiro na tabela providers
+        $user  = Provider::where('email', $credentials['email'])->first();
+        $guard = 'web';
 
-        if (!$user) {
-            return back()->withErrors(['email' => 'Email não cadastrado']);
+        // 3) se não achar, tenta na tabela custom_users
+        if (! $user) {
+            $user  = CustomUser::where('email', $credentials['email'])->first();
+            $guard = 'custom';
         }
 
+        // 4) se não encontrar em nenhum, erro de e-mail
+        if (! $user) {
+            return back()->withErrors([
+                'email' => 'Email não cadastrado.'
+            ]);
+        }
+
+        // 5) verifica senha e faz login com o guard correspondente
         if (Hash::check($credentials['password'], $user->password)) {
-            Auth::login($user, $request->filled('remember'));
+            Auth::guard($guard)->login($user, $request->filled('remember'));
             $request->session()->regenerate();
-            
+
             return redirect()->route('home')
-                ->with('success', 'Login realizado com sucesso!');
+                             ->with('success', 'Login realizado com sucesso!');
         }
 
+        // 6) credenciais inválidas
         return back()
             ->withInput($request->only('email', 'remember'))
             ->withErrors([
@@ -58,15 +74,17 @@ class AuthController extends Controller
     }
 
     /**
-     * Processa o logout do usuário
+     * Processa o logout do usuário (tanto provider quanto custom)
      */
     public function logout(Request $request)
     {
-        Auth::logout();
+        Auth::guard('web')->logout();
+        Auth::guard('custom')->logout();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         
         return redirect()->route('login')
-            ->with('status', 'Você saiu da sua conta com sucesso.');
+                         ->with('status', 'Você saiu da conta com sucesso.');
     }
 }
