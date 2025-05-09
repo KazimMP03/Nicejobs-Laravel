@@ -56,4 +56,12 @@ class Provider extends Authenticatable
     {
         return $this->hasMany(Portfolio::class);
     }
+
+    /**
+     * Relação um-para-muitos com Service.
+     */
+    public function services()
+    {
+        return $this->hasMany(Service::class);
+    }
 }
