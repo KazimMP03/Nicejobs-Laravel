@@ -28,8 +28,6 @@ class ProviderController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'phone' => 'required|string',
 
-            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-
             'birth_date' => 'nullable|date|required_if:user_type,PF',
             'foundation_date' => 'nullable|date|required_if:user_type,PJ',
 

@@ -10,8 +10,6 @@ class AddressController extends Controller
 {
     /**
      * Exibe a lista de endereços do usuário logado.
-     *
-     * @return \Illuminate\View\View
      */
     public function index()
     {
@@ -39,8 +37,6 @@ class AddressController extends Controller
 
     /**
      * Mostra o formulário para criação de um novo endereço.
-     *
-     * @return \Illuminate\View\View
      */
     public function create()
     {
@@ -52,9 +48,6 @@ class AddressController extends Controller
      * 1. Se for o primeiro, torna padrão.
      * 2. Caso contrário, não-padrão.
      * 3. Se for padrão, limpa qualquer outro padrão existente.
-     *
-     * @param  Request  $request
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
@@ -101,9 +94,6 @@ class AddressController extends Controller
 
     /**
      * Formulário de edição de um endereço existente.
-     *
-     * @param  Address  $address
-     * @return \Illuminate\View\View|\Illuminate\Http\Response
      */
     public function edit(Address $address)
     {
@@ -118,10 +108,6 @@ class AddressController extends Controller
     /**
      * Atualiza um endereço e, se necessário, a lógica de is_default:
      * - Se marcado manualmente como padrão, limpa os demais.
-     *
-     * @param  Request  $request
-     * @param  Address  $address
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, Address $address)
     {
@@ -167,9 +153,6 @@ class AddressController extends Controller
     /**
      * Remove um endereço e garante que sempre haja um padrão:
      * - Se remover o padrão, o primeiro restante vira padrão.
-     *
-     * @param  Address  $address
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Address $address)
     {
@@ -214,9 +197,6 @@ class AddressController extends Controller
 
     /**
      * Define um endereço como padrão.
-     *
-     * @param  Address  $address
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function setDefault(Address $address)
     {

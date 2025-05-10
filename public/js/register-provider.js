@@ -81,7 +81,6 @@ function updateReviewSection() {
     document.getElementById('review-name').textContent = `Nome: ${document.getElementById('user_name').value}`;
     document.getElementById('review-email').textContent = `E-mail: ${document.getElementById('email').value}`;
 
-    // Formata o CPF/CNPJ para exibição
     const taxId = document.getElementById('tax_id').value;
     const isPF = document.getElementById('user_type').value === 'PF';
     document.getElementById('review-tax-id').textContent = isPF
@@ -91,15 +90,23 @@ function updateReviewSection() {
     document.getElementById('review-phone').textContent = `Telefone: ${document.getElementById('phone').value}`;
 
     // Dados profissionais
-    document.getElementById('review-service-category').textContent =
-        `Categoria: ${document.getElementById('service_category').options[document.getElementById('service_category').selectedIndex].text}`;
     document.getElementById('review-work-radius').textContent =
         `Raio de atendimento: ${document.getElementById('work_radius').value} km`;
 
-    // Descrição
+    const availabilityMap = {
+        weekdays: 'Dias de semana',
+        weekends: 'Finais de semana',
+        both: 'Ambos'
+    };
+    const availabilityValue = document.querySelector('input[name="availability"]:checked')?.value || '';
+    document.getElementById('review-availability').textContent =
+        `Disponibilidade: ${availabilityMap[availabilityValue] || 'Não informado'}`;
+
+    // Sobre você
     document.getElementById('review-description').textContent =
         document.getElementById('provider_description').value;
 }
+
 
 // Controle do tipo de pessoa (PF/PJ)
 document.getElementById('user_type').addEventListener('change', function () {

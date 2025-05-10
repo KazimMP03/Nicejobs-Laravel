@@ -229,7 +229,7 @@
 
     <!-- Bootstrap JS e dependências -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('js/register-custom-user.js') }}"></script>
+    <script src="{{ asset('js/register-provider.js') }}"></script>
 </body>
 
 </html>

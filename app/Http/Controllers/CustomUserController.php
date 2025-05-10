@@ -24,31 +24,17 @@ class CustomUserController extends Controller
             'tax_id'          => 'required|string|unique:custom_users,tax_id',
             'email'           => 'required|email|unique:custom_users,email',
             'password'        => 'required|string|min:8|confirmed',
-            'phone'           => 'required|string|min:10|max:11',
+            'phone'           => 'required|string',
 
             'birth_date'      => 'nullable|date|required_if:user_type,PF',
-            'foundation_date' => 'nullable|date|required_if:user_type,PJ',
-
-            'availability'    => ['required', Rule::in(['weekdays', 'weekends', 'both'])],
-            'terms'           => 'required|accepted',
-
-            'addresses'                => 'nullable|array',
-            'addresses.*.cep'          => 'required|string|max:9',
-            'addresses.*.logradouro'   => 'required|string|max:255',
-            'addresses.*.bairro'       => 'required|string|max:255',
-            'addresses.*.numero'       => 'required|string|max:20',
-            'addresses.*.cidade'       => 'required|string|max:255',
-            'addresses.*.estado'       => 'required|string|max:2',
-            'addresses.*.complemento'  => 'nullable|string|max:255',
+            'foundation_date' => 'nullable|date|required_if:user_type,PJ',   
+            
+            'status' => 'required|boolean',
         ], [
             'birth_date.required_if'       => 'A data de nascimento é obrigatória para PF.',
             'foundation_date.required_if'  => 'A data de fundação é obrigatória para PJ.',
             'tax_id.unique'                => 'Este CPF/CNPJ já está cadastrado.',
             'email.unique'                 => 'Este e-mail já está em uso.',
-            'terms.required'               => 'Você deve aceitar os termos de serviço.',
-            'availability.in'              => 'Disponibilidade inválida. Use: weekdays, weekends ou both.',
-            'phone.min'                    => 'O telefone deve ter no mínimo 10 dígitos.',
-            'phone.max'                    => 'O telefone deve ter no máximo 11 dígitos.',
         ]);
 
         // Retorna com erros se a validação falhar
@@ -67,17 +53,7 @@ class CustomUserController extends Controller
         // 3) Cria o cliente
         $customUser = CustomUser::create($data);
 
-        // 4) Associa endereços e marca o primeiro como padrão
-        if (!empty($data['addresses'])) {
-            foreach ($data['addresses'] as $index => $addrData) {
-                $address = Address::create($addrData);
-                $customUser->addresses()->attach($address->id, [
-                    'is_default' => ($index === 0),
-                ]);
-            }
-        }
-
-        // 5) Redireciona ao login
+        // 4) Redireciona ao login
         return redirect()->route('login')
                          ->with('success', 'Cadastro realizado com sucesso! Faça login para continuar.');
     }
