@@ -27,20 +27,15 @@ Route::middleware('guest')->group(function () {
 
     // Registro
     Route::prefix('register')->group(function () {
-        Route::get('/', [RegisterController::class, 'showRegistrationSelector'])
-             ->name('register.selector');
+        Route::get('/', [RegisterController::class, 'showRegistrationSelector'])->name('register.selector');
 
         // Cliente
-        Route::get('/client', [RegisterController::class, 'showCustomUserRegistrationForm'])
-             ->name('register.custom-user.form');
-        Route::post('/client', [CustomUserController::class, 'store'])
-             ->name('register.custom-user.post');
+        Route::get('/client', [RegisterController::class, 'showCustomUserRegistrationForm'])->name('register.custom-user.form');
+        Route::post('/client', [CustomUserController::class, 'store'])->name('register.custom-user.post');
 
         // Prestador
-        Route::get('/provider', [RegisterController::class, 'showProviderRegistrationForm'])
-             ->name('register.provider.form');
-        Route::post('/provider', [ProviderController::class, 'store'])
-             ->name('register.provider');
+        Route::get('/provider', [RegisterController::class, 'showProviderRegistrationForm'])->name('register.provider.form');
+        Route::post('/provider', [ProviderController::class, 'store'])->name('register.provider');
     });
 
     // Recuperação de senha
@@ -72,14 +67,24 @@ Route::middleware('auth:web,custom')->group(function () {
     // Home
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-    // Endereços
+    // Endereços (gerenciados após o cadastro)
     Route::prefix('addresses')->group(function () {
         Route::get('/', [AddressController::class, 'index'])->name('addresses.index');
         Route::get('/create', [AddressController::class, 'create'])->name('addresses.create');
         Route::post('/', [AddressController::class, 'store'])->name('addresses.store');
+        Route::get('/{address}/edit', [AddressController::class, 'edit'])->name('addresses.edit'); // ✅ Corrigido
+        Route::put('/{address}', [AddressController::class, 'update'])->name('addresses.update'); // ✅ Corrigido
         Route::post('/{address}/set-default', [AddressController::class, 'setDefault'])->name('addresses.setDefault');
         Route::delete('/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
     });
+
+    // Gerenciamento de categorias do Provider (após cadastro)
+    Route::get('/provider/categories', [ProviderController::class, 'editCategories'])->name('provider.categories.edit');
+    Route::post('/provider/categories', [ProviderController::class, 'updateCategories'])->name('provider.categories.update');
+
+    // Foto de perfil do Provider (edição separada)
+    Route::get('/provider/profile', [ProviderController::class, 'editProfile'])->name('provider.profile.edit');
+    Route::post('/provider/profile/photo', [ProviderController::class, 'updateProfilePhoto'])->name('provider.profile.photo');
 
     // Categorias de Serviço
     Route::resource('service-categories', ServiceCategoryController::class)->except(['show']);

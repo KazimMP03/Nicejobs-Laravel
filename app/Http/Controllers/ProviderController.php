@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Provider;
 use App\Models\Address;
+use App\Models\ServiceCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -20,47 +21,35 @@ class ProviderController extends Controller
     {
         // 1. Validação dos dados do prestador e endereços vinculados
         $validator = Validator::make($request->all(), [
-            'user_name'            => 'required|string|max:255',
-            'user_type'            => 'required|in:PF,PJ',
-            'tax_id'               => 'required|string|unique:providers,tax_id',
-            'email'                => 'required|email|unique:providers,email',
-            'password'             => 'required|string|min:8|confirmed',
-            'phone'                => 'required|string|min:10|max:11',
+            'user_name' => 'required|string|max:255',
+            'user_type' => 'required|in:PF,PJ',
+            'tax_id' => 'required|string|unique:providers,tax_id',
+            'email' => 'required|email|unique:providers,email',
+            'password' => 'required|string|min:8|confirmed',
+            'phone' => 'required|string',
 
-            'profile_photo'        => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
 
-            'birth_date'           => 'nullable|date|required_if:user_type,PF',
-            'foundation_date'      => 'nullable|date|required_if:user_type,PJ',
+            'birth_date' => 'nullable|date|required_if:user_type,PF',
+            'foundation_date' => 'nullable|date|required_if:user_type,PJ',
 
-            'status'               => 'required|boolean',
+            'status' => 'required|boolean',
             'provider_description' => 'required|string',
-            'work_radius'          => 'required|integer|min:1',
+            'work_radius' => 'required|integer|min:1',
 
-            'availability'         => ['required', Rule::in(['weekdays', 'weekends', 'both'])],
-
-            // Endereços vinculados (se fornecidos)
-            'addresses'                => 'nullable|array',
-            'addresses.*.cep'          => 'required|string|max:9',
-            'addresses.*.logradouro'   => 'required|string|max:255',
-            'addresses.*.bairro'       => 'required|string|max:255',
-            'addresses.*.numero'       => 'required|string|max:20',
-            'addresses.*.cidade'       => 'required|string|max:255',
-            'addresses.*.estado'       => 'required|string|max:2',
-            'addresses.*.complemento'  => 'nullable|string|max:255',
+            'availability' => ['required', Rule::in(['weekdays', 'weekends', 'both'])],
         ], [
             // Mensagens customizadas
-            'availability.in'             => 'Disponibilidade inválida. Escolha “weekdays”, “weekends” ou “both”.',
-            'birth_date.required_if'      => 'A data de nascimento é obrigatória para PF.',
+            'availability.in' => 'Disponibilidade inválida. Escolha “weekdays”, “weekends” ou “both”.',
+            'birth_date.required_if' => 'A data de nascimento é obrigatória para PF.',
             'foundation_date.required_if' => 'A data de fundação é obrigatória para PJ.',
-            'phone.min'                   => 'O telefone deve ter no mínimo 10 dígitos.',
-            'phone.max'                   => 'O telefone deve ter no máximo 11 dígitos.',
         ]);
 
         // Retorna com erros se a validação falhar
         if ($validator->fails()) {
             return redirect()->back()
-                             ->withErrors($validator)
-                             ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
         // 2. Preparação dos dados validados para persistência
@@ -68,28 +57,88 @@ class ProviderController extends Controller
         $data['password'] = Hash::make($data['password']);
         unset($data['password_confirmation']); // segurança
 
-        // 3. Armazenamento da imagem de perfil (se enviada)
-        if ($request->hasFile('profile_photo')) {
-            $data['profile_photo'] = $request
-                ->file('profile_photo')
-                ->store('profile_photos', 'public');
-        }
+        // 3. Criação do prestador no banco
+        Provider::create($data);
 
-        // 4. Criação do prestador no banco
-        $provider = Provider::create($data);
-
-        // 5. Associa os endereços fornecidos ao prestador (marcando o primeiro como padrão)
-        if (!empty($data['addresses'])) {
-            foreach ($data['addresses'] as $index => $addressData) {
-                $address = Address::create($addressData);
-                $provider->addresses()->attach($address->id, [
-                    'is_default' => ($index === 0),
-                ]);
-            }
-        }
-
-        // 6. Redirecionamento com feedback
+        // 4. Redirecionamento com feedback
         return redirect()->route('login')
-                         ->with('success', 'Cadastro realizado com sucesso! Faça login para continuar.');
+            ->with('success', 'Cadastro realizado com sucesso! Faça login para continuar.');
+    }
+
+    /**
+     * Exibe o formulário para atualizar a foto de perfil do Provider.
+     */
+    public function editProfile()
+    {
+        $provider = auth()->user();
+
+        if (!($provider instanceof Provider)) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        return view('providers.edit-profile', compact('provider'));
+    }
+
+    /**
+     * Atualiza a foto de perfil do Provider autenticado.
+     */
+    public function updateProfilePhoto(Request $request)
+    {
+        $provider = auth()->user();
+
+        if (!($provider instanceof Provider)) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        $request->validate([
+            'profile_photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $path = $request->file('profile_photo')->store('profile_photos', 'public');
+
+        $provider->update(['profile_photo' => $path]);
+
+        return redirect()->route('provider.profile.edit')->with('success', 'Foto de perfil atualizada com sucesso.');
+    }
+
+
+    /**
+     * Exibe o formulário para que o Provider selecione suas categorias de serviço.
+     * A funcionalidade é exclusiva para usuários autenticados como Provider.
+     */
+    public function editCategories(Request $request)
+    {
+        $provider = auth()->user();
+
+        // Impedir acesso de outros tipos de usuário
+        if (!($provider instanceof Provider)) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        $categories = ServiceCategory::all();
+
+        return view('providers.edit-categories', compact('provider', 'categories'));
+    }
+
+    /**
+     * Atualiza as categorias associadas ao Provider autenticado.
+     * Apenas associa ou desassocia categorias existentes.
+     */
+    public function updateCategories(Request $request)
+    {
+        $provider = auth()->user();
+
+        if (!($provider instanceof Provider)) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        $request->validate([
+            'categories' => 'required|array',
+            'categories.*' => 'exists:service_categories,id',
+        ]);
+
+        $provider->categories()->sync($request->categories);
+
+        return redirect()->route('home')->with('success', 'Categorias atualizadas com sucesso!');
     }
 }
