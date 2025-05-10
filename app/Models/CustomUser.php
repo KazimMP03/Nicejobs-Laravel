@@ -29,15 +29,26 @@ class CustomUser extends Authenticatable
 
     protected $casts = [
         'status' => 'boolean',
-        'availability' => 'array',
+        'availability' => 'string',
         'birth_date' => 'date',
         'foundation_date' => 'date'
     ];
 
+    /**
+     * Relação muitos-para-muitos com Address.
+     */
     public function addresses()
     {
         return $this->belongsToMany(Address::class, 'address_custom_user')
             ->withPivot('is_default')
             ->withTimestamps();
+    }
+
+    /**
+     * Relação de um-para-muitos com Review.
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 }

@@ -15,8 +15,20 @@ class ServiceCategory extends Model
         'description',
     ];
 
+    /**
+     * Relação um-para-muitos com Service.
+     */
     public function services()
     {
         return $this->hasMany(Service::class);
     }
+
+    /**
+     * Relação de muitos-para-muitos com Providers
+     */
+    public function providers()
+    {
+        return $this->belongsToMany(Provider::class, 'category_provider')->withTimestamps();
+    }
+
 }

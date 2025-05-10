@@ -34,10 +34,18 @@ class Provider extends Authenticatable
 
     protected $casts = [
         'availability' => 'string',
-        'status'       => 'boolean',
-        'birth_date'   => 'date',
+        'status' => 'boolean',
+        'birth_date' => 'date',
         'foundation_date' => 'date',
     ];
+
+    /**
+     * Metódo auxilar para verificar a viabilidade de um prestador nos finais de semana.
+     */
+    public function isAvailableOnWeekends()
+    {
+        return $this->availability === 'weekends' || $this->availability === 'both';
+    }
 
     /**
      * Relação muitos-para-muitos com Address.
@@ -64,4 +72,29 @@ class Provider extends Authenticatable
     {
         return $this->hasMany(Service::class);
     }
+
+    /**
+     * Relação de muitos-para-muitos com ServiceCategory.
+     */
+    public function categories()
+    {
+        return $this->belongsToMany(ServiceCategory::class, 'category_provider')->withTimestamps();
+    }
+
+    /**
+     * Relação de um-para-muitos com Review.
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Método para buscar a avaliação média do Provider.
+     */
+    public function averageRating(): float
+    {
+        return round($this->reviews()->avg('rating') ?? 0, 1);
+    }
+
 }
