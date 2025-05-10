@@ -65,7 +65,8 @@ Route::middleware('auth:web,custom')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // Home
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/home', fn () => view('home'))->name('home');
+
 
     // Endereços (gerenciados após o cadastro)
     Route::prefix('addresses')->group(function () {
