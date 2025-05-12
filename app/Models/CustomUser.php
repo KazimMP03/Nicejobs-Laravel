@@ -19,7 +19,6 @@ class CustomUser extends Authenticatable
         'birth_date',
         'foundation_date',
         'status',
-        'availability'
     ];
 
     protected $hidden = [

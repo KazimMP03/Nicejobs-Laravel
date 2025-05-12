@@ -27,16 +27,18 @@ Route::middleware('guest')->group(function () {
 
     // Registro
     Route::prefix('register')->group(function () {
-        Route::get('/', [RegisterController::class, 'showRegistrationSelector'])->name('register.selector');
+        // Página de seleção de tipo de registro (cliente ou prestador)
+        Route::get('/', fn() => view('auth.register-selector'))->name('register.selector');
 
         // Cliente
-        Route::get('/client', [RegisterController::class, 'showCustomUserRegistrationForm'])->name('register.custom-user.form');
+        Route::get('/client', fn() => view('auth.register-custom-user'))->name('register.custom-user.form');
         Route::post('/client', [CustomUserController::class, 'store'])->name('register.custom-user.post');
 
         // Prestador
-        Route::get('/provider', [RegisterController::class, 'showProviderRegistrationForm'])->name('register.provider.form');
+        Route::get('/provider', fn() => view('auth.register-provider'))->name('register.provider.form');
         Route::post('/provider', [ProviderController::class, 'store'])->name('register.provider');
     });
+
 
     // Recuperação de senha
     Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
@@ -65,7 +67,7 @@ Route::middleware('auth:web,custom')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // Home
-    Route::get('/home', fn () => view('home'))->name('home');
+    Route::get('/home', fn() => view('home'))->name('home');
 
 
     // Endereços (gerenciados após o cadastro)
@@ -106,7 +108,7 @@ Route::middleware('auth:web,custom')->group(function () {
 | Redirecionamentos e fallback
 |--------------------------------------------------------------------------
 */
-Route::get('/dashboard', fn () => redirect()->route('home'));
+Route::get('/dashboard', fn() => redirect()->route('home'));
 
 Route::fallback(function () {
     return auth('web')->check() || auth('custom')->check()

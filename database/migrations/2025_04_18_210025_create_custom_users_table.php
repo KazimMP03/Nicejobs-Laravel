@@ -21,7 +21,6 @@ class CreateCustomUsersTable extends Migration
             $table->date('foundation_date')->nullable(); // Data de Abertura (se PJ)
             $table->boolean('status')->default(true); // Ativo ou Inativo
             $table->rememberToken();  // Adicionado para funcionalidade "Lembrar-me"
-            $table->json('availability'); // ou use uma tabela separada se quiser algo mais detalhado
             $table->timestamps();
         });
     }
