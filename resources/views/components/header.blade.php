@@ -33,12 +33,18 @@
         </button>
     </div>
 
-    <!-- Perfil -->
+    <!-- Perfil (CustomUser ou Provider) -->
+    @php
+        $user = auth('web')->user() ?? auth('custom')->user();
+        $profileName = $user ? strtok($user->user_name, ' ') : 'Perfil';
+        $profilePhoto = ($user && method_exists($user, 'getAttribute')) 
+            ? ($user->getAttribute('profile_photo') ? asset('storage/' . $user->profile_photo) : asset('images/logo.png'))
+            : asset('images/logo.png');
+    @endphp
+
     <a href="#" class="nav-link profile">
-        <img src="{{ asset('images/logo.png') }}" class="profile-img" alt="Foto de perfil"/>
-        <span class="nav-text profile-name">
-            {{ strtok(auth()->user()->user_name, ' ') }}
-        </span>
+        <img src="{{ $profilePhoto }}" class="profile-img" alt="Foto de perfil"/>
+        <span class="nav-text profile-name">{{ $profileName }}</span>
     </a>
 
     <!-- Favoritos -->
@@ -56,3 +62,4 @@
         </button>
     </form>
 </header>
+
