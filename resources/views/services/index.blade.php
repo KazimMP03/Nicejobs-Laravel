@@ -1,10 +1,11 @@
-{{-- resources/views/services/index.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
 <div class="container">
     <h1>Meus Serviços</h1>
-    <a href="{{ route('services.create') }}" class="btn btn-primary mb-3">Novo Serviço</a>
+
+    {{-- Removeu o botão de criar serviço --}}
+    {{-- <a href="{{ route('services.create') }}" class="btn btn-primary mb-3">Novo Serviço</a> --}}
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -25,7 +26,7 @@
             <tr>
                 <td>{{ $service->title }}</td>
                 <td>{{ $service->category->name }}</td>
-                <td>{{ number_format($service->price,2,',','.') }}</td>
+                <td>{{ number_format($service->price, 2, ',', '.') }}</td>
                 <td>{{ ucfirst($service->status) }}</td>
                 <td>
                     <a href="{{ route('services.edit', $service) }}" class="btn btn-sm btn-warning">Editar</a>

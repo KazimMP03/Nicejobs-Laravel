@@ -9,11 +9,19 @@ use Illuminate\Http\Request;
 class ServiceController extends Controller
 {
     /**
-     * Exibe todos os serviços com os relacionamentos carregados (categoria e provedor).
+     * Exibe todos os serviços do Provider logado.
      */
     public function index()
     {
-        $services = Service::with(['provider', 'category'])->get();
+        $provider = auth('web')->user();
+
+        if (!$provider instanceof \App\Models\Provider) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        $services = Service::with('category')
+            ->where('provider_id', $provider->id)
+            ->get();
 
         return view('services.index', compact('services'));
     }
@@ -23,7 +31,12 @@ class ServiceController extends Controller
      */
     public function create()
     {
-        // Recupera todas as categorias para o select do formulário
+        $provider = auth('web')->user();
+
+        if (!$provider instanceof \App\Models\Provider) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
         $categories = ServiceCategory::all();
 
         return view('services.create', compact('categories'));
@@ -34,7 +47,12 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
-        // Validação dos dados do formulário
+        $provider = auth('web')->user();
+
+        if (!$provider instanceof \App\Models\Provider) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
         $data = $request->validate([
             'service_category_id' => 'required|exists:service_categories,id',
             'title'               => 'required|string|max:255',
@@ -42,11 +60,9 @@ class ServiceController extends Controller
             'price'               => 'required|numeric|min:0',
         ]);
 
-        // Define o provedor logado como dono do serviço e status inicial como pendente
-        $data['provider_id'] = auth()->id();
+        $data['provider_id'] = $provider->id;
         $data['status']      = Service::STATUS_PENDING;
 
-        // Cria o novo serviço
         Service::create($data);
 
         return redirect()->route('services.index')
@@ -58,7 +74,12 @@ class ServiceController extends Controller
      */
     public function edit(Service $service)
     {
-        // Recupera todas as categorias para possibilitar edição
+        $provider = auth('web')->user();
+
+        if (!$provider instanceof \App\Models\Provider || $service->provider_id !== $provider->id) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
         $categories = ServiceCategory::all();
 
         return view('services.edit', compact('service', 'categories'));
@@ -69,7 +90,12 @@ class ServiceController extends Controller
      */
     public function update(Request $request, Service $service)
     {
-        // Validação dos dados atualizados
+        $provider = auth('web')->user();
+
+        if (!$provider instanceof \App\Models\Provider || $service->provider_id !== $provider->id) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
         $data = $request->validate([
             'service_category_id' => 'required|exists:service_categories,id',
             'title'               => 'required|string|max:255',
@@ -83,7 +109,6 @@ class ServiceController extends Controller
             ]),
         ]);
 
-        // Atualiza o serviço com os novos dados
         $service->update($data);
 
         return redirect()->route('services.index')
@@ -95,6 +120,12 @@ class ServiceController extends Controller
      */
     public function destroy(Service $service)
     {
+        $provider = auth('web')->user();
+
+        if (!$provider instanceof \App\Models\Provider || $service->provider_id !== $provider->id) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
         $service->delete();
 
         return redirect()->route('services.index')

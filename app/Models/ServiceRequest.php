@@ -13,6 +13,7 @@ class ServiceRequest extends Model
     public const STATUS_PENDING = 'pending';
     public const STATUS_ACCEPTED = 'accepted';
     public const STATUS_REJECTED = 'rejected';
+    public const STATUS_COMPLETED = 'completed';
 
     protected $fillable = [
         'custom_user_id',
@@ -40,6 +41,11 @@ class ServiceRequest extends Model
     public function isRejected(): bool
     {
         return $this->status === self::STATUS_REJECTED;
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->status === self::STATUS_COMPLETED;
     }
 
     public function customUser()

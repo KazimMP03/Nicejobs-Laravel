@@ -104,7 +104,7 @@ class ProviderController extends Controller
      * Exibe o formulário para que o Provider selecione suas categorias de serviço.
      * A funcionalidade é exclusiva para usuários autenticados como Provider.
      */
-    public function editCategories(Request $request)
+    public function showCategories(Request $request)
     {
         $provider = auth()->user();
 
@@ -115,7 +115,7 @@ class ProviderController extends Controller
 
         $categories = ServiceCategory::all();
 
-        return view('providers.edit-categories', compact('provider', 'categories'));
+        return view('providers.show-categories', compact('provider', 'categories'));
     }
 
     /**
