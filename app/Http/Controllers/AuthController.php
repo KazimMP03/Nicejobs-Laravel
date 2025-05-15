@@ -33,9 +33,9 @@ class AuthController extends Controller
             'email'    => 'required|email',
             'password' => 'required|string|min:8',
         ], [
-            'email.required'    => 'O campo e-mail é obrigatório.',
-            'email.email'       => 'Por favor, insira um e-mail válido.',
-            'password.required' => 'O campo senha é obrigatório.',
+            'email.required'    => 'O campo E-mail é obrigatório.',
+            'email.email'       => 'Por favor, insira um E-mail válido.',
+            'password.required' => 'O campo Senha é obrigatório.',
             'password.min'      => 'A senha deve ter pelo menos 8 caracteres.',
         ]);
 
