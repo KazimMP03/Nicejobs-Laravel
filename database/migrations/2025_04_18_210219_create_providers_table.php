@@ -23,7 +23,7 @@ class CreateProvidersTable extends Migration
             $table->text('provider_description'); // Descrição do Prestador
             $table->integer('work_radius'); // Distância em km
             // Enum para disponibilidade (dias úteis, finais de semana ou ambos)
-            $table->enum('availability', ['weekdays', 'weekend', 'both'])
+            $table->enum('availability', ['weekdays', 'weekends', 'both'])
                 ->default('weekdays')->comment('Disponibilidade: dias úteis, finais de semana ou ambos'); 
             $table->rememberToken();  // Adicionado para funcionalidade "Lembrar-me"
             $table->timestamps();
