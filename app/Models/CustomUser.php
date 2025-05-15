@@ -44,6 +44,14 @@ class CustomUser extends Authenticatable
     }
 
     /**
+     * Relação um-para-muitos com ServiceRequest
+     */
+    public function serviceRequests()
+    {
+        return $this->hasMany(ServiceRequest::class);
+    }
+
+    /**
      * Relação de um-para-muitos com Review.
      */
     public function reviews()

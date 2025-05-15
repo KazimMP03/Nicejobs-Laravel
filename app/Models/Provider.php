@@ -66,14 +66,6 @@ class Provider extends Authenticatable
     }
 
     /**
-     * Relação um-para-muitos com Service.
-     */
-    public function services()
-    {
-        return $this->hasMany(Service::class);
-    }
-
-    /**
      * Relação de muitos-para-muitos com ServiceCategory.
      */
     public function categories()
@@ -88,6 +80,16 @@ class Provider extends Authenticatable
     {
         return $this->hasMany(Review::class);
     }
+
+    /**
+     * Relação de um-para-muitos com ServiceRequest.
+     * O Provider recebe várias solicitações.
+     */
+    public function serviceRequests()
+    {
+        return $this->hasMany(ServiceRequest::class);
+    }
+
 
     /**
      * Método para buscar a avaliação média do Provider.

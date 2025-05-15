@@ -16,14 +16,6 @@ class ServiceCategory extends Model
     ];
 
     /**
-     * Relação um-para-muitos com Service.
-     */
-    public function services()
-    {
-        return $this->hasMany(Service::class);
-    }
-
-    /**
      * Relação de muitos-para-muitos com Providers
      */
     public function providers()
