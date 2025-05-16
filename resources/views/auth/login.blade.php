@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Icon Font Stylesheet -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -31,11 +31,9 @@
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
 </head>
 
-
-
 <body class="bg-white">
-
     <div class="container-xxl position-relative bg-white d-flex p-0">
+
         <!-- Spinner Start -->
         <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
@@ -53,49 +51,51 @@
                             <a href="" class="">
                                 <img src="{{ asset('images/logo_big_rect_round.png') }}" alt="NiceJob Logo" style="height: 45px;">
                             </a>
-                                <h3 class="mb-0 fw-bold text-secondary">Login</h3>
+                            <h3 class="mb-0 fw-bold text-secondary">Login</h3>
                         </div>
-                                   <!-- Mensagens de Sucesso -->
-            @if(session('success'))
-<div class="alert alert-success mb-3 text-center">
-    {{ session('success') }}
-</div>
 
-            @endif
-<!-- Mensagens de Erro -->
-@if($errors->any())
-    <div class="alert alert-danger mb-3 py-2 px-3 text-center">
-        <ul class="mb-0 d-inline-block text-start text-center" style="list-style: none; padding-left: 0;">
-            @foreach($errors->all() as $error)
-                <li class="my-1">{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+                        <!-- Mensagens de Sucesso -->
+                        @if(session('success'))
+                        <div class="alert alert-success mb-3 text-center">
+                            {{ session('success') }}
+                        </div>
+                        @endif
 
+                        <!-- Mensagens de Erro -->
+                        @if($errors->any())
+                        <div class="alert alert-danger mb-3 py-2 px-3 text-center">
+                            <ul class="mb-0 d-inline-block text-start text-center" style="list-style: none; padding-left: 0;">
+                                @foreach($errors->all() as $error)
+                                <li class="my-1">{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        @endif
+
+                        <!-- Formulário -->
                         <form action="{{ route('login.post') }}" method="POST">
-@csrf
-<div class="form-floating mb-3">
-                            <input type="email" name="email" class="form-control" id="floatingInput" placeholder="nome@exemplo.com" value="{{ old('email') }}">
-                            <label for="floatingInput">E-mail</label>
-                        </div>
-                        <div class="form-floating mb-2">
-                            <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Digite aqui sua senha.">
-                            <label for="floatingPassword">Senha</label>
+                            @csrf
+                            <div class="form-floating mb-3">
+                                <input type="email" name="email" class="form-control" id="floatingInput" placeholder="nome@exemplo.com" value="{{ old('email') }}">
+                                <label for="floatingInput">E-mail</label>
+                            </div>
+                            <div class="form-floating mb-2">
+                                <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Digite aqui sua senha.">
+                                <label for="floatingPassword">Senha</label>
                                 <span class="position-absolute top-50 end-0 translate-middle-y me-3" style="cursor: pointer;" onclick="togglePassword()">
                                     <i class="fa fa-eye" id="togglePasswordIcon"></i>
                                 </span>
-                        </div>
-                       <div class="d-flex align-items-center justify-content-between mb-4">
-    <div class="form-check">
-        <input type="checkbox" class="form-check-input" id="remember" name="remember">
-        <label class="form-check-label" for="remember" style="font-size: 14px;">Manter conectado</label>
-    </div>
-    <a href="" style="font-size: 14px;">Perdeu a senha?</a>
-</div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                                    <label class="form-check-label" for="remember" style="font-size: 14px;">Manter conectado</label>
+                                </div>
+                                <a href="" style="font-size: 14px;">Perdeu a senha?</a>
+                            </div>
 
-                        <button type="submit" class="btn btn-primary py-3 w-100 mb-4 fw-bold fs-5">Entrar</button>
- </form>
+                            <button type="submit" class="btn btn-primary py-3 w-100 mb-4 fw-bold fs-5">Entrar</button>
+                        </form>
                         <p class="text-center mb-0" style="font-size: 15px;"> Ainda não tem uma conta? Cadastre-se como <a href="{{ route('register.provider.form') }}" class="fw-bold" style="font-size: 17px;">PRESTADOR</a> ou como <a href="{{ route('register.custom-user.form') }}" class="fw-bold" style="font-size: 17px;">CLIENTE</a>.
                         </p>
                     </div>
@@ -103,6 +103,7 @@
             </div>
         </div>
         <!-- Sign In End -->
+
     </div>
 
     <!-- JavaScript Libraries -->
@@ -115,9 +116,8 @@
     <script src="lib/tempusdominus/js/moment.min.js"></script>
     <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
     <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
-
-    <!-- Template Javascript -->
     <script src="{{ asset('js/main.js') }}"></script>
+    
 </body>
 
-</html> 
+</html>
