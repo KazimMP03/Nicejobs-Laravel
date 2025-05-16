@@ -4,9 +4,10 @@
 <head>
     <meta charset="utf-8">
     <title>NiceJob - Login</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="keywords" content="serviços, contratação, autônomos, plataforma, NiceJob, prestadores">
-    <meta name="description" content="Plataforma para contratar prestadores de serviço com segurança, avaliações e agilidade. Encontre o profissional ideal no NiceJob!.">
+    <meta name="description"
+        content="Plataforma para contratar prestadores de serviço com segurança, avaliações e agilidade. Encontre o profissional ideal no NiceJob.">
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('images/logo_favicon.png') }}">
@@ -35,7 +36,8 @@
     <div class="container-xxl position-relative bg-white d-flex p-0">
 
         <!-- Spinner Start -->
-        <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div id="spinner"
+            class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                 <span class="sr-only">Carregando...</span>
             </div>
@@ -49,7 +51,8 @@
                     <div class="bg-light rounded p-4 p-sm-5 my-4 mx-3">
                         <div class="d-flex align-items-center justify-content-between mb-4">
                             <a href="" class="">
-                                <img src="{{ asset('images/logo_big_rect_round.png') }}" alt="NiceJob Logo" style="height: 45px;">
+                                <img src="{{ asset('images/logo_big_rect_round.png') }}" alt="NiceJob Logo"
+                                    style="height: 45px;">
                             </a>
                             <h3 class="mb-0 fw-bold text-secondary">Login</h3>
                         </div>
@@ -64,7 +67,8 @@
                         <!-- Mensagens de Erro -->
                         @if($errors->any())
                         <div class="alert alert-danger mb-3 py-2 px-3 text-center">
-                            <ul class="mb-0 d-inline-block text-start text-center" style="list-style: none; padding-left: 0;">
+                            <ul class="mb-0 d-inline-block text-start text-center"
+                                style="list-style: none; padding-left: 0;">
                                 @foreach($errors->all() as $error)
                                 <li class="my-1">{{ $error }}</li>
                                 @endforeach
@@ -76,27 +80,35 @@
                         <form action="{{ route('login.post') }}" method="POST">
                             @csrf
                             <div class="form-floating mb-3">
-                                <input type="email" name="email" class="form-control" id="floatingInput" placeholder="nome@exemplo.com" value="{{ old('email') }}">
+                                <input type="email" name="email" class="form-control" id="floatingInput"
+                                    placeholder="nome@exemplo.com" value="{{ old('email') }}">
                                 <label for="floatingInput">E-mail</label>
                             </div>
                             <div class="form-floating mb-2">
-                                <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Digite aqui sua senha.">
+                                <input type="password" name="password" class="form-control" id="floatingPassword"
+                                    placeholder="Digite aqui sua senha.">
                                 <label for="floatingPassword">Senha</label>
-                                <span class="position-absolute top-50 end-0 translate-middle-y me-3" style="cursor: pointer;" onclick="togglePassword()">
+                                <span class="position-absolute top-50 end-0 translate-middle-y me-3"
+                                    style="cursor: pointer;" onclick="togglePassword()">
                                     <i class="fa fa-eye" id="togglePasswordIcon"></i>
                                 </span>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mb-4">
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                                    <label class="form-check-label" for="remember" style="font-size: 14px;">Manter conectado</label>
+                                    <label class="form-check-label" for="remember" style="font-size: 14px;">Manter
+                                        conectado</label>
                                 </div>
                                 <a href="" style="font-size: 14px;">Perdeu a senha?</a>
                             </div>
 
                             <button type="submit" class="btn btn-primary py-3 w-100 mb-4 fw-bold fs-5">Entrar</button>
                         </form>
-                        <p class="text-center mb-0" style="font-size: 15px;"> Ainda não tem uma conta? Cadastre-se como <a href="{{ route('register.provider.form') }}" class="fw-bold" style="font-size: 17px;">PRESTADOR</a> ou como <a href="{{ route('register.custom-user.form') }}" class="fw-bold" style="font-size: 17px;">CLIENTE</a>.
+                        <p class="text-center mb-0" style="font-size: 15px;"> Ainda não tem uma conta? Cadastre-se como
+                            <a href="{{ route('register.provider.form') }}" class="fw-bold"
+                                style="font-size: 17px;">PRESTADOR</a> ou como <a
+                                href="{{ route('register.custom-user.form') }}" class="fw-bold"
+                                style="font-size: 17px;">CLIENTE</a>.
                         </p>
                     </div>
                 </div>
@@ -117,7 +129,7 @@
     <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
     <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
     <script src="{{ asset('js/main.js') }}"></script>
-    
+
 </body>
 
 </html>

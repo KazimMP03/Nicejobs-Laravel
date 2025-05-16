@@ -2,25 +2,42 @@
 /* ESTILOS GERAIS DO FORMULÁRIO */
 /* ======================= */
 
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    /* bloqueia a rolagem */
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #F9F9F9;
-    padding: 20px;
-    padding-bottom: 100px; /* Espaço para o footer */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    padding: 0 30px;
+}
+
+.page-wrapper {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 0;
+    /* para respiro vertical também, opcional */
 }
 
 .register-container {
     max-width: 900px;
-    margin: 30px auto;
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-height: 95vh;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    padding: 20px;
 }
 
 .register-header {
-    background-color: #2c3e50;
+    background-color: #f8f9fa;
     color: white;
     padding: 25px;
     text-align: center;
@@ -283,22 +300,22 @@ a:hover {
         margin: 15px auto;
         border-radius: 0;
     }
-    
+
     .step-title {
         font-size: 12px;
         max-width: 70px;
     }
-    
+
     .step-number {
         width: 30px;
         height: 30px;
         font-size: 14px;
     }
-    
+
     .register-header {
         padding: 20px 15px;
     }
-    
+
     .register-body {
         padding: 20px 15px;
     }
@@ -308,11 +325,11 @@ a:hover {
     .step-indicator {
         margin-bottom: 20px;
     }
-    
+
     .step-title {
         display: none;
     }
-    
+
     .form-section h4 {
         font-size: 18px;
     }
