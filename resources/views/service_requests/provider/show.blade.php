@@ -19,9 +19,14 @@
                 <p><strong>Valor Final Acordado:</strong> R$ {{ number_format($serviceRequest->final_price, 2, ',', '.') }}</p>
             @endif
 
-            <p><strong>Status:</strong> <span class="badge bg-{{ $serviceRequest->status === 'requested' ? 'secondary' : ($serviceRequest->status === 'chat_opened' ? 'info' : 'success') }}">
-                {{ ucfirst($serviceRequest->status) }}
-            </span></p>
+            <p><strong>Status:</strong> 
+                <span class="badge bg-{{ 
+                    $serviceRequest->status === 'requested' ? 'secondary' : 
+                    ($serviceRequest->status === 'chat_opened' ? 'info' : 'success') 
+                }}">
+                    {{ ucfirst($serviceRequest->status) }}
+                </span>
+            </p>
         </div>
     </div>
 
@@ -44,19 +49,27 @@
             <form action="{{ route('service-requests.update', $serviceRequest->id) }}" method="POST">
                 @csrf
                 @method('PUT')
-                <input type="hidden" name="action" value="open_chat">
+                <input type="hidden" name="status" value="chat_opened">
                 <button type="submit" class="btn btn-info">Abrir Chat</button>
             </form>
 
             <form action="{{ route('service-requests.update', $serviceRequest->id) }}" method="POST">
                 @csrf
                 @method('PUT')
-                <input type="hidden" name="action" value="reject">
+                <input type="hidden" name="status" value="rejected">
                 <button type="submit" class="btn btn-danger">Rejeitar Solicitação</button>
             </form>
         </div>
     @elseif($serviceRequest->isChatOpened())
-        <a href="{{ route('chat.open', $serviceRequest->id) }}" class="btn btn-primary">Ir para o Chat</a>
+        @php
+            $chat = \App\Models\Chat::where('service_request_id', $serviceRequest->id)->first();
+        @endphp
+
+        @if($chat)
+            <a href="{{ route('chat.show', $chat->id) }}" class="btn btn-primary">Ir para o Chat</a>
+        @else
+            <span class="text-danger">Chat não encontrado.</span>
+        @endif
     @endif
 </div>
 @endsection
