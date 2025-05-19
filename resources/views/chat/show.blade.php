@@ -21,37 +21,64 @@
                 <div class="chat-bubble">
                     @if ($msg->type === 'text' || $msg->type === 'emoji')
                         {{ $msg->message }}
+                    
                     @elseif ($msg->type === 'image')
                         <img src="{{ asset('storage/' . $msg->file_path) }}" class="chat-image" onclick="openImage('{{ asset('storage/' . $msg->file_path) }}')">
+
                     @elseif ($msg->type === 'file')
                         @php
                             $ext = pathinfo($msg->original_name, PATHINFO_EXTENSION);
+                            $sizeKb = $msg->size ? number_format($msg->size / 1024, 0) . ' KB' : '';
+                            $desc = match(strtolower($ext)) {
+                                'pdf' => 'Documento PDF',
+                                'doc', 'docx' => 'Documento do Word',
+                                'xls', 'xlsx' => 'Planilha do Excel',
+                                'ppt', 'pptx' => 'Apresentação do PowerPoint',
+                                'txt' => 'Arquivo de texto',
+                                'zip', 'rar', '7z' => 'Arquivo compactado',
+                                'json', 'xml', 'csv' => 'Arquivo de dados',
+                                default => strtoupper($ext) . ' file'
+                            };
                             $icon = match(strtolower($ext)) {
-                                'pdf'   => 'fa-file-pdf text-file-pdf',
+                                'pdf' => 'fa-file-pdf text-file-pdf',
                                 'doc', 'docx' => 'fa-file-word text-file-word',
                                 'xls', 'xlsx' => 'fa-file-excel text-file-excel',
                                 'ppt', 'pptx' => 'fa-file-powerpoint text-file-ppt',
                                 'zip', 'rar', '7z' => 'fa-file-archive text-file-archive',
-                                'txt'   => 'fa-file-lines text-file-text',
+                                'txt' => 'fa-file-lines text-file-text',
                                 'csv', 'xml', 'json' => 'fa-file-code text-file-code',
                                 default => 'fa-file text-file-default',
                             };
                         @endphp
-                        <div class="file-message">
-                            <i class="fas {{ $icon }}"></i>
-                            <span>{{ $msg->original_name }}</span>
-                            <div>
-                                <a href="{{ asset('storage/' . $msg->file_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">Abrir</a>
-                                <a href="{{ asset('storage/' . $msg->file_path) }}" download class="btn btn-sm btn-outline-secondary">Salvar como…</a>
+
+                        <div class="file-message-new">
+                            <div class="file-icon">
+                                <i class="fas {{ $icon }}"></i>
+                            </div>
+                            <div class="file-info">
+                                <div class="file-name" title="{{ $msg->original_name }}">
+                                    {{ \Illuminate\Support\Str::limit($msg->original_name, 40) }}
+                                </div>
+                                <div class="file-desc">{{ $desc }} • {{ $sizeKb }}</div>
+                                <div class="file-actions">
+                                    <a href="{{ asset('storage/' . $msg->file_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">Abrir</a>
+                                    <a href="{{ asset('storage/' . $msg->file_path) }}" download class="btn btn-sm btn-outline-secondary">Salvar como…</a>
+                                </div>
                             </div>
                         </div>
+
                     @elseif ($msg->type === 'audio')
                         <audio controls src="{{ asset('storage/' . $msg->file_path) }}"></audio>
+
                     @elseif ($msg->type === 'video')
                         <video controls class="chat-video">
                             <source src="{{ asset('storage/' . $msg->file_path) }}">
                         </video>
                     @endif
+
+                    <div class="bubble-time" title="{{ $msg->created_at->format('d/m/Y H:i') }}">
+                        {{ $msg->created_at->format('H:i') }}
+                    </div>
                 </div>
             </div>
         @endforeach

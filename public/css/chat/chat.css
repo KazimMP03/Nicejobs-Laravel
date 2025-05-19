@@ -134,3 +134,59 @@
 .attachment-item:hover {
     background: #e0e0e0;
 }
+
+.bubble-time {
+    font-size: 0.65rem;
+    color: #a0a0a0;
+    text-align: right;
+    margin-top: 6px;
+}
+
+.file-message-new {
+    display: flex;
+    align-items: center; /* centraliza verticalmente */
+    gap: 12px;
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #fdfdfd;
+    max-width: 100%;
+}
+
+.file-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+}
+
+.file-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.file-icon i {
+    font-size: 2.6rem; /* aumento do tamanho */
+}
+
+.file-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-desc {
+    font-size: 0.8rem;
+    color: #777;
+    margin-top: 2px;
+    margin-bottom: 6px;
+}
+
+.file-actions {
+    display: flex;
+    gap: 10px;
+}
