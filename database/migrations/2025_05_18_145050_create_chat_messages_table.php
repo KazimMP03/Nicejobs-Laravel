@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Executa as migrações.
      */
     public function up(): void
     {
@@ -19,12 +19,16 @@ return new class extends Migration
             $table->enum('type', ['text', 'emoji', 'image', 'file', 'audio', 'video']);
             $table->text('message')->nullable();
             $table->string('file_path')->nullable();
+            $table->string('original_name')->nullable();
+            $table->string('mime_type')->nullable();
+            $table->unsignedBigInteger('size')->nullable();
+            $table->unsignedInteger('duration')->nullable(); // em segundos
             $table->timestamps();
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Reverte as migrações.
      */
     public function down(): void
     {

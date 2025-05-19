@@ -1,0 +1,100 @@
+.chat-box {
+    height: 350px;
+    overflow-y: auto;
+    background: #f5f5f5;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.chat-message {
+    margin-bottom: 8px;
+    display: flex;
+}
+
+.chat-message.me {
+    justify-content: flex-end;
+}
+
+.chat-message.them {
+    justify-content: flex-start;
+}
+
+.chat-bubble {
+    background: #fff;
+    padding: 8px 12px;
+    border-radius: 16px;
+    max-width: 70%;
+}
+
+.chat-image {
+    max-height: 200px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.chat-video {
+    max-width: 100%;
+    border-radius: 10px;
+}
+
+.chat-input-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 30px;
+    background: #fff;
+}
+
+.chat-input-container input[type="text"] {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+}
+
+.chat-input-container button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.file-message {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.text-file-pdf {
+    color: #d93025; /* vermelho Google Drive PDF */
+}
+
+.text-file-word {
+    color: #2a5699; /* azul Word */
+}
+
+.text-file-excel {
+    color: #217346; /* verde Excel */
+}
+
+.text-file-ppt {
+    color: #d24726; /* laranja PowerPoint */
+}
+
+.text-file-archive {
+    color: #a77f2d; /* tom amarelado para zip */
+}
+
+.text-file-text {
+    color: #5f6368; /* cinza para txt */
+}
+
+.text-file-code {
+    color: #4a148c; /* roxo escuro */
+}
+
+.text-file-default {
+    color: #3c4043; /* cinza escuro para padrão */
+}

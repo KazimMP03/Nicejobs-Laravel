@@ -6,7 +6,6 @@ use App\Models\Chat;
 use App\Models\ChatMessage;
 use App\Models\ServiceRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class ChatController extends Controller
 {
@@ -35,17 +34,15 @@ class ChatController extends Controller
     {
         $user = auth()->user();
 
-        // Segurança: só participantes podem ver
         if ($user->id !== $serviceRequest->custom_user_id && $user->id !== $serviceRequest->provider_id) {
             abort(403, 'Acesso não autorizado.');
         }
 
-        // Cria o chat se ainda não existir
         $chat = Chat::firstOrCreate([
             'service_request_id' => $serviceRequest->id
         ]);
 
-        $messages = $chat->messages()->latest()->get();
+        $messages = $chat->messages()->oldest()->get();
 
         return view('chat.show', compact('chat', 'messages'));
     }
@@ -58,7 +55,6 @@ class ChatController extends Controller
         $user = auth()->user();
         $sr = $chat->serviceRequest;
 
-        // Segurança: só envolvidos podem enviar
         if ($user->id !== $sr->custom_user_id && $user->id !== $sr->provider_id) {
             abort(403);
         }
@@ -66,12 +62,36 @@ class ChatController extends Controller
         $data = $request->validate([
             'type' => 'required|in:text,emoji,image,file,audio,video',
             'message' => 'nullable|string|max:5000',
-            'file' => 'nullable|file|max:20480', // até 20MB
+            'file' => 'nullable|file',
         ]);
 
         $path = null;
+        $originalName = null;
+        $mimeType = null;
+        $size = null;
+        $duration = null;
+
         if ($request->hasFile('file')) {
-            $path = $request->file('file')->store('chat_files', 'public');
+            $file = $request->file('file');
+
+            // Limite em MB definido no .env
+            $maxMb = config('chat.max_upload_size_mb', 20);
+            $maxSizeBytes = $maxMb * 1024 * 1024;
+
+            if ($file->getSize() > $maxSizeBytes) {
+                return back()->withErrors([
+                    'file' => "O arquivo excede o limite de {$maxMb}MB."
+                ])->withInput();
+            }
+
+            $path = $file->store('chat_files', 'public');
+            $originalName = $file->getClientOriginalName();
+            $mimeType = $file->getMimeType();
+            $size = $file->getSize();
+
+            if (in_array($data['type'], ['audio', 'video'])) {
+                $duration = $this->getMediaDuration($file->getPathname());
+            }
         }
 
         ChatMessage::create([
@@ -81,8 +101,32 @@ class ChatController extends Controller
             'type' => $data['type'],
             'message' => $data['message'] ?? null,
             'file_path' => $path,
+            'original_name' => $originalName,
+            'mime_type' => $mimeType,
+            'size' => $size,
+            'duration' => $duration,
         ]);
 
         return redirect()->route('chat.show', $sr);
+    }
+
+    /**
+     * Retorna a duração de mídia (áudio/vídeo) em segundos usando ffprobe.
+     */
+    private function getMediaDuration(string $filePath): ?int
+    {
+        try {
+            $command = "ffprobe -v error -select_streams a:0 -show_entries stream=duration " .
+                       "-of default=noprint_wrappers=1:nokey=1 " . escapeshellarg($filePath);
+            $output = shell_exec($command);
+
+            if ($output) {
+                return (int) round((float) $output);
+            }
+        } catch (\Exception $e) {
+            // Ignorar falha silenciosamente
+        }
+
+        return null;
     }
 }

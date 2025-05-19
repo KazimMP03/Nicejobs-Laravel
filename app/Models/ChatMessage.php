@@ -10,8 +10,16 @@ class ChatMessage extends Model
     use HasFactory;
 
     protected $fillable = [
-        'chat_id', 'sender_type', 'sender_id',
-        'type', 'message', 'file_path'
+        'chat_id',
+        'sender_type',
+        'sender_id',
+        'type',
+        'message',
+        'file_path',
+        'original_name',
+        'mime_type',
+        'size',
+        'duration',
     ];
 
     public function chat()
