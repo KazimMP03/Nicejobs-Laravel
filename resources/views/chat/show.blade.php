@@ -140,9 +140,15 @@
         <button type="submit" class="btn btn-primary">Enviar</button>
       </div>
     </form>
-  </div>
+    
+    </div>
 </div>
 
+<!-- Emoji Picker -->
+<emoji-picker id="emoji-picker" style="position: absolute; bottom: 80px; left: 20px; z-index: 999; display: none;"></emoji-picker>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Emoji Picker via Web Component -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1.11.2/index.js"></script>
 <script src="{{ asset('js/chat.js') }}"></script>
 @endsection

@@ -190,3 +190,10 @@
     display: flex;
     gap: 10px;
 }
+
+emoji-picker {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    max-width: 340px;
+    max-height: 320px;
+}
