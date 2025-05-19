@@ -98,3 +98,39 @@
 .text-file-default {
     color: #3c4043; /* cinza escuro para padrão */
 }
+
+.attachment-panel {
+    position: absolute;
+    bottom: 45px;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+    z-index: 10;
+    width: 160px;
+}
+
+.attachment-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    background: #f5f5f5;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.attachment-item i {
+    font-size: 18px;
+}
+
+.attachment-item:hover {
+    background: #e0e0e0;
+}
