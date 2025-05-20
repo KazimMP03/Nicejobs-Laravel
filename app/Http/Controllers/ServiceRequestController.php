@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ServiceRequest;
 use App\Models\Provider;
 use App\Models\CustomUser;
+use App\Models\Chat;
 use Illuminate\Http\Request;
 
 class ServiceRequestController extends Controller
@@ -133,6 +134,13 @@ class ServiceRequestController extends Controller
 
         $serviceRequest->status = $data['status'];
         $serviceRequest->save();
+
+        // Cria o Chat se status for 'chat_opened'
+        if ($data['status'] === ServiceRequest::STATUS_CHAT_OPENED) {
+            Chat::firstOrCreate([
+                'service_request_id' => $serviceRequest->id
+            ]);
+        }
 
         return redirect()->route('service-requests.index')
                          ->with('success', 'Status atualizado com sucesso.');

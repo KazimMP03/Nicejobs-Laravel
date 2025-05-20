@@ -1,15 +1,16 @@
 (function ($) {
     "use strict";
 
-    // Spinner
-    var spinner = function () {
-        setTimeout(function () {
-            if ($('#spinner').length > 0) {
-                $('#spinner').removeClass('show');
-            }
-        }, 1);
-    };
-    spinner();
+// Spinner
+var spinner = function () {
+    $(window).on('load', function () {
+        if ($('#spinner').length > 0) {
+            $('#spinner').removeClass('show').addClass('d-none');
+        }
+        $('.page-wrapper').removeClass('hidden-until-loaded');
+    });
+};
+spinner();
     
     
     // Back to top button
@@ -240,3 +241,17 @@ function toggleConfirmaSenha() {
     icon.classList.toggle('fa-eye');
     icon.classList.toggle('fa-eye-slash');
 }
+
+window.addEventListener('load', function () {
+    const spinner = document.getElementById('spinner');
+    const mainContent = document.querySelector('.page-wrapper');
+
+    if (spinner) {
+        spinner.classList.remove('show');
+        spinner.classList.add('d-none'); // oculta de vez
+    }
+
+    if (mainContent) {
+        mainContent.classList.remove('hidden-until-loaded'); // mostra o conteúdo
+    }
+});

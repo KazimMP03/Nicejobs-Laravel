@@ -5,6 +5,7 @@
     <title>NiceJobs</title>
     <!-- Favicon (ícone da aba do navegador) -->
     <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
+    
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
 <body>
@@ -16,6 +17,5 @@
 
     @include('components.footer')
 
-    <script src="{{ asset('js/script.js') }}"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
  // Controle das seções do formulário
- document.querySelectorAll('.next-section').forEach(button => {
+    document.querySelectorAll('.next-section').forEach(button => {
     button.addEventListener('click', function () {
         const currentSection = this.closest('.form-section');
         const nextSectionId = this.getAttribute('data-next');
@@ -121,13 +121,13 @@ document.getElementById('user_type').addEventListener('change', function () {
 
     // Atualiza o campo de documento
     if (isPF) {
-        taxIdLabel.textContent = 'CPF*';
+        taxIdLabel.textContent = 'CPF';
         taxIdInput.placeholder = '000.000.000-00';
         taxIdHint.textContent = 'Informe seu CPF (11 dígitos)';
         document.getElementById('birth_date').required = true;
         document.getElementById('foundation_date').required = false;
     } else {
-        taxIdLabel.textContent = 'CNPJ*';
+        taxIdLabel.textContent = 'CNPJ';
         taxIdInput.placeholder = '00.000.000/0000-00';
         taxIdHint.textContent = 'Informe seu CNPJ (14 dígitos)';
         document.getElementById('birth_date').required = false;
@@ -225,18 +225,26 @@ document.addEventListener('DOMContentLoaded', function() {
      * @returns {boolean} True se válido, False se inválido
      */
     function validatePhone() {
-        const phoneValue = phoneInput.value.replace(/\D/g, '');
-        // Telefone válido deve ter 10 (8 dígitos) ou 11 (9 dígitos) números incluindo DDD
-        const isValid = phoneValue.length === 10 || phoneValue.length === 11;
-        
-        if (!isValid) {
-            phoneInput.classList.add('is-invalid');
-            return false;
-        }
-        
+    const phoneValue = phoneInput.value.replace(/\D/g, '');
+
+    // ⚠️ Se o campo estiver vazio, não aplica is-invalid
+    if (phoneValue.length === 0) {
         phoneInput.classList.remove('is-invalid');
         return true;
     }
+
+    // Deve ter 10 ou 11 dígitos incluindo DDD
+    const isValid = phoneValue.length === 10 || phoneValue.length === 11;
+
+    if (!isValid) {
+        phoneInput.classList.add('is-invalid');
+        return false;
+    }
+
+    phoneInput.classList.remove('is-invalid');
+    return true;
+}
+
 
     /**
      * =============================================
@@ -252,12 +260,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const currentValue = taxIdInput.value.replace(/\D/g, '');
 
         if (isPF) {
-            taxIdLabel.textContent = 'CPF*';
+            taxIdLabel.textContent = 'CPF';
             taxIdInput.placeholder = '000.000.000-00';
             taxIdHint.textContent = 'Informe seu CPF (11 dígitos)';
             taxIdInput.value = applyCPFMask(currentValue);
         } else {
-            taxIdLabel.textContent = 'CNPJ*';
+            taxIdLabel.textContent = 'CNPJ';
             taxIdInput.placeholder = '00.000.000/0000-00';
             taxIdHint.textContent = 'Informe seu CNPJ (14 dígitos)';
             taxIdInput.value = applyCNPJMask(currentValue);

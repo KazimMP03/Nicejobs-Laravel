@@ -20,7 +20,7 @@
     </a>
 
     <!-- Chat -->
-    <a href="#" class="nav-link chat">
+    <a href="{{ route('chat.index') }}" class="nav-link chat">
         <i class="fas fa-comment-alt"></i>
         <span class="nav-text">Chats</span>
     </a>
