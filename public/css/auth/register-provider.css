@@ -118,13 +118,13 @@ body {
 }
 
 .step.active .step-number {
-    background-color: #2c3e50;
+    background-color: #009CFF;
     color: white;
-    border-color: #2c3e50;
+    border-color: #ffffff;
 }
 
 .step.active .step-title {
-    color: #2c3e50;
+    color: #009CFF;
     font-weight: bold;
 }
 
@@ -133,7 +133,7 @@ body {
 /* ======================= */
 
 .form-section h4 {
-    color: #2c3e50;
+    color: #6c757d;
     font-size: 20px;
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
@@ -141,7 +141,7 @@ body {
 }
 
 .form-section h4 i {
-    color: #2c3e50;
+    color: #6c757d;
 }
 
 .form-label {
@@ -218,23 +218,27 @@ body {
 }
 
 .btn-primary {
-    background-color: #2c3e50;
-    border-color: #2c3e50;
+    background-color: #009CFF;
+    border-color: #009CFF;
+    color: #ffffff;
 }
 
 .btn-primary:hover {
-    background-color: #1d2b36;
-    border-color: #1d2b36;
+    background-color: #3eb5ff;
+    border-color: #3eb5ff;
+    color: #ffffff;
 }
 
 .btn-outline-secondary {
-    color: #666;
-    border-color: #ddd;
+    color: #ffffff;
+    background-color: #6c757d;
+    border-color: #6c757d;
 }
 
 .btn-outline-secondary:hover {
-    background-color: #f5f5f5;
-    border-color: #ccc;
+    color: #ffffff;
+    background-color: #8f9ba5;
+    border-color: #8f9ba5;
 }
 
 .btn-success {
@@ -333,4 +337,34 @@ a:hover {
     .form-section h4 {
         font-size: 18px;
     }
+}
+
+.form-divider {
+    border-bottom: 1px solid #eee;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.hidden-until-loaded {
+    visibility: hidden;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #009CFF !important;
+    box-shadow: 0 0 0 0.25rem rgba(0, 156, 255, 0.25) !important;
+}
+
+.form-label {
+    margin-left: 2px;
+    padding-left: 4px;
+}
+
+.form-floating>label {
+    left: 0.9rem;
+    /* margem à esquerda do label flutuante */
+    padding-left: 0.25rem;
+    /* um respiro a mais */
+    font-size: 0.875rem;
+    /* opcional, para combinar exatamente com login */
 }

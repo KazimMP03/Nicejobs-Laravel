@@ -34,7 +34,15 @@
 </head>
 
 <body>
-    <div class="page-wrapper">
+    <!-- Spinner Start -->
+    <div id="spinner"
+        class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Carregando...</span>
+        </div>
+    </div>
+    <!-- Spinner End -->
+    <div class="page-wrapper hidden-until-loaded">
         <div class="register-container">
             <div class="d-flex align-items-center justify-content-between my-4 mx-4">
                 <a href="" class="">
@@ -45,7 +53,7 @@
 
             <div class="register-body">
                 <!-- Indicador de Passos -->
-                <div class="step-indicator mb-4">
+                <div class="step-indicator mb-5">
                     <div class="step active">
                         <div class="step-number">1</div>
                         <div class="step-title">Dados Pessoais</div>
@@ -71,45 +79,44 @@
                         <h4 class="mb-4"><i class="fas fa-user me-2"></i> Dados Pessoais</h4>
 
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="user_name" class="form-label">Nome Completo*</label>
+                            <div class="col-md-6 form-floating">
                                 <input type="text" class="form-control @error('user_name') is-invalid @enderror"
-                                    id="user_name" name="user_name" value="{{ old('user_name') }}" required>
+                                    id="user_name" name="user_name" placeholder="Nome Completo"
+                                    value="{{ old('user_name') }}" required>
+                                <label for="user_name">Nome Completo</label>
                                 @error('user_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
-                            <div class="col-md-6">
-                                <label for="email" class="form-label">E-mail*</label>
+                            <div class="col-md-6 form-floating">
                                 <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
-                                    name="email" value="{{ old('email') }}" required>
+                                    name="email" placeholder="E-mail" value="{{ old('email') }}" required>
+                                <label for="email">E-mail</label>
                                 @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
-                            <div class="col-md-6">
-                                <label for="password" class="form-label">Senha*</label>
+                            <div class="col-md-6 form-floating">
                                 <input type="password" class="form-control @error('password') is-invalid @enderror"
-                                    id="password" name="password" required>
+                                    id="password" name="password" placeholder="Senha" required>
+                                <label for="password">Senha</label>
                                 @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                                <small class="text-muted">Mínimo de 8 caracteres</small>
                             </div>
 
-                            <div class="col-md-6">
-                                <label for="password_confirmation" class="form-label">Confirmar Senha*</label>
+                            <div class="col-md-6 form-floating">
                                 <input type="password" class="form-control" id="password_confirmation"
-                                    name="password_confirmation" required>
+                                    name="password_confirmation" placeholder="Confirmar Senha" required>
+                                <label for="password_confirmation">Confirmar Senha</label>
                             </div>
 
-                            <div class="col-md-6">
-                                <label for="phone" class="form-label">Telefone*</label>
+                            <div class="col-md-6 form-floating">
                                 <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone"
-                                    name="phone" value="{{ old('phone') }}" required>
+                                    name="phone" placeholder="Telefone" value="{{ old('phone') }}" required>
+                                <label for="phone">Telefone</label>
                                 @error('phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
-                            <div class="col-md-6">
-                                <label for="user_type" class="form-label">Tipo de Pessoa*</label>
+                            <div class="col-md-6 form-floating">
                                 <select class="form-select @error('user_type') is-invalid @enderror" id="user_type"
-                                    name="user_type" required>
+                                    name="user_type" aria-label="Tipo de Pessoa" required>
                                     <option value="" disabled {{ old('user_type') ? '' : 'selected' }}>Selecione...
                                     </option>
                                     <option value="PF" {{ old('user_type') == 'PF' ? 'selected' : '' }}>Pessoa Física
@@ -117,36 +124,46 @@
                                     <option value="PJ" {{ old('user_type') == 'PJ' ? 'selected' : '' }}>Pessoa Jurídica
                                     </option>
                                 </select>
+                                <label for="user_type">Tipo de Pessoa</label>
                                 @error('user_type')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
-                            <div class="col-md-6">
-                                <label for="tax_id" class="form-label">CPF/CNPJ*</label>
+                            <div class="col-md-6 form-floating">
                                 <input type="text" class="form-control @error('tax_id') is-invalid @enderror"
-                                    id="tax_id" name="tax_id" value="{{ old('tax_id') }}"
-                                    placeholder="Selecione o tipo de pessoa primeiro" required>
+                                    id="tax_id" name="tax_id" placeholder="CPF ou CNPJ" value="{{ old('tax_id') }}"
+                                    required>
+                                <label for="tax_id">CPF/CNPJ</label>
                                 @error('tax_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
-                            <div class="col-md-6" id="birth_date_field"
+                            <div class="col-md-6 form-floating" id="birth_date_field"
                                 style="{{ old('user_type') != 'PF' ? 'display: none;' : '' }}">
-                                <label for="birth_date" class="form-label">Data de Nascimento*</label>
                                 <input type="date" class="form-control @error('birth_date') is-invalid @enderror"
-                                    id="birth_date" name="birth_date" value="{{ old('birth_date') }}">
+                                    id="birth_date" name="birth_date" placeholder="Data de Nascimento"
+                                    value="{{ old('birth_date') }}">
+                                <label for="birth_date">Data de Nascimento</label>
                                 @error('birth_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
-                            <div class="col-md-6" id="foundation_date_field"
+                            <div class="col-md-6 form-floating" id="foundation_date_field"
                                 style="{{ old('user_type') != 'PJ' ? 'display: none;' : '' }}">
-                                <label for="foundation_date" class="form-label">Data de Fundação*</label>
                                 <input type="date" class="form-control @error('foundation_date') is-invalid @enderror"
-                                    id="foundation_date" name="foundation_date" value="{{ old('foundation_date') }}">
+                                    id="foundation_date" name="foundation_date" placeholder="Data de Fundação"
+                                    value="{{ old('foundation_date') }}">
+                                <label for="foundation_date">Data de Fundação</label>
                                 @error('foundation_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between mt-4">
-                            <button type="button" class="btn btn-outline-secondary" disabled>Voltar</button>
+                        <p class="mt-4 mb-0" style="font-size: 15px;">
+                            Todos os campos são de <span style="color: #009CFF;">preenchimento obrigatório</span>.
+                        </p>
+
+                        <div class="form-divider"></div>
+
+                        <div class="d-flex justify-content-between mt-5">
+                            <a href="{{ route('login') }}" class="btn btn-outline-secondary"
+                                style="text-decoration: none;">Voltar</a>
                             <button type="button" class="btn btn-primary next-section"
                                 data-next="section2">Próximo</button>
                         </div>
