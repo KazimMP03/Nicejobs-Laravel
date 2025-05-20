@@ -81,7 +81,8 @@ Route::middleware('auth:web')->group(function () {
 
     Route::get('/provider/categories', [ProviderController::class, 'showCategories'])->name('provider.categories.edit');
     Route::post('/provider/categories', [ProviderController::class, 'updateCategories'])->name('provider.categories.update');
-
+   
+    // Criação Portfólio
     Route::get('/provider/portfolio/create', [PortfolioController::class, 'create'])
         ->name('provider.portfolio.create');
 
