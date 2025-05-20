@@ -144,6 +144,18 @@
     </div>
 </div>
 
+<!-- Modal de Visualização de Imagem -->
+<div class="modal fade" id="imageViewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-dark border-0">
+      <div class="modal-body p-0 text-center">
+        <img id="modal-image" src="" class="img-fluid rounded" style="max-height: 90vh;">
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <!-- Emoji Picker -->
 <emoji-picker id="emoji-picker" style="position: absolute; bottom: 80px; left: 20px; z-index: 999; display: none;"></emoji-picker>
 

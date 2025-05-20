@@ -197,3 +197,23 @@ emoji-picker {
     max-width: 340px;
     max-height: 320px;
 }
+
+.modal-content.bg-dark {
+    background-color: #000 !important;
+}
+
+.modal-body img {
+    object-fit: contain;
+}
+
+#audio-btn.recording {
+    color: red;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+}
+
