@@ -9,7 +9,9 @@ use App\Http\Controllers\{
     ServiceCategoryController,
     ServiceRequestController,
     ExploreController,
-    ReviewController
+    ReviewController,
+    ChatController,
+    PortfolioController
 };
 
 /*
@@ -50,7 +52,7 @@ Route::middleware('auth:web,custom')->group(function () {
     // Home
     Route::get('/home', fn() => view('home'))->name('home');
 
-    // Endereços (Provider e CustomUser)
+    // Endereços
     Route::prefix('addresses')->group(function () {
         Route::get('/', [AddressController::class, 'index'])->name('addresses.index');
         Route::get('/create', [AddressController::class, 'create'])->name('addresses.create');
@@ -60,6 +62,11 @@ Route::middleware('auth:web,custom')->group(function () {
         Route::post('/{address}/set-default', [AddressController::class, 'setDefault'])->name('addresses.setDefault');
         Route::delete('/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
     });
+
+    // Chat
+    Route::get('/chats', [ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chats/service-request/{serviceRequest}', [ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chats/{chat}/message', [ChatController::class, 'storeMessage'])->name('chat.message.store');
 });
 
 /*
@@ -68,24 +75,42 @@ Route::middleware('auth:web,custom')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:web')->group(function () {
-    // Perfil do Provider
     Route::get('/provider/profile', [ProviderController::class, 'editProfile'])->name('provider.profile.edit');
     Route::post('/provider/profile/update-info', [ProviderController::class, 'updateInfo'])->name('provider.profile.updateInfo');
     Route::post('/provider/profile/update-photo', [ProviderController::class, 'updateProfilePhoto'])->name('provider.profile.updatePhoto');
 
-    // Categorias do Provider
     Route::get('/provider/categories', [ProviderController::class, 'showCategories'])->name('provider.categories.edit');
     Route::post('/provider/categories', [ProviderController::class, 'updateCategories'])->name('provider.categories.update');
 
-    // ServiceRequests recebidas
+    Route::get('/provider/portfolio/create', [PortfolioController::class, 'create'])
+        ->name('provider.portfolio.create');
+
+    // Armazena novo portfólio
+    Route::post('/provider/portfolio', [PortfolioController::class, 'store'])
+        ->name('provider.portfolio.store');
+
+    // Tela de edição
+    Route::get('/provider/portfolio/{portfolio}/edit', [PortfolioController::class, 'edit'])
+        ->name('provider.portfolio.edit');
+
+    // Atualização
+    Route::put('/provider/portfolio/{portfolio}', [PortfolioController::class, 'update'])
+        ->name('provider.portfolio.update');
+
+    // Exclusão de portfólio completo
+    Route::delete('/provider/portfolio/{portfolio}', [PortfolioController::class, 'destroy'])
+        ->name('provider.portfolio.destroy');
+
+    // Exclusão de imagem individual do portfólio
+    Route::delete('/provider/portfolio/{portfolio}/image', [PortfolioController::class, 'deleteImage'])
+        ->name('provider.portfolio.delete-image');
+
     Route::get('/service-requests', [ServiceRequestController::class, 'index'])->name('service-requests.index');
     Route::get('/service-requests/{serviceRequest}', [ServiceRequestController::class, 'show'])->name('service-requests.show');
     Route::put('/service-requests/{serviceRequest}', [ServiceRequestController::class, 'update'])->name('service-requests.update');
 
-    // Avaliar CustomUser
     Route::post('/service-request/{serviceRequest}/review', [ReviewController::class, 'store'])->name('service-requests.review');
 
-    // ServiceCategories (admin)
     Route::resource('service-categories', ServiceCategoryController::class)->except(['show']);
 });
 
@@ -95,23 +120,19 @@ Route::middleware('auth:web')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:custom')->group(function () {
-    // Explorar Providers por Categoria
     Route::prefix('explore')->group(function () {
         Route::get('/', [ExploreController::class, 'index'])->name('explore.index');
         Route::get('/category/{id}', [ExploreController::class, 'byCategory'])->name('explore.byCategory');
         Route::get('/provider/{id}', [ExploreController::class, 'showProvider'])->name('providers.show');
     });
 
-    // Criar uma nova ServiceRequest
     Route::get('/provider/{provider}/request', [ServiceRequestController::class, 'create'])->name('service-requests.create');
     Route::post('/provider/{provider}/request', [ServiceRequestController::class, 'store'])->name('service-requests.store');
 
-    // Minhas solicitações (CustomUser)
     Route::get('/my-requests', [ServiceRequestController::class, 'index'])->name('custom-user.service-requests.index');
     Route::get('/my-requests/{serviceRequest}', [ServiceRequestController::class, 'show'])->name('custom-user.service-requests.show');
     Route::put('/my-requests/{serviceRequest}/cancel', [ServiceRequestController::class, 'cancel'])->name('custom-user.service-requests.cancel');
 
-    // Avaliar Provider
     Route::post('/provider/{id}/review', [ReviewController::class, 'store'])->name('providers.review');
 });
 
@@ -124,7 +145,7 @@ Route::get('/dashboard', function () {
     return auth('web')->check() || auth('custom')->check()
         ? redirect()->route('home')
         : redirect()->route('login');
-});
+})->name('dashboard');;
 
 Route::fallback(function () {
     return auth('web')->check() || auth('custom')->check()
