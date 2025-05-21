@@ -33,7 +33,6 @@
                     : 'them' 
                 }}">
                 <div class="chat-bubble">
-
                     {{-- Texto ou emoji --}}
                     @if ($msg->type === 'text' || $msg->type === 'emoji')
                         {{ $msg->message }}
@@ -50,35 +49,9 @@
                         @php
                             $ext = pathinfo($msg->original_name, PATHINFO_EXTENSION);
                             $sizeKb = $msg->size ? number_format($msg->size / 1024, 0) . ' KB' : '';
-                            $desc = match(strtolower($ext)) {
-                                'pdf' => 'Documento PDF',
-                                'doc', 'docx' => 'Documento do Word',
-                                'xls', 'xlsx' => 'Planilha do Excel',
-                                'ppt', 'pptx' => 'Apresentação do PowerPoint',
-                                'txt' => 'Arquivo de texto',
-                                'zip', 'rar', '7z' => 'Arquivo compactado',
-                                'json', 'xml', 'csv' => 'Arquivo de dados',
-                                default => strtoupper($ext) . ' file'
-                            };
-                            $icon = match(strtolower($ext)) {
-                                'pdf' => 'fa-file-pdf text-file-pdf',
-                                'doc' => 'fa-file-word text-file-word',
-                                'docx' => 'fa-file-word text-file-word',
-                                'xls' => 'fa-file-excel text-file-excel',
-                                'xlsx' => 'fa-file-excel text-file-excel',
-                                'ppt' => 'fa-file-powerpoint text-file-ppt',
-                                'pptx' => 'fa-file-powerpoint text-file-ppt',
-                                'zip' => 'fa-file-archive text-file-archive',
-                                'rar' => 'fa-file-archive text-file-archive',
-                                '7z' => 'fa-file-archive text-file-archive',
-                                'txt' => 'fa-file-lines text-file-text',
-                                'csv' => 'fa-file-code text-file-code',
-                                'xml' => 'fa-file-code text-file-code',
-                                'json' => 'fa-file-code text-file-code',
-                                default => 'fa-file text-file-default',
-                            };
+                            $desc = strtoupper($ext) . ' File';
+                            $icon = 'fa-file';
                         @endphp
-
                         <div class="file-message-new">
                             <div class="file-icon">
                                 <i class="fas {{ $icon }}"></i>
@@ -91,12 +64,8 @@
                                     {{ $desc }} • {{ $sizeKb }}
                                 </div>
                                 <div class="file-actions">
-                                    <a href="{{ asset('storage/' . $msg->file_path) }}" 
-                                        target="_blank" 
-                                        class="btn btn-sm btn-outline-primary">Abrir</a>
-                                    <a href="{{ asset('storage/' . $msg->file_path) }}" 
-                                        download 
-                                        class="btn btn-sm btn-outline-secondary">Salvar como…</a>
+                                    <a href="{{ asset('storage/' . $msg->file_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">Abrir</a>
+                                    <a href="{{ asset('storage/' . $msg->file_path) }}" download class="btn btn-sm btn-outline-secondary">Salvar como…</a>
                                 </div>
                             </div>
                         </div>
@@ -115,7 +84,6 @@
                     <div class="bubble-time" title="{{ $msg->created_at->format('d/m/Y H:i') }}">
                         {{ $msg->created_at->format('H:i') }}
                     </div>
-
                 </div>
             </div>
         @endforeach
@@ -123,14 +91,9 @@
 
     {{-- ================= FORMULÁRIO DE ENVIO ================= --}}
     @if(!$chat->serviceRequest->isFinalized())
-        <form id="chat-form" 
-              action="{{ route('chat.message.store', $chat) }}" 
-              method="POST" 
-              enctype="multipart/form-data">
+        <form id="chat-form" action="{{ route('chat.message.store', $chat) }}" method="POST" enctype="multipart/form-data">
             @csrf
-
             <div class="chat-input-container">
-
                 {{-- Botão de emoji --}}
                 <button type="button" id="emoji-btn">
                     <i class="far fa-smile"></i>
@@ -156,22 +119,18 @@
 
                 {{-- Inputs ocultos --}}
                 <input type="file" id="hidden-image-input" class="d-none" accept="image/*,video/*">
-                <input type="file" id="hidden-camera-input" class="d-none" accept="image/*" capture="environment">
-                <input type="file" id="hidden-file-input" class="d-none" 
-                       accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.7z,.xml,.csv,.json">
+                <input type="file" id="hidden-file-input" class="d-none" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.7z,.xml,.csv,.json">
 
-                {{-- Input de mensagem --}}
+                {{-- Input de texto --}}
                 <input type="text" name="message" id="message-input" placeholder="Mensagem" autocomplete="off">
                 <input type="hidden" name="type" id="message-type" value="text">
 
-                {{-- Botões de enviar e de áudio --}}
+                {{-- Botões de enviar e áudio --}}
                 <button type="submit" id="send-btn"><i class="fas fa-paper-plane"></i></button>
                 <button type="button" id="audio-btn"><i class="fas fa-microphone"></i></button>
-
             </div>
         </form>
     @else
-        {{-- Se chat arquivado, desativa formulário --}}
         <div class="alert alert-secondary mt-3">
             📦 Este chat está arquivado. Não é possível enviar novas mensagens.
         </div>
@@ -180,9 +139,54 @@
 </div>
 
 {{-- ================= EMOJI PICKER ================= --}}
-<emoji-picker id="emoji-picker" style="display: none; position: absolute; bottom: 70px; left: 20px; z-index: 9999;"></emoji-picker>
+<emoji-picker id="emoji-picker" style="display: none; position: absolute; bottom: 80px; left: 20px; z-index: 9999;"></emoji-picker>
 
-{{-- ================== MODAIS E SCRIPTS ================== --}}
+{{-- ================= MODAL DE IMAGEM ================= --}}
+<div class="modal fade" id="imageViewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark">
+            <div class="modal-body p-0">
+                <img id="modal-image" src="" class="w-100">
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ================= MODAL DE CÂMERA ================= --}}
+<div class="modal fade" id="cameraModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+            <div class="modal-body text-center">
+                {{-- Preview da imagem capturada --}}
+                <div id="captured-image-preview" class="d-none">
+                    <img id="captured-image" src="" class="img-fluid rounded">
+                </div>
+
+                {{-- Stream da câmera --}}
+                <video id="camera-stream" autoplay playsinline class="w-100 rounded"></video>
+
+                {{-- Formulário para enviar a foto --}}
+                <form id="camera-form" class="d-none" action="{{ route('chat.message.store', $chat) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="type" value="image">
+                    <input type="file" id="captured-file-input" name="file" class="d-none" accept="image/*">
+                    <input type="text" name="message" class="form-control mb-2" placeholder="Adicionar legenda (opcional)">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary w-100">Enviar</button>
+                        <button type="button" class="btn btn-secondary w-100" onclick="retakePhoto()">Refazer</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-center border-0">
+                <button id="capture-btn" class="btn btn-danger rounded-circle" style="width: 60px; height: 60px;">
+                    <i class="fas fa-camera"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ================== SCRIPTS ================== --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1.11.2/index.js"></script>
 <script src="{{ asset('js/chat.js') }}"></script>
