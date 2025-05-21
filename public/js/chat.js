@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const attachMenu = document.getElementById('attachment-menu');
 
     const imageInput = document.getElementById('hidden-image-input');
-    const cameraInput = document.getElementById('hidden-camera-input');
     const fileInput = document.getElementById('hidden-file-input');
 
     const emojiBtn = document.getElementById('emoji-btn');
@@ -14,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const formActionUrl = document.getElementById('chat-form').getAttribute('action');
     const csrfToken = document.querySelector('input[name="_token"]').value;
 
-    // Alternar visibilidade dos botões de envio
+    // Alternar botões enviar/áudio
     function toggleSendAudio() {
         if (messageInput.value.trim().length > 0) {
             sendBtn.style.display = 'inline-block';
@@ -46,13 +45,10 @@ document.addEventListener('DOMContentLoaded', function () {
             imageInput.click();
         } else if (type === 'file') {
             fileInput.click();
-        } else if (type === 'camera') {
-            cameraInput.value = '';
-            cameraInput.click();
         }
     };
 
-    // Função de pré-visualização de arquivos no modal
+    // Função de pré-visualização
     function handleFileInput(input, type) {
         input.addEventListener('change', () => {
             const file = input.files[0];
@@ -104,7 +100,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     handleFileInput(imageInput, 'image');
-    handleFileInput(cameraInput, 'image');
     handleFileInput(fileInput, 'file');
 
     // === Emoji Picker ===
@@ -131,7 +126,6 @@ document.addEventListener('DOMContentLoaded', function () {
     let audioChunks = [];
 
     audioBtn.addEventListener('click', async () => {
-        // Já está gravando? Então parar
         if (mediaRecorder && mediaRecorder.state === "recording") {
             mediaRecorder.stop();
             return;
@@ -143,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             mediaRecorder.start();
             audioChunks = [];
-            audioBtn.classList.add('recording'); // muda aparência
+            audioBtn.classList.add('recording');
 
             mediaRecorder.addEventListener("dataavailable", event => {
                 audioChunks.push(event.data);
@@ -169,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     body: formData
                 }).then(() => {
-                    window.location.reload(); // recarrega chat
+                    window.location.reload();
                 }).catch(err => {
                     console.error("Erro ao enviar áudio:", err);
                     alert("Erro ao enviar áudio.");
@@ -182,12 +176,82 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Função para abrir imagem no modal
+    // === Modal de Imagem ===
     window.openImage = function (url) {
         const modalImg = document.getElementById('modal-image');
         modalImg.src = url;
 
         const modal = new bootstrap.Modal(document.getElementById('imageViewModal'));
         modal.show();
+    };
+
+    // === Captura pela Webcam ===
+    let stream = null;
+
+    window.openCamera = async function () {
+        const modal = new bootstrap.Modal(document.getElementById('cameraModal'));
+        modal.show();
+
+        const video = document.getElementById('camera-stream');
+        const preview = document.getElementById('captured-image-preview');
+        const form = document.getElementById('camera-form');
+
+        preview.classList.add('d-none');
+        video.classList.remove('d-none');
+        form.classList.add('d-none');
+
+        document.getElementById('capture-btn').classList.remove('d-none');
+
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+        } catch (err) {
+            alert('Não foi possível acessar a câmera.');
+            console.error(err);
+        }
+    };
+
+    window.stopCamera = function () {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+    };
+
+    document.getElementById('capture-btn').addEventListener('click', () => {
+        const video = document.getElementById('camera-stream');
+        const preview = document.getElementById('captured-image-preview');
+        const capturedImg = document.getElementById('captured-image');
+        const form = document.getElementById('camera-form');
+
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+
+        const imageData = canvas.toDataURL('image/png');
+        capturedImg.src = imageData;
+        preview.classList.remove('d-none');
+
+        fetch(imageData)
+            .then(res => res.blob())
+            .then(blob => {
+                const file = new File([blob], `captured_${Date.now()}.png`, { type: 'image/png' });
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+
+                const input = document.getElementById('captured-file-input');
+                input.files = dataTransfer.files;
+            });
+
+        video.classList.add('d-none');
+        form.classList.remove('d-none');
+        document.getElementById('capture-btn').classList.add('d-none');
+
+        stopCamera();
+    });
+
+    window.retakePhoto = function () {
+        openCamera();
     };
 });

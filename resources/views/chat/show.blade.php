@@ -95,7 +95,7 @@
                     <button type="button" class="attachment-item" onclick="triggerFileInput('image')">
                         <i class="fas fa-photo-video"></i><span>Fotos e vídeos</span>
                     </button>
-                    <button type="button" class="attachment-item" onclick="triggerFileInput('camera')">
+                    <button type="button" class="attachment-item" onclick="openCamera()">
                         <i class="fas fa-camera"></i><span>Câmera</span>
                     </button>
                     <button type="button" class="attachment-item" onclick="triggerFileInput('file')">
@@ -155,6 +155,50 @@
   </div>
 </div>
 
+<!-- Modal da Câmera -->
+<div class="modal fade" id="cameraModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Tirar Foto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar" onclick="stopCamera()"></button>
+      </div>
+
+      <div class="modal-body text-center">
+        <!-- Video da Câmera -->
+        <video id="camera-stream" autoplay playsinline style="max-width: 100%; border-radius: 10px;"></video>
+
+        <!-- Imagem Capturada -->
+        <div id="captured-image-preview" class="d-none">
+          <img id="captured-image" src="" class="img-fluid rounded">
+        </div>
+      </div>
+
+      <div class="modal-footer flex-column">
+        <!-- Botão de Captura -->
+        <button id="capture-btn" class="btn btn-light rounded-circle" style="width:60px;height:60px;">
+          <i class="fas fa-camera"></i>
+        </button>
+
+        <!-- Formulário após captura -->
+        <form id="camera-form" method="POST" action="{{ route('chat.message.store', $chat) }}" enctype="multipart/form-data" class="w-100 d-none">
+          @csrf
+          <input type="hidden" name="type" value="image">
+          <input type="file" name="file" id="captured-file-input" class="d-none">
+          <input type="text" name="message" class="form-control mb-2 mt-2" placeholder="Mensagem (opcional)">
+          <div class="d-flex justify-content-between">
+            <button type="button" class="btn btn-light" onclick="retakePhoto()">
+              <i class="fas fa-arrow-left"></i> Refazer
+            </button>
+            <button type="submit" class="btn btn-success">
+              <i class="fas fa-paper-plane"></i> Enviar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Emoji Picker -->
 <emoji-picker id="emoji-picker" style="position: absolute; bottom: 80px; left: 20px; z-index: 999; display: none;"></emoji-picker>

@@ -211,6 +211,23 @@ emoji-picker {
     animation: pulse 1s infinite;
 }
 
+#capture-btn {
+    border: 3px solid #ccc;
+}
+
+#capture-btn:hover {
+    background-color: #f0f0f0;
+}
+
+#cameraModal .modal-footer {
+    gap: 10px;
+    flex-direction: column;
+}
+
+#cameraModal .form-control {
+    width: 100%;
+}
+
 @keyframes pulse {
     0% { opacity: 1; }
     50% { opacity: 0.4; }
