@@ -32,7 +32,7 @@
                     ($serviceRequest->isChatOpened() ? 'info' : 
                     ($serviceRequest->isPendingAcceptance() ? 'warning' : 
                     ($serviceRequest->isAccepted() ? 'success' : 'dark'))) }}">
-                    {{ ucfirst($serviceRequest->status) }}
+                    {{ $serviceRequest->getStatusLabel() }}
                 </span>
             </p>
         </div>

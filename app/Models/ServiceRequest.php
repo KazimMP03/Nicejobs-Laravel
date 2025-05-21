@@ -9,7 +9,7 @@ class ServiceRequest extends Model
 {
     use HasFactory;
 
-    // === Status possíveis ===
+    // === Status possíveis === //
     public const STATUS_REQUESTED         = 'requested';
     public const STATUS_CHAT_OPENED       = 'chat_opened';
     public const STATUS_PENDING_ACCEPT    = 'pending_acceptance';
@@ -40,7 +40,7 @@ class ServiceRequest extends Model
         'status'              => 'string',
     ];
 
-    // === Relações ===
+    // === Relações === //
 
     /**
      * Muitos-para-um com CustomUser
@@ -74,7 +74,7 @@ class ServiceRequest extends Model
         return $this->hasOne(Chat::class);
     }
 
-    // === Métodos auxiliares de status ===
+    // === Métodos auxiliares de status === //
 
     public function isRequested(): bool
     {
@@ -120,7 +120,7 @@ class ServiceRequest extends Model
         ]);
     }
 
-    // === Verificações de ações ===
+    // === Verificações de ações === //
 
     public function canPropose(): bool
     {
@@ -173,7 +173,7 @@ class ServiceRequest extends Model
         ]);
     }
 
-    // === Ações de negociação ===
+    // === Ações de negociação === //
 
     /**
      * Tenta avançar para "accepted" se ambos aceitaram.
@@ -199,4 +199,20 @@ class ServiceRequest extends Model
             'status'             => self::STATUS_CHAT_OPENED,
         ]);
     }
+
+    // === Método auxiliar para traduzir os status === //
+    public function getStatusLabel()
+    {
+        return match ($this->status) {
+            'requested'       => 'Solicitado',
+            'chat_opened'     => 'Chat Aberto',
+            'pending_acceptance' => 'Pendente de Aceitação',
+            'accepted'        => 'Aceito',
+            'completed'       => 'Concluído',
+            'cancelled'       => 'Cancelado',
+            'rejected'        => 'Rejeitado',
+            default            => ucfirst($this->status),
+        };
+    }
+
 }

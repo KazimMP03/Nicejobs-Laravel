@@ -39,7 +39,7 @@
                         ($sr->isPendingAcceptance() ? 'warning' :
                         ($sr->isAccepted() ? 'success' : 'dark')))
                     }}">
-                        {{ ucfirst($sr->status) }}
+                        {{ $sr->getStatusLabel() }}
                     </span>
                 </div>
             </div>
