@@ -56,7 +56,7 @@
         <div class="d-flex gap-2 flex-wrap">
 
             {{-- Propor Valor e Data --}}
-            @if($serviceRequest->canPropose())
+           @if($serviceRequest->canPropose())
                 <form action="{{ route('service-requests.propose-price', $serviceRequest) }}" method="POST" class="d-flex gap-2 flex-wrap">
                     @csrf
                     @method('PUT')
@@ -68,7 +68,8 @@
 
                     <input type="date" name="service_date" 
                         class="form-control w-auto" 
-                        required>
+                        required
+                        min="{{ now()->format('Y-m-d') }}">
 
                     <button class="btn btn-info">Propor Valor e Data</button>
                 </form>

@@ -9,10 +9,23 @@
         <div class="card-body">
             <h5>Prestador: <strong>{{ $serviceRequest->provider->user_name }}</strong></h5>
             <p><strong>Descrição:</strong> {{ $serviceRequest->description }}</p>
-            <p><strong>Orçamento Inicial:</strong> R$ {{ number_format($serviceRequest->initial_budget, 2, ',', '.') }}</p>
+
+            <p><strong>Orçamento Inicial:</strong> 
+                R$ {{ number_format($serviceRequest->initial_budget, 2, ',', '.') }}
+            </p>
+
             @if($serviceRequest->final_price)
-                <p><strong>Valor Final Proposto:</strong> R$ {{ number_format($serviceRequest->final_price, 2, ',', '.') }}</p>
+                <p><strong>Valor Final Proposto:</strong> 
+                    R$ {{ number_format($serviceRequest->final_price, 2, ',', '.') }}
+                </p>
             @endif
+
+            @if($serviceRequest->service_date)
+                <p><strong>Data do Serviço:</strong> 
+                    {{ \Carbon\Carbon::parse($serviceRequest->service_date)->format('d/m/Y') }}
+                </p>
+            @endif
+
             <p><strong>Status:</strong> 
                 <span class="badge bg-{{ 
                     $serviceRequest->isRequested() ? 'secondary' : 
