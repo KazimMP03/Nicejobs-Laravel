@@ -81,8 +81,8 @@
                         </video>
                     @endif
 
-                    <div class="bubble-time" title="{{ $msg->created_at->format('d/m/Y H:i') }}">
-                        {{ $msg->created_at->format('H:i') }}
+                    <div class="bubble-time" title="{{ $msg->created_at->setTimezone(config('app.timezone'))->format('d/m/Y H:i') }}">
+                        {{ $msg->created_at->setTimezone(config('app.timezone'))->format('H:i') }}
                     </div>
                 </div>
             </div>

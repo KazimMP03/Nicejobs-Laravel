@@ -279,4 +279,9 @@ document.addEventListener('DOMContentLoaded', function () {
         openCamera();
     };
 
+    // === Ao carregar a página, rolar até o final do chat (igual WhatsApp) ===
+    const chatBox = document.getElementById('chat-box');
+    if (chatBox) {
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
 });
