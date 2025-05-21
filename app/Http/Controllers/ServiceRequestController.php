@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 class ServiceRequestController extends Controller
 {
     /**
-     * Lista as ServiceRequests do usuário logado (Provider ou CustomUser).
+     * Lista as solicitações do usuário autenticado.
      */
     public function index()
     {
@@ -42,7 +42,6 @@ class ServiceRequestController extends Controller
     public function create(Provider $provider)
     {
         $user = auth()->user();
-
         $addresses = $user->addresses()->withPivot('is_default')->get();
 
         return view('service_requests.create', compact('provider', 'addresses'));
@@ -56,12 +55,11 @@ class ServiceRequestController extends Controller
         $user = auth()->user();
 
         $data = $request->validate([
-            'description'     => 'required|string',
-            'initial_budget'  => 'required|numeric|min:0',
-            'address_id'      => 'nullable|exists:addresses,id',
+            'description'    => 'required|string',
+            'initial_budget' => 'required|numeric|min:0',
+            'address_id'     => 'nullable|exists:addresses,id',
         ]);
 
-        // Se não selecionou endereço → usa o padrão
         if (empty($data['address_id'])) {
             $defaultAddress = $user->addresses()->wherePivot('is_default', true)->first();
 
@@ -86,7 +84,7 @@ class ServiceRequestController extends Controller
     }
 
     /**
-     * Exibe os detalhes de uma ServiceRequest (para Provider ou CustomUser).
+     * Exibe os detalhes da ServiceRequest.
      */
     public function show(ServiceRequest $serviceRequest)
     {
@@ -96,7 +94,6 @@ class ServiceRequestController extends Controller
             abort(403, 'Acesso não autorizado.');
         }
 
-        // Renderiza a view correta conforme o tipo de usuário
         if ($user instanceof Provider) {
             return view('service_requests.provider.show', compact('serviceRequest'));
         }
@@ -109,9 +106,9 @@ class ServiceRequestController extends Controller
     }
 
     /**
-     * Provider atualiza status da ServiceRequest (chat_opened, rejected, accepted, completed).
+     * Provider propõe o valor final e a data do serviço.
      */
-    public function update(Request $request, ServiceRequest $serviceRequest)
+    public function proposePrice(Request $request, ServiceRequest $serviceRequest)
     {
         $provider = auth()->user();
 
@@ -119,35 +116,116 @@ class ServiceRequestController extends Controller
             abort(403, 'Acesso não autorizado.');
         }
 
+        if (!$serviceRequest->canPropose()) {
+            return back()->with('error', 'Não é possível propor um valor neste momento.');
+        }
+
         $data = $request->validate([
-            'status'       => 'required|in:chat_opened,rejected,accepted,completed',
-            'final_price'  => 'nullable|numeric|min:0',
+            'final_price'  => 'required|numeric|min:0',
+            'service_date' => 'required|date|after_or_equal:today',
         ]);
 
-        if ($data['status'] === ServiceRequest::STATUS_ACCEPTED && empty($data['final_price'])) {
-            return back()->withErrors(['final_price' => 'É necessário definir o valor final ao aceitar.']);
-        }
+        $serviceRequest->update([
+            'final_price'        => $data['final_price'],
+            'service_date'       => $data['service_date'],
+            'provider_accepted'  => true,
+            'customer_accepted'  => false,
+            'status'             => ServiceRequest::STATUS_PENDING_ACCEPT,
+        ]);
 
-        if ($data['status'] === ServiceRequest::STATUS_ACCEPTED) {
-            $serviceRequest->final_price = $data['final_price'];
-        }
-
-        $serviceRequest->status = $data['status'];
-        $serviceRequest->save();
-
-        // Cria o Chat se status for 'chat_opened'
-        if ($data['status'] === ServiceRequest::STATUS_CHAT_OPENED) {
-            Chat::firstOrCreate([
-                'service_request_id' => $serviceRequest->id
-            ]);
-        }
-
-        return redirect()->route('service-requests.index')
-                         ->with('success', 'Status atualizado com sucesso.');
+        return back()->with('success', 'Proposta enviada com sucesso. Aguardando aceite do cliente.');
     }
 
     /**
-     * CustomUser pode cancelar sua própria solicitação.
+     * Cliente aceita a proposta (valor + data).
+     */
+    public function acceptProposal(ServiceRequest $serviceRequest)
+    {
+        $user = auth()->user();
+
+        if (!$user instanceof CustomUser || $serviceRequest->custom_user_id !== $user->id) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        if (!$serviceRequest->canAcceptProposal()) {
+            return back()->with('error', 'Não é possível aceitar essa proposta no momento.');
+        }
+
+        $serviceRequest->customer_accepted = true;
+        $serviceRequest->trySetAccepted();
+
+        return back()->with('success', 'Proposta aceita e serviço confirmado.');
+    }
+
+    /**
+     * Cliente recusa a proposta.
+     */
+    public function rejectProposal(ServiceRequest $serviceRequest)
+    {
+        $user = auth()->user();
+
+        if (!$user instanceof CustomUser || $serviceRequest->custom_user_id !== $user->id) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        if (!$serviceRequest->canRejectProposal()) {
+            return back()->with('error', 'Não é possível recusar essa proposta no momento.');
+        }
+
+        $serviceRequest->resetProposal();
+
+        return back()->with('success', 'Proposta recusada. Continue negociando no chat.');
+    }
+
+    /**
+     * Atualiza status: abrir chat, rejeitar, concluir.
+     */
+    public function update(Request $request, ServiceRequest $serviceRequest)
+    {
+        $user = auth()->user();
+
+        if (!($user->id === $serviceRequest->provider_id || $user->id === $serviceRequest->custom_user_id)) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        $data = $request->validate([
+            'status' => 'required|in:chat_opened,rejected,completed',
+        ]);
+
+        $status = $data['status'];
+
+        if ($status === ServiceRequest::STATUS_CHAT_OPENED) {
+            if ($serviceRequest->isFinalized()) {
+                return back()->with('error', 'Não é possível abrir chat em uma solicitação finalizada.');
+            }
+            $serviceRequest->status = ServiceRequest::STATUS_CHAT_OPENED;
+            Chat::firstOrCreate(['service_request_id' => $serviceRequest->id]);
+        }
+
+        if ($status === ServiceRequest::STATUS_REJECTED) {
+            if (!$serviceRequest->canReject()) {
+                return back()->with('error', 'Não é possível rejeitar esta solicitação neste status.');
+            }
+            $serviceRequest->status = ServiceRequest::STATUS_REJECTED;
+        }
+
+        if ($status === ServiceRequest::STATUS_COMPLETED) {
+            if (!$serviceRequest->canComplete()) {
+                return back()->with('error', 'Só é possível concluir uma solicitação aceita.');
+            }
+            if (!($user instanceof CustomUser)) {
+                return back()->with('error', 'Apenas o cliente pode concluir o serviço.');
+            }
+            $serviceRequest->status = ServiceRequest::STATUS_COMPLETED;
+        }
+
+        $serviceRequest->save();
+
+        return back()->with('success', 'Status atualizado com sucesso.');
+    }
+
+    /**
+     * Cliente cancela a solicitação.
      */
     public function cancel(ServiceRequest $serviceRequest)
     {
@@ -157,7 +235,7 @@ class ServiceRequestController extends Controller
             abort(403, 'Acesso não autorizado.');
         }
 
-        if (!in_array($serviceRequest->status, [ServiceRequest::STATUS_REQUESTED, ServiceRequest::STATUS_CHAT_OPENED])) {
+        if (!$serviceRequest->canCancel()) {
             return back()->with('error', 'Esta solicitação não pode mais ser cancelada.');
         }
 

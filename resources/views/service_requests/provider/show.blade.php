@@ -8,29 +8,37 @@
     <div class="card mb-4">
         <div class="card-body">
             <h5>Solicitante: <strong>{{ $serviceRequest->customUser->user_name }}</strong></h5>
+            <p><strong>Descrição:</strong> {{ $serviceRequest->description }}</p>
 
-            <p><strong>Descrição do serviço:</strong><br>
-                {{ $serviceRequest->description }}
+            <p><strong>Orçamento Inicial:</strong> 
+                R$ {{ number_format($serviceRequest->initial_budget, 2, ',', '.') }}
             </p>
 
-            <p><strong>Orçamento Inicial:</strong> R$ {{ number_format($serviceRequest->initial_budget, 2, ',', '.') }}</p>
-
             @if($serviceRequest->final_price)
-                <p><strong>Valor Final Acordado:</strong> R$ {{ number_format($serviceRequest->final_price, 2, ',', '.') }}</p>
+                <p><strong>Valor Final Proposto:</strong> 
+                    R$ {{ number_format($serviceRequest->final_price, 2, ',', '.') }}
+                </p>
+            @endif
+
+            @if($serviceRequest->service_date)
+                <p><strong>Data do Serviço:</strong> 
+                    {{ \Carbon\Carbon::parse($serviceRequest->service_date)->format('d/m/Y') }}
+                </p>
             @endif
 
             <p><strong>Status:</strong> 
                 <span class="badge bg-{{ 
-                    $serviceRequest->status === 'requested' ? 'secondary' : 
-                    ($serviceRequest->status === 'chat_opened' ? 'info' : 'success') 
-                }}">
+                    $serviceRequest->isRequested() ? 'secondary' : 
+                    ($serviceRequest->isChatOpened() ? 'info' : 
+                    ($serviceRequest->isPendingAcceptance() ? 'warning' : 
+                    ($serviceRequest->isAccepted() ? 'success' : 'dark'))) }}">
                     {{ ucfirst($serviceRequest->status) }}
                 </span>
             </p>
         </div>
     </div>
 
-    {{-- Endereço do Serviço --}}
+    {{-- Endereço do serviço --}}
     <div class="card mb-4">
         <div class="card-header">Endereço do Serviço</div>
         <div class="card-body">
@@ -43,33 +51,59 @@
         </div>
     </div>
 
-    {{-- Ações do Provider --}}
-    @if($serviceRequest->isRequested())
-        <div class="d-flex gap-2">
-            <form action="{{ route('service-requests.update', $serviceRequest->id) }}" method="POST">
-                @csrf
-                @method('PUT')
-                <input type="hidden" name="status" value="chat_opened">
-                <button type="submit" class="btn btn-info">Abrir Chat</button>
-            </form>
+    {{-- Ações --}}
+    @if(!$serviceRequest->isFinalized())
+        <div class="d-flex gap-2 flex-wrap">
 
-            <form action="{{ route('service-requests.update', $serviceRequest->id) }}" method="POST">
-                @csrf
-                @method('PUT')
-                <input type="hidden" name="status" value="rejected">
-                <button type="submit" class="btn btn-danger">Rejeitar Solicitação</button>
-            </form>
+            {{-- Propor Valor e Data --}}
+            @if($serviceRequest->canPropose())
+                <form action="{{ route('service-requests.propose-price', $serviceRequest) }}" method="POST" class="d-flex gap-2 flex-wrap">
+                    @csrf
+                    @method('PUT')
+
+                    <input type="number" step="0.01" name="final_price" 
+                        class="form-control w-auto" 
+                        placeholder="Valor Final (R$)" 
+                        required>
+
+                    <input type="date" name="service_date" 
+                        class="form-control w-auto" 
+                        required>
+
+                    <button class="btn btn-info">Propor Valor e Data</button>
+                </form>
+            @endif
+
+            {{-- Rejeitar --}}
+            @if($serviceRequest->canReject())
+                <form action="{{ route('service-requests.update', $serviceRequest) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="status" value="rejected">
+                    <button class="btn btn-danger">Rejeitar</button>
+                </form>
+            @endif
+
+            {{-- Acesso ao Chat --}}
+            @if($serviceRequest->chat)
+                <a href="{{ route('chat.show', $serviceRequest->id) }}" class="btn btn-secondary">
+                    Ir para o Chat
+                </a>
+            @else
+                {{-- Abrir Chat --}}
+                <form action="{{ route('service-requests.update', $serviceRequest) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="status" value="chat_opened">
+                    <button class="btn btn-info">Abrir Chat</button>
+                </form>
+            @endif
+
         </div>
-    @elseif($serviceRequest->isChatOpened())
-        @php
-            $chat = \App\Models\Chat::where('service_request_id', $serviceRequest->id)->first();
-        @endphp
-
-        @if($chat)
-            <a href="{{ route('chat.show', $chat->id) }}" class="btn btn-primary">Ir para o Chat</a>
-        @else
-            <span class="text-danger">Chat não encontrado.</span>
-        @endif
+    @else
+        <div class="alert alert-info">
+            Esta solicitação está {{ ucfirst($serviceRequest->status) }}.
+        </div>
     @endif
 </div>
 @endsection

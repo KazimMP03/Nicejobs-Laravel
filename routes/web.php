@@ -24,13 +24,12 @@ use App\Http\Controllers\{
 */
 Route::redirect('/', '/login')->name('root');
 
-// Agrupamento de rotas públicas para guests (não autenticados)
 Route::middleware('guest')->group(function () {
     // Login
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
-    // Registro de usuários (CustomUser e Provider)
+    // Registro de usuários
     Route::prefix('register')->group(function () {
         Route::get('/', fn() => view('auth.register-selector'))->name('register.selector');
         Route::get('/client', fn() => view('auth.register-custom-user'))->name('register.custom-user.form');
@@ -49,7 +48,7 @@ Route::middleware('guest')->group(function () {
 | Rotas Comuns (auth:web,custom)
 |--------------------------------------------------------------------------
 | Rotas acessíveis tanto para Providers quanto para CustomUsers.
-| Inclui home, logout, endereços e chat.
+| Inclui logout, home, endereços e chat.
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:web,custom')->group(function () {
@@ -59,7 +58,7 @@ Route::middleware('auth:web,custom')->group(function () {
     // Página inicial
     Route::get('/home', fn() => view('home'))->name('home');
 
-    // CRUD de endereços (tanto Provider quanto CustomUser)
+    // CRUD de Endereços (Provider e CustomUser)
     Route::prefix('addresses')->group(function () {
         Route::get('/', [AddressController::class, 'index'])->name('addresses.index');
         Route::get('/create', [AddressController::class, 'create'])->name('addresses.create');
@@ -70,47 +69,52 @@ Route::middleware('auth:web,custom')->group(function () {
         Route::delete('/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
     });
 
-    // Chat entre Provider e CustomUser
+    // Chat
     Route::get('/chats', [ChatController::class, 'index'])->name('chat.index');
     Route::get('/chats/service-request/{serviceRequest}', [ChatController::class, 'show'])->name('chat.show');
     Route::post('/chats/{chat}/message', [ChatController::class, 'storeMessage'])->name('chat.message.store');
+
+    // Atualização de status de ServiceRequest (Acesso Comum: Provider e CustomUser)
+    Route::put('/service-requests/{serviceRequest}', [ServiceRequestController::class, 'update'])->name('service-requests.update');
 });
 
 /*
 |--------------------------------------------------------------------------
 | Rotas do Provider (auth:web)
 |--------------------------------------------------------------------------
-| Rotas específicas para usuários do tipo Provider.
-| Inclui perfil, categorias, portfólio, service requests e avaliações.
+| Rotas específicas para Providers.
+| Inclui perfil, categorias, portfólio, solicitações (Service Requests) e avaliações.
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:web')->group(function () {
-    // Gerenciamento do perfil do Provider
+    // Perfil do Provider
     Route::get('/provider/profile', [ProviderController::class, 'editProfile'])->name('provider.profile.edit');
     Route::post('/provider/profile/update-info', [ProviderController::class, 'updateInfo'])->name('provider.profile.updateInfo');
     Route::post('/provider/profile/update-photo', [ProviderController::class, 'updateProfilePhoto'])->name('provider.profile.updatePhoto');
 
-    // Gerenciamento das categorias que o Provider atende
+    // Categorias atendidas
     Route::get('/provider/categories', [ProviderController::class, 'showCategories'])->name('provider.categories.edit');
     Route::post('/provider/categories', [ProviderController::class, 'updateCategories'])->name('provider.categories.update');
 
-    // CRUD de Portfólio
-    Route::get('/provider/portfolio/create', [PortfolioController::class, 'create'])->name('provider.portfolio.create'); // Criação
-    Route::post('/provider/portfolio', [PortfolioController::class, 'store'])->name('provider.portfolio.store'); // Armazenamento
-    Route::get('/provider/portfolio/{portfolio}/edit', [PortfolioController::class, 'edit'])->name('provider.portfolio.edit'); // Edição
-    Route::put('/provider/portfolio/{portfolio}', [PortfolioController::class, 'update'])->name('provider.portfolio.update'); // Atualização
-    Route::delete('/provider/portfolio/{portfolio}', [PortfolioController::class, 'destroy'])->name('provider.portfolio.destroy'); // Exclusão completa
-    Route::delete('/provider/portfolio/{portfolio}/image', [PortfolioController::class, 'deleteImage'])->name('provider.portfolio.delete-image'); // Exclusão de imagem individual
+    // Portfólio
+    Route::get('/provider/portfolio/create', [PortfolioController::class, 'create'])->name('provider.portfolio.create');
+    Route::post('/provider/portfolio', [PortfolioController::class, 'store'])->name('provider.portfolio.store');
+    Route::get('/provider/portfolio/{portfolio}/edit', [PortfolioController::class, 'edit'])->name('provider.portfolio.edit');
+    Route::put('/provider/portfolio/{portfolio}', [PortfolioController::class, 'update'])->name('provider.portfolio.update');
+    Route::delete('/provider/portfolio/{portfolio}', [PortfolioController::class, 'destroy'])->name('provider.portfolio.destroy');
+    Route::delete('/provider/portfolio/{portfolio}/image', [PortfolioController::class, 'deleteImage'])->name('provider.portfolio.delete-image');
 
-    // Gerenciamento de Service Requests recebidas
+    // Service Requests Recebidas
     Route::get('/service-requests', [ServiceRequestController::class, 'index'])->name('service-requests.index');
     Route::get('/service-requests/{serviceRequest}', [ServiceRequestController::class, 'show'])->name('service-requests.show');
-    Route::put('/service-requests/{serviceRequest}', [ServiceRequestController::class, 'update'])->name('service-requests.update');
+   
+    // Propor valor (Duplo Aceite)
+    Route::put('/service-requests/{serviceRequest}/propose', [ServiceRequestController::class, 'proposePrice'])->name('service-requests.propose-price');
 
-    // Avaliação de clientes (CustomUser)
+    // Avaliação do Cliente
     Route::post('/service-request/{serviceRequest}/review', [ReviewController::class, 'store'])->name('service-requests.review');
 
-    // Gerenciamento de categorias de serviço (restrito a administradores ou Providers autorizados)
+    // Gerenciamento de categorias de serviço (Admins ou Providers autorizados)
     Route::resource('service-categories', ServiceCategoryController::class)->except(['show']);
 });
 
@@ -118,28 +122,32 @@ Route::middleware('auth:web')->group(function () {
 |--------------------------------------------------------------------------
 | Rotas do CustomUser (auth:custom)
 |--------------------------------------------------------------------------
-| Rotas específicas para usuários do tipo CustomUser.
-| Inclui explorar Providers, criar solicitações, gerenciar solicitações e avaliações.
+| Rotas específicas para clientes (CustomUser).
+| Inclui explorar Providers, solicitações (Service Requests) e avaliações.
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth:custom')->group(function () {
-    // Explorar Providers por categoria ou individualmente
+    // Explorar Providers
     Route::prefix('explore')->group(function () {
         Route::get('/', [ExploreController::class, 'index'])->name('explore.index');
         Route::get('/category/{id}', [ExploreController::class, 'byCategory'])->name('explore.byCategory');
         Route::get('/provider/{id}', [ExploreController::class, 'showProvider'])->name('providers.show');
     });
 
-    // Criar uma nova Service Request para um Provider
+    // Criar Service Request
     Route::get('/provider/{provider}/request', [ServiceRequestController::class, 'create'])->name('service-requests.create');
     Route::post('/provider/{provider}/request', [ServiceRequestController::class, 'store'])->name('service-requests.store');
 
-    // Gerenciar minhas solicitações (Service Requests) como CustomUser
+    // Gerenciar minhas solicitações
     Route::get('/my-requests', [ServiceRequestController::class, 'index'])->name('custom-user.service-requests.index');
     Route::get('/my-requests/{serviceRequest}', [ServiceRequestController::class, 'show'])->name('custom-user.service-requests.show');
     Route::put('/my-requests/{serviceRequest}/cancel', [ServiceRequestController::class, 'cancel'])->name('custom-user.service-requests.cancel');
 
-    // Avaliar Providers após conclusão da Service Request
+    // Aceitar ou Recusar proposta (Duplo Aceite)
+    Route::put('/my-requests/{serviceRequest}/accept-proposal', [ServiceRequestController::class, 'acceptProposal'])->name('service-requests.accept-proposal');
+    Route::put('/my-requests/{serviceRequest}/reject-proposal', [ServiceRequestController::class, 'rejectProposal'])->name('service-requests.reject-proposal');
+
+    // Avaliação do Provider
     Route::post('/provider/{id}/review', [ReviewController::class, 'store'])->name('providers.review');
 });
 
@@ -147,8 +155,7 @@ Route::middleware('auth:custom')->group(function () {
 |--------------------------------------------------------------------------
 | Dashboard & Fallback
 |--------------------------------------------------------------------------
-| Redirecionamento inteligente baseado em autenticação.
-| Se o usuário estiver logado, vai para /home, senão volta para /login.
+| Redirecionamento inteligente e fallback para rotas não encontradas.
 |--------------------------------------------------------------------------
 */
 Route::get('/dashboard', function () {
@@ -157,7 +164,6 @@ Route::get('/dashboard', function () {
         : redirect()->route('login');
 })->name('dashboard');
 
-// Fallback para qualquer rota não encontrada
 Route::fallback(function () {
     return auth('web')->check() || auth('custom')->check()
         ? redirect()->route('home')

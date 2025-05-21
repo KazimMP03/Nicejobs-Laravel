@@ -12,19 +12,27 @@ class ChatController extends Controller
     /**
      * Lista os chats do usuário autenticado.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
+        $status = $request->input('status', 'all');
 
-        $chats = Chat::whereHas('serviceRequest', function ($q) use ($user) {
+        $chats = Chat::whereHas('serviceRequest', function ($q) use ($user, $status) {
             if ($user instanceof \App\Models\Provider) {
                 $q->where('provider_id', $user->id);
             } else {
                 $q->where('custom_user_id', $user->id);
             }
+
+            // Filtro de status
+            if ($status === 'active') {
+                $q->whereIn('status', ['chat_opened', 'accepted']);
+            } elseif ($status === 'archived') {
+                $q->whereIn('status', ['completed', 'cancelled', 'rejected']);
+            }
         })->with('serviceRequest')->get();
 
-        return view('chat.index', compact('chats'));
+        return view('chat.index', compact('chats', 'status'));
     }
 
     /**
@@ -55,8 +63,14 @@ class ChatController extends Controller
         $user = auth()->user();
         $sr = $chat->serviceRequest;
 
+        // Verifica se o usuário está vinculado à ServiceRequest
         if ($user->id !== $sr->custom_user_id && $user->id !== $sr->provider_id) {
-            abort(403);
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        // 🚫 Impede envio de mensagens se a ServiceRequest estiver finalizada
+        if ($sr->isFinalized()) {
+            return back()->with('error', 'Este chat está arquivado. Não é possível enviar mensagens.');
         }
 
         $data = $request->validate([

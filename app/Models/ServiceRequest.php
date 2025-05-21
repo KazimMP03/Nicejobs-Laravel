@@ -9,13 +9,14 @@ class ServiceRequest extends Model
 {
     use HasFactory;
 
-    // Status possíveis
-    public const STATUS_REQUESTED    = 'requested';
-    public const STATUS_CHAT_OPENED  = 'chat_opened';
-    public const STATUS_ACCEPTED     = 'accepted';
-    public const STATUS_REJECTED     = 'rejected';  
-    public const STATUS_CANCELLED    = 'cancelled';
-    public const STATUS_COMPLETED    = 'completed';
+    // === Status possíveis ===
+    public const STATUS_REQUESTED         = 'requested';
+    public const STATUS_CHAT_OPENED       = 'chat_opened';
+    public const STATUS_PENDING_ACCEPT    = 'pending_acceptance';
+    public const STATUS_ACCEPTED          = 'accepted';
+    public const STATUS_REJECTED          = 'rejected';
+    public const STATUS_CANCELLED         = 'cancelled';
+    public const STATUS_COMPLETED         = 'completed';
 
     protected $fillable = [
         'custom_user_id',
@@ -25,15 +26,56 @@ class ServiceRequest extends Model
         'initial_budget',
         'final_price',
         'status',
+        'provider_accepted',
+        'customer_accepted',
+        'service_date',
     ];
 
     protected $casts = [
-        'initial_budget' => 'decimal:2',
-        'final_price'    => 'decimal:2',
-        'status'         => 'string',
+        'service_date' => 'datetime',
+        'initial_budget'      => 'decimal:2',
+        'final_price'         => 'decimal:2',
+        'provider_accepted'   => 'boolean',
+        'customer_accepted'   => 'boolean',
+        'status'              => 'string',
     ];
 
+    // === Relações ===
+
+    /**
+     * Muitos-para-um com CustomUser
+     */
+    public function customUser()
+    {
+        return $this->belongsTo(CustomUser::class);
+    }
+
+    /**
+     * Muitos-para-um com Provider
+     */
+    public function provider()
+    {
+        return $this->belongsTo(Provider::class);
+    }
+
+    /**
+     * Muitos-para-um com Address
+     */
+    public function address()
+    {
+        return $this->belongsTo(Address::class);
+    }
+
+    /**
+     * Um-para-um com Chat
+     */
+    public function chat()
+    {
+        return $this->hasOne(Chat::class);
+    }
+
     // === Métodos auxiliares de status ===
+
     public function isRequested(): bool
     {
         return $this->status === self::STATUS_REQUESTED;
@@ -42,6 +84,11 @@ class ServiceRequest extends Model
     public function isChatOpened(): bool
     {
         return $this->status === self::STATUS_CHAT_OPENED;
+    }
+
+    public function isPendingAcceptance(): bool
+    {
+        return $this->status === self::STATUS_PENDING_ACCEPT;
     }
 
     public function isAccepted(): bool
@@ -64,27 +111,92 @@ class ServiceRequest extends Model
         return $this->status === self::STATUS_COMPLETED;
     }
 
-    /**
-     * Relação de muitos-para-um com CustomUser
-     */
-    public function customUser()
+    public function isFinalized(): bool
     {
-        return $this->belongsTo(CustomUser::class);
+        return in_array($this->status, [
+            self::STATUS_COMPLETED,
+            self::STATUS_CANCELLED,
+            self::STATUS_REJECTED,
+        ]);
+    }
+
+    // === Verificações de ações ===
+
+    public function canPropose(): bool
+    {
+        return in_array($this->status, [
+            self::STATUS_REQUESTED,
+            self::STATUS_CHAT_OPENED,
+            self::STATUS_PENDING_ACCEPT,
+        ]);
+    }
+
+    public function canAcceptProposal(): bool
+    {
+        return $this->status === self::STATUS_PENDING_ACCEPT
+            && !$this->customer_accepted;
+    }
+
+    public function canRejectProposal(): bool
+    {
+        return $this->status === self::STATUS_PENDING_ACCEPT;
+    }
+
+    public function canAccept(): bool
+    {
+        return in_array($this->status, [
+            self::STATUS_REQUESTED,
+            self::STATUS_CHAT_OPENED,
+        ]);
+    }
+
+    public function canCancel(): bool
+    {
+        return in_array($this->status, [
+            self::STATUS_REQUESTED,
+            self::STATUS_CHAT_OPENED,
+            self::STATUS_PENDING_ACCEPT,
+            self::STATUS_ACCEPTED,
+        ]);
+    }
+
+    public function canComplete(): bool
+    {
+        return $this->status === self::STATUS_ACCEPTED;
+    }
+
+    public function canReject(): bool
+    {
+        return in_array($this->status, [
+            self::STATUS_REQUESTED,
+            self::STATUS_CHAT_OPENED,
+        ]);
+    }
+
+    // === Ações de negociação ===
+
+    /**
+     * Tenta avançar para "accepted" se ambos aceitaram.
+     */
+    public function trySetAccepted()
+    {
+        if ($this->provider_accepted && $this->customer_accepted) {
+            $this->status = self::STATUS_ACCEPTED;
+            $this->save();
+        }
     }
 
     /**
-     * Relação de muitos-para-um com Providers
+     * Reseta a proposta, volta para chat_opened.
      */
-    public function provider()
+    public function resetProposal()
     {
-        return $this->belongsTo(Provider::class);
-    }
-
-    /**
-     * Relação de muitos-para-um com Address
-     */
-    public function address()
-    {
-        return $this->belongsTo(Address::class);
+        $this->update([
+            'service_date' => null,
+            'final_price'        => null,
+            'provider_accepted'  => false,
+            'customer_accepted'  => false,
+            'status'             => self::STATUS_CHAT_OPENED,
+        ]);
     }
 }

@@ -8,24 +8,24 @@
     <div class="card mb-4">
         <div class="card-body">
             <h5>Prestador: <strong>{{ $serviceRequest->provider->user_name }}</strong></h5>
-
-            <p><strong>Descrição do serviço:</strong><br>
-                {{ $serviceRequest->description }}
-            </p>
-
+            <p><strong>Descrição:</strong> {{ $serviceRequest->description }}</p>
             <p><strong>Orçamento Inicial:</strong> R$ {{ number_format($serviceRequest->initial_budget, 2, ',', '.') }}</p>
-
             @if($serviceRequest->final_price)
-                <p><strong>Valor Final Acordado:</strong> R$ {{ number_format($serviceRequest->final_price, 2, ',', '.') }}</p>
+                <p><strong>Valor Final Proposto:</strong> R$ {{ number_format($serviceRequest->final_price, 2, ',', '.') }}</p>
             @endif
-
-            <p><strong>Status:</strong> <span class="badge bg-{{ $serviceRequest->status === 'requested' ? 'secondary' : ($serviceRequest->status === 'chat_opened' ? 'info' : 'success') }}">
-                {{ ucfirst($serviceRequest->status) }}
-            </span></p>
+            <p><strong>Status:</strong> 
+                <span class="badge bg-{{ 
+                    $serviceRequest->isRequested() ? 'secondary' : 
+                    ($serviceRequest->isChatOpened() ? 'info' : 
+                    ($serviceRequest->isPendingAcceptance() ? 'warning' : 
+                    ($serviceRequest->isAccepted() ? 'success' : 'dark'))) }}">
+                    {{ ucfirst($serviceRequest->status) }}
+                </span>
+            </p>
         </div>
     </div>
 
-    {{-- Endereço do Serviço --}}
+    {{-- Endereço --}}
     <div class="card mb-4">
         <div class="card-header">Endereço do Serviço</div>
         <div class="card-body">
@@ -38,17 +38,59 @@
         </div>
     </div>
 
-    {{-- Ações do CustomUser --}}
-    @if($serviceRequest->isChatOpened())
-        <a href="{{ route('chat.open', $serviceRequest->id) }}" class="btn btn-primary">Ir para o Chat</a>
-    @endif
+    {{-- Ações --}}
+    @if(!$serviceRequest->isFinalized())
+        <div class="d-flex gap-2 flex-wrap">
 
-    @if($serviceRequest->isRequested() || $serviceRequest->isChatOpened())
-        <form action="{{ route('custom-user.service-requests.cancel', $serviceRequest->id) }}" method="POST" class="mt-3">
-            @csrf
-            @method('PUT')
-            <button type="submit" class="btn btn-warning">Cancelar Solicitação</button>
-        </form>
+            {{-- Aceitar Proposta --}}
+            @if($serviceRequest->canAcceptProposal())
+                <form action="{{ route('service-requests.accept-proposal', $serviceRequest) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <button class="btn btn-success">Aceitar Proposta</button>
+                </form>
+            @endif
+
+            {{-- Recusar Proposta --}}
+            @if($serviceRequest->canRejectProposal())
+                <form action="{{ route('service-requests.reject-proposal', $serviceRequest) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <button class="btn btn-warning">Recusar Proposta</button>
+                </form>
+            @endif
+
+            {{-- Concluir (Aparece apenas se está aceito) --}}
+            @if($serviceRequest->isAccepted())
+                <form action="{{ route('service-requests.update', $serviceRequest) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="status" value="completed">
+                    <button class="btn btn-primary">Concluir Serviço</button>
+                </form>
+            @endif
+
+            {{-- Cancelar --}}
+            @if($serviceRequest->canCancel())
+                <form action="{{ route('custom-user.service-requests.cancel', $serviceRequest) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <button class="btn btn-outline-warning">Cancelar</button>
+                </form>
+            @endif
+
+            {{-- Ir para o Chat --}}
+            @if($serviceRequest->chat)
+                <a href="{{ route('chat.show', $serviceRequest->id) }}" class="btn btn-secondary">
+                    Ir para o Chat
+                </a>
+            @endif
+
+        </div>
+    @else
+        <div class="alert alert-info">
+            Esta solicitação está {{ ucfirst($serviceRequest->status) }}.
+        </div>
     @endif
 </div>
 @endsection
