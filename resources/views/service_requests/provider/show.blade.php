@@ -101,10 +101,6 @@
             @endif
 
         </div>
-    @else
-        <div class="alert alert-info">
-            Esta solicitação está {{ ucfirst($serviceRequest->status) }}.
-        </div>
     @endif
 </div>
 @endsection
