@@ -102,5 +102,14 @@
 
         </div>
     @endif
+
+    {{-- Se estiver concluído, aparece o botão de avaliação --}}
+    @if($serviceRequest->isCompleted() && !$serviceRequest->wasReviewedBy(auth()->user()))
+        <div class="mt-3">
+            <a href="{{ route('service-requests.review', $serviceRequest) }}" class="btn btn-outline-primary">
+                Avaliar {{ auth()->user() instanceof \App\Models\Provider ? 'Cliente' : 'Prestador' }}
+            </a>
+        </div>
+    @endif
 </div>
 @endsection

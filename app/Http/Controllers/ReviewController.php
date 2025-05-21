@@ -9,30 +9,33 @@ use Illuminate\Http\Request;
 class ReviewController extends Controller
 {
     /**
-     * Armazena uma avaliação bilateral (Provider ou CustomUser) vinculada a uma ServiceRequest.
+     * Exibe o formulário de avaliação.
      */
-    public function store(Request $request, $serviceRequestId)
+    public function create(ServiceRequest $serviceRequest)
     {
-        // Busca a ServiceRequest
-        $serviceRequest = ServiceRequest::findOrFail($serviceRequestId);
-
-        // Identificar o usuário autenticado (Provider ou CustomUser)
+        // Verifica se o usuário está autenticado como Provider ou CustomUser
         $user = auth('web')->user() ?? auth('custom')->user();
         $isProvider = $user instanceof \App\Models\Provider;
         $isCustomUser = $user instanceof \App\Models\CustomUser;
 
-        // Validar se o usuário tem permissão para avaliar
         if (!$isProvider && !$isCustomUser) {
             abort(403, 'Acesso não autorizado.');
         }
 
-        // Verificar se a solicitação permite avaliação
-        // Ex: Apenas quando está aceita ou finalizada
-        if (!$serviceRequest->isAccepted() && !$serviceRequest->isCompleted()) {
+        // Valida se o usuário tem relação com a serviceRequest
+        if (
+            ($isProvider && $serviceRequest->provider_id !== $user->id) ||
+            ($isCustomUser && $serviceRequest->custom_user_id !== $user->id)
+        ) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        // Verifica se a solicitação está apta para avaliação (após ser concluída)
+        if (!$serviceRequest->isCompleted()) {
             return redirect()->back()->with('error', 'Este serviço ainda não pode ser avaliado.');
         }
 
-        // Impedir avaliações duplicadas para este service request pelo mesmo reviewer
+        // Impede avaliação duplicada
         $alreadyReviewed = Review::where('service_request_id', $serviceRequest->id)
             ->where('reviewer_id', $user->id)
             ->where('reviewer_type', $isProvider ? 'provider' : 'custom_user')
@@ -42,16 +45,50 @@ class ReviewController extends Controller
             return redirect()->back()->with('warning', 'Você já avaliou esta solicitação.');
         }
 
-        // Validação dos dados enviados no formulário
+        // Exibe a view de avaliação
+        return view('reviews.create', compact('serviceRequest'));
+    }
+
+    /**
+     * Armazena uma avaliação.
+     */
+    public function store(Request $request, $serviceRequestId)
+    {
+        // Busca a ServiceRequest
+        $serviceRequest = ServiceRequest::findOrFail($serviceRequestId);
+
+        // Identifica o usuário
+        $user = auth('web')->user() ?? auth('custom')->user();
+        $isProvider = $user instanceof \App\Models\Provider;
+        $isCustomUser = $user instanceof \App\Models\CustomUser;
+
+        if (!$isProvider && !$isCustomUser) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        // Verifica se a solicitação permite avaliação
+        if (!$serviceRequest->isCompleted()) {
+            return redirect()->back()->with('error', 'Este serviço ainda não pode ser avaliado.');
+        }
+
+        // Impede avaliações duplicadas
+        $alreadyReviewed = Review::where('service_request_id', $serviceRequest->id)
+            ->where('reviewer_id', $user->id)
+            ->where('reviewer_type', $isProvider ? 'provider' : 'custom_user')
+            ->exists();
+
+        if ($alreadyReviewed) {
+            return redirect()->back()->with('warning', 'Você já avaliou esta solicitação.');
+        }
+
+        // Validação dos dados
         $data = $request->validate([
             'rating'  => 'required|integer|min:1|max:5',
             'comment' => 'nullable|string|max:1000',
         ]);
 
-        // Determinar o "alvo" da avaliação (Provider ou CustomUser)
-        // Se for CustomUser avaliando → alvo é Provider
-        // Se for Provider avaliando → alvo é CustomUser
-        $review = new Review([
+        // Cria a review
+        Review::create([
             'service_request_id' => $serviceRequest->id,
             'rating'             => $data['rating'],
             'comment'            => $data['comment'] ?? null,
@@ -61,10 +98,6 @@ class ReviewController extends Controller
             'custom_user_id'     => $isProvider ? $serviceRequest->custom_user_id : null,
         ]);
 
-        // Salvar a avaliação no banco de dados
-        $review->save();
-
-        // Redirecionar com mensagem de sucesso
-        return redirect()->back()->with('success', 'Avaliação registrada com sucesso!');
+        return redirect()->route('home')->with('success', 'Avaliação registrada com sucesso!');
     }
 }

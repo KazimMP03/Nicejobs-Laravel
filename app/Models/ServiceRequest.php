@@ -215,4 +215,16 @@ class ServiceRequest extends Model
         };
     }
 
+    // === Método auxiliar para avaliação de usuário === //
+    public function wasReviewedBy($user)
+    {
+        return \App\Models\Review::wasReviewedBy(
+            $user->id,
+            $user instanceof \App\Models\Provider ? 'provider' : 'custom_user',
+            $user instanceof \App\Models\CustomUser ? $this->provider_id : null,
+            $user instanceof \App\Models\Provider ? $this->custom_user_id : null
+        );
+    }
+
+
 }

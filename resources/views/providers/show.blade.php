@@ -46,13 +46,7 @@
         <h4>Avaliações</h4>
         @forelse($provider->reviews as $review)
             <div class="border p-2 rounded mb-2">
-                <strong>
-                    @if($review->reviewer_type === 'custom_user')
-                        {{ $review->customUser->user_name }}
-                    @else
-                        Prestador
-                    @endif
-                </strong>
+                <strong>{{ $review->reviewer_name }}</strong>
                 <span> - Nota: {{ $review->rating }}/5</span>
                 <p>{{ $review->comment }}</p>
             </div>

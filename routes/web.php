@@ -76,6 +76,9 @@ Route::middleware('auth:web,custom')->group(function () {
 
     // Atualização de status de ServiceRequest (Acesso Comum: Provider e CustomUser)
     Route::put('/service-requests/{serviceRequest}', [ServiceRequestController::class, 'update'])->name('service-requests.update');
+    // Avaliação de CustomUser e Provider
+    Route::get('/service-requests/{serviceRequest}/review', [ReviewController::class, 'create'])->name('service-requests.review');
+    Route::post('/service-requests/{serviceRequest}/review', [ReviewController::class, 'store'])->name('service-requests.review.store');
 });
 
 /*
@@ -111,9 +114,6 @@ Route::middleware('auth:web')->group(function () {
     // Propor valor (Duplo Aceite)
     Route::put('/service-requests/{serviceRequest}/propose', [ServiceRequestController::class, 'proposePrice'])->name('service-requests.propose-price');
 
-    // Avaliação do Cliente
-    Route::post('/service-request/{serviceRequest}/review', [ReviewController::class, 'store'])->name('service-requests.review');
-
     // Gerenciamento de categorias de serviço (Admins ou Providers autorizados)
     Route::resource('service-categories', ServiceCategoryController::class)->except(['show']);
 });
@@ -146,9 +146,6 @@ Route::middleware('auth:custom')->group(function () {
     // Aceitar ou Recusar proposta (Duplo Aceite)
     Route::put('/my-requests/{serviceRequest}/accept-proposal', [ServiceRequestController::class, 'acceptProposal'])->name('service-requests.accept-proposal');
     Route::put('/my-requests/{serviceRequest}/reject-proposal', [ServiceRequestController::class, 'rejectProposal'])->name('service-requests.reject-proposal');
-
-    // Avaliação do Provider
-    Route::post('/provider/{id}/review', [ReviewController::class, 'store'])->name('providers.review');
 });
 
 /*
