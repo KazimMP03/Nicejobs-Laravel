@@ -26,10 +26,16 @@ document.addEventListener('DOMContentLoaded', function () {
             : value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
     }
 
-    function validatePhone() {
-        const phone = phoneInput.value.replace(/\D/g, '');
-        phoneInput.classList.toggle('is-invalid', !(phone.length === 10 || phone.length === 11));
+function validatePhone() {
+    const phone = phoneInput.value.replace(/\D/g, '');
+
+    if (phone.length === 0) {
+        phoneInput.classList.remove('is-invalid');
+        return;
     }
+
+    phoneInput.classList.toggle('is-invalid', !(phone.length === 10 || phone.length === 11));
+}
 
     // Alterna campos com base no tipo de pessoa
     userTypeSelect.addEventListener('change', () => {
@@ -66,6 +72,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     input.classList.remove('is-invalid');
                 }
             });
+
+            // Validação extra para telefone
+const phoneValue = phoneInput.value.replace(/\D/g, '');
+if (!phoneValue || !(phoneValue.length === 10 || phoneValue.length === 11)) {
+    phoneInput.classList.add('is-invalid');
+    valid = false;
+} else {
+    phoneInput.classList.remove('is-invalid');
+}
+
 
             if (valid) {
                 section.style.display = 'none';
@@ -104,5 +120,5 @@ document.addEventListener('DOMContentLoaded', function () {
     // Inicialização
     if (userTypeSelect.value) userTypeSelect.dispatchEvent(new Event('change'));
     phoneInput.value = applyPhoneMask(phoneInput.value);
-    validatePhone();
+
 });

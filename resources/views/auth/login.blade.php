@@ -99,11 +99,11 @@
                                     <label class="form-check-label" for="remember" style="font-size: 14px;">Manter
                                         conectado</label>
                                 </div>
-                                <a href="" style="font-size: 14px;">Perdeu a senha?</a>
+                                <a href="{{ route('password.request') }}" style="font-size: 14px;">Perdeu a senha?</a>
                             </div>
-
                             <button type="submit" class="btn btn-primary py-3 w-100 mb-4 fw-bold fs-5">Entrar</button>
                         </form>
+                        <!-- Fim do Formulário -->
                         <p class="text-center mb-0" style="font-size: 15px;"> Ainda não tem uma conta? Cadastre-se como
                             <a href="{{ route('register.provider.form') }}" class="fw-bold"
                                 style="font-size: 17px;">PRESTADOR</a> ou como <a
@@ -129,7 +129,6 @@
     <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
     <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
     <script src="{{ asset('js/main.js') }}"></script>
-
 </body>
 
 </html>

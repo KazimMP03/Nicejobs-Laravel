@@ -11,7 +11,8 @@ use App\Http\Controllers\{
     ExploreController,
     ReviewController,
     ChatController,
-    PortfolioController
+    PortfolioController,
+    PasswordResetController
 };
 
 /*
@@ -22,6 +23,7 @@ use App\Http\Controllers\{
 | Inclui login, registro e recuperação de senha.
 |--------------------------------------------------------------------------
 */
+
 Route::redirect('/', '/login')->name('root');
 
 Route::middleware('guest')->group(function () {
@@ -39,8 +41,10 @@ Route::middleware('guest')->group(function () {
     });
 
     // Recuperação de senha
-    Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
-    Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/password/forgot', [PasswordResetController::class, 'showForgotForm'])->name('password.request');
+    Route::post('/password/email', [PasswordResetController::class, 'sendResetLink'])->name('password.email');
+    Route::get('/password/reset/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/password/reset', [PasswordResetController::class, 'resetPassword'])->name('password.update');
 });
 
 /*
@@ -110,7 +114,7 @@ Route::middleware('auth:web')->group(function () {
     // Service Requests Recebidas
     Route::get('/service-requests', [ServiceRequestController::class, 'index'])->name('service-requests.index');
     Route::get('/service-requests/{serviceRequest}', [ServiceRequestController::class, 'show'])->name('service-requests.show');
-   
+
     // Propor valor (Duplo Aceite)
     Route::put('/service-requests/{serviceRequest}/propose', [ServiceRequestController::class, 'proposePrice'])->name('service-requests.propose-price');
 

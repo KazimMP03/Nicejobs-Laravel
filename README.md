@@ -7,13 +7,14 @@ O sistema oferece uma base sólida para gerenciamento de usuários, cadastro de 
 ---
 
 🚀 **Tecnologias Utilizadas:**
-- **Laravel** – Framework PHP para estruturação do backend
-- **PHP** – Linguagem principal da aplicação
-- **PostgreSQL** – Banco de dados relacional de alto desempenho
-- **Blade** – Sistema de templates nativo do Laravel
-- **Bootstrap** – Framework CSS responsivo para layout e componentes
-- **JavaScript** – Funcionalidades dinâmicas e interatividade
-- **HTML5 & CSS3** – Estrutura e estilo do front-end
+
+-   **Laravel** – Framework PHP para estruturação do backend
+-   **PHP** – Linguagem principal da aplicação
+-   **PostgreSQL** – Banco de dados relacional de alto desempenho
+-   **Blade** – Sistema de templates nativo do Laravel
+-   **Bootstrap** – Framework CSS responsivo para layout e componentes
+-   **JavaScript** – Funcionalidades dinâmicas e interatividade
+-   **HTML5 & CSS3** – Estrutura e estilo do front-end
 
 ---
 
@@ -28,15 +29,16 @@ Criar uma plataforma completa onde usuários possam cadastrar, buscar e contrata
 ---
 
 ## 🧱 Estrutura do Projeto
-app/ -> 
-Controladores e modelos da aplicação bootstrap/ -> 
-Arquivo de bootstrap da aplicação config/ -> 
-Arquivos de configuração do sistema database/ -> 
-Migrations, seeders e factories public/ -> 
-Arquivos públicos (index.php) resources/ -> 
-Views Blade, CSS, JS routes/ -> 
-Rotas web e API storage/ -> 
-Cache, logs e uploads tests/ -> 
+
+app/ ->
+Controladores e modelos da aplicação bootstrap/ ->
+Arquivo de bootstrap da aplicação config/ ->
+Arquivos de configuração do sistema database/ ->
+Migrations, seeders e factories public/ ->
+Arquivos públicos (index.php) resources/ ->
+Views Blade, CSS, JS routes/ ->
+Rotas web e API storage/ ->
+Cache, logs e uploads tests/ ->
 Testes automatizados
 
 ---
@@ -45,7 +47,8 @@ Testes automatizados
 
 # CONFIGURAÇÃO - Ambiente de Trabalho NiceJob! (Passo a Passo)
 
-- REQUISITOS:
+-   REQUISITOS:
+
 1. PHP
 2. Composer
 3. PostgreSQL + pgAdmin 4
@@ -54,7 +57,8 @@ Testes automatizados
 6. Clonar repositório
 7. Configurar projeto
 
-- PASSOS:
+-   PASSOS:
+
 1. Pedir auxílio de alguma IA como ChatGPT para auxiliar na instalação e/ou atualização dos itens 1 ao 4 em sua máquina.
 
 2. Procurar o arquivo "php.ini-development" na pasta onde foi instalado o php. Renomear o arquivo para "php.ini". Abrir o arquivo como bloco de notas e tirar o ";" das seguintes linhas: ";extension=fileinfo" / ";extension=mbstring" / ";extension=openssl" / ";extension=pdo_pgsql". Salvar o arquivo.
@@ -71,13 +75,25 @@ Testes automatizados
 
 8. Rodar na pasta: copy .env.example .env
 
-9. Abrir o arquivo ".env" (opcionalmente no VSCode) e colocar estes valores:
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=nicejob_db
-DB_USERNAME=seu_usuario_postgres (normalmente postgres)
-DB_PASSWORD=sua_senha_postgres (normalmente 123)
+9. Abrir o arquivo ".env" (opcionalmente no VSCode) e substituir estes valores:
+   DB_CONNECTION=pgsql
+   DB_HOST=127.0.0.1
+   DB_PORT=5432
+   DB_DATABASE=nicejob_db
+   DB_USERNAME=seu_usuario_postgres (normalmente postgres)
+   DB_PASSWORD=sua_senha_postgres (normalmente 123)
+
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=nicejob.noreply@gmail.com
+MAIL_PASSWORD=rgzjgahypsatvzmz
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=nicejob.noreply@gmail.com
+MAIL_FROM_NAME="NiceJob"
+
+APP_TIMEZONE=America/Sao_Paulo
+
 Salvar o arquivo.
 
 10. Na busca do windows, abrir "Serviços", procurar por "postgresql", click com botão direito e "iniciar", se já não estiver iniciado.

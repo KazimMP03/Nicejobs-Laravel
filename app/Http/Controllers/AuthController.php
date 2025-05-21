@@ -19,7 +19,7 @@ class AuthController extends Controller
         if (Auth::guard('web')->check() || Auth::guard('custom')->check()) {
             return redirect()->route('home');
         }
-        
+
         return view('auth.login');
     }
 
@@ -52,7 +52,7 @@ class AuthController extends Controller
         // 4) se não encontrar em nenhum, erro de e-mail
         if (! $user) {
             return back()->withErrors([
-                'email' => 'Email não cadastrado.'
+                'email' => 'E-mail não cadastrado.'
             ]);
         }
 
@@ -62,7 +62,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             return redirect()->route('home')
-                             ->with('success', 'Login realizado com sucesso!');
+                ->with('success', 'Login realizado com sucesso!');
         }
 
         // 6) credenciais inválidas
@@ -83,8 +83,8 @@ class AuthController extends Controller
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
+
         return redirect()->route('login')
-                         ->with('status', 'Você saiu da conta com sucesso.');
+            ->with('status', 'Você saiu da conta com sucesso.');
     }
 }

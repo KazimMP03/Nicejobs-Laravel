@@ -245,7 +245,6 @@ document.addEventListener('DOMContentLoaded', function() {
     return true;
 }
 
-
     /**
      * =============================================
      * FUNÇÕES DE ATUALIZAÇÃO DE CAMPOS
@@ -318,6 +317,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Atualiza quando muda o tipo de pessoa
     userTypeSelect.addEventListener('change', updateTaxIdField);
 
+    
     /**
      * =============================================
      * INICIALIZAÇÃO
