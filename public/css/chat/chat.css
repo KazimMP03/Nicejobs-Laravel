@@ -1,3 +1,6 @@
+/* ==================== ÁREA DE MENSAGENS ==================== */
+
+/* Caixa principal do chat */
 .chat-box {
     height: 350px;
     overflow-y: auto;
@@ -6,19 +9,23 @@
     border-radius: 8px;
 }
 
+/* Bloco de cada mensagem */
 .chat-message {
     margin-bottom: 8px;
     display: flex;
 }
 
+/* Mensagem enviada (me) — alinhada à direita */
 .chat-message.me {
     justify-content: flex-end;
 }
 
+/* Mensagem recebida (them) — alinhada à esquerda */
 .chat-message.them {
     justify-content: flex-start;
 }
 
+/* Balão da mensagem */
 .chat-bubble {
     background: #fff;
     padding: 8px 12px;
@@ -26,17 +33,22 @@
     max-width: 70%;
 }
 
+/* Imagens dentro do chat */
 .chat-image {
     max-height: 200px;
     border-radius: 10px;
     cursor: pointer;
 }
 
+/* Vídeos dentro do chat */
 .chat-video {
     max-width: 100%;
     border-radius: 10px;
 }
 
+/* ==================== INPUT DE MENSAGEM ==================== */
+
+/* Container da caixa de mensagem */
 .chat-input-container {
     display: flex;
     align-items: center;
@@ -48,12 +60,14 @@
     background: #fff;
 }
 
+/* Input de texto dentro da caixa */
 .chat-input-container input[type="text"] {
     flex-grow: 1;
     border: none;
     outline: none;
 }
 
+/* Botões da caixa de mensagem (emoji, enviar, microfone, etc.) */
 .chat-input-container button {
     background: none;
     border: none;
@@ -61,44 +75,84 @@
     cursor: pointer;
 }
 
+/* ==================== MENSAGEM DE ARQUIVO ==================== */
+
+/* Estrutura antiga (não está mais em uso, apenas referência) */
 .file-message {
     display: flex;
     flex-direction: column;
     gap: 5px;
 }
 
-.text-file-pdf {
-    color: #d93025; /* vermelho Google Drive PDF */
+/* Cores para tipos de arquivos */
+.text-file-pdf { color: #d93025; }      /* PDF - vermelho Google */
+.text-file-word { color: #2a5699; }     /* Word - azul */
+.text-file-excel { color: #217346; }    /* Excel - verde */
+.text-file-ppt { color: #d24726; }      /* PowerPoint - laranja */
+.text-file-archive { color: #a77f2d; }  /* ZIP, RAR - dourado */
+.text-file-text { color: #5f6368; }     /* TXT - cinza médio */
+.text-file-code { color: #4a148c; }     /* JSON, XML - roxo escuro */
+.text-file-default { color: #3c4043; }  /* Outros arquivos - cinza escuro */
+
+/* Nova estrutura de exibição de arquivos */
+.file-message-new {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #fdfdfd;
+    max-width: 100%;
 }
 
-.text-file-word {
-    color: #2a5699; /* azul Word */
+/* Ícone do arquivo */
+.file-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
 }
 
-.text-file-excel {
-    color: #217346; /* verde Excel */
+/* Informações do arquivo (nome e descrição) */
+.file-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0;
 }
 
-.text-file-ppt {
-    color: #d24726; /* laranja PowerPoint */
+/* Ícone aumentado */
+.file-icon i {
+    font-size: 2.6rem;
 }
 
-.text-file-archive {
-    color: #a77f2d; /* tom amarelado para zip */
+/* Nome do arquivo */
+.file-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.text-file-text {
-    color: #5f6368; /* cinza para txt */
+/* Descrição do arquivo (tipo + tamanho) */
+.file-desc {
+    font-size: 0.8rem;
+    color: #777;
+    margin-top: 2px;
+    margin-bottom: 6px;
 }
 
-.text-file-code {
-    color: #4a148c; /* roxo escuro */
+/* Ações do arquivo (abrir, salvar) */
+.file-actions {
+    display: flex;
+    gap: 10px;
 }
 
-.text-file-default {
-    color: #3c4043; /* cinza escuro para padrão */
-}
+/* ==================== MENU DE ANEXOS ==================== */
 
+/* Painel que aparece ao clicar no clipe */
 .attachment-panel {
     position: absolute;
     bottom: 45px;
@@ -114,6 +168,7 @@
     width: 160px;
 }
 
+/* Cada item do menu de anexos */
 .attachment-item {
     display: flex;
     align-items: center;
@@ -127,14 +182,19 @@
     transition: background 0.2s ease;
 }
 
+/* Ícone dos itens do menu */
 .attachment-item i {
     font-size: 18px;
 }
 
+/* Efeito hover */
 .attachment-item:hover {
     background: #e0e0e0;
 }
 
+/* ==================== INFORMAÇÕES DAS MENSAGENS ==================== */
+
+/* Horário da mensagem */
 .bubble-time {
     font-size: 0.65rem;
     color: #a0a0a0;
@@ -142,55 +202,9 @@
     margin-top: 6px;
 }
 
-.file-message-new {
-    display: flex;
-    align-items: center; /* centraliza verticalmente */
-    gap: 12px;
-    border: 1px solid #ddd;
-    padding: 10px 12px;
-    border-radius: 10px;
-    background: #fdfdfd;
-    max-width: 100%;
-}
+/* ==================== EMOJI PICKER ==================== */
 
-.file-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 50px;
-}
-
-.file-info {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    min-width: 0;
-}
-
-.file-icon i {
-    font-size: 2.6rem; /* aumento do tamanho */
-}
-
-.file-name {
-    font-weight: 600;
-    font-size: 0.95rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.file-desc {
-    font-size: 0.8rem;
-    color: #777;
-    margin-top: 2px;
-    margin-bottom: 6px;
-}
-
-.file-actions {
-    display: flex;
-    gap: 10px;
-}
-
+/* Estilo do emoji picker */
 emoji-picker {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     border-radius: 12px;
@@ -198,19 +212,36 @@ emoji-picker {
     max-height: 320px;
 }
 
+/* ==================== MODAIS ==================== */
+
+/* Modal escuro para visualização de imagem */
 .modal-content.bg-dark {
     background-color: #000 !important;
 }
 
+/* Imagem dentro do modal de visualização */
 .modal-body img {
     object-fit: contain;
 }
 
+/* ==================== GRAVAÇÃO DE ÁUDIO ==================== */
+
+/* Botão de áudio com efeito de gravação */
 #audio-btn.recording {
     color: red;
     animation: pulse 1s infinite;
 }
 
+/* Animação de piscar */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+}
+
+/* ==================== MODAL DA CÂMERA ==================== */
+
+/* Botão de capturar (estilo círculo) */
 #capture-btn {
     border: 3px solid #ccc;
 }
@@ -219,18 +250,13 @@ emoji-picker {
     background-color: #f0f0f0;
 }
 
+/* Footer do modal da câmera organizado em coluna */
 #cameraModal .modal-footer {
     gap: 10px;
     flex-direction: column;
 }
 
+/* Campo de mensagem dentro do modal da câmera ocupa 100% */
 #cameraModal .form-control {
     width: 100%;
 }
-
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.4; }
-    100% { opacity: 1; }
-}
-

@@ -1,19 +1,22 @@
+// Aguarda o carregamento completo do DOM antes de executar o script
 document.addEventListener('DOMContentLoaded', function () {
-    const messageInput = document.getElementById('message-input');
-    const sendBtn = document.getElementById('send-btn');
-    const audioBtn = document.getElementById('audio-btn');
-    const attachBtn = document.getElementById('attach-btn');
-    const attachMenu = document.getElementById('attachment-menu');
 
-    const imageInput = document.getElementById('hidden-image-input');
-    const fileInput = document.getElementById('hidden-file-input');
+    // === Definição dos elementos principais do chat ===
+    const messageInput = document.getElementById('message-input');      // Campo de texto da mensagem
+    const sendBtn = document.getElementById('send-btn');                // Botão de enviar texto
+    const audioBtn = document.getElementById('audio-btn');              // Botão de gravar áudio
+    const attachBtn = document.getElementById('attach-btn');            // Botão de abrir menu de anexos
+    const attachMenu = document.getElementById('attachment-menu');      // Menu de anexos
 
-    const emojiBtn = document.getElementById('emoji-btn');
-    const emojiPicker = document.getElementById('emoji-picker');
-    const formActionUrl = document.getElementById('chat-form').getAttribute('action');
-    const csrfToken = document.querySelector('input[name="_token"]').value;
+    const imageInput = document.getElementById('hidden-image-input');   // Input oculto para fotos e vídeos
+    const fileInput = document.getElementById('hidden-file-input');     // Input oculto para documentos
 
-    // Alternar botões enviar/áudio
+    const emojiBtn = document.getElementById('emoji-btn');              // Botão de abrir emoji picker
+    const emojiPicker = document.getElementById('emoji-picker');        // Elemento emoji picker
+    const formActionUrl = document.getElementById('chat-form').getAttribute('action'); // URL de envio das mensagens
+    const csrfToken = document.querySelector('input[name="_token"]').value; // Token CSRF para segurança
+
+    // === Alternância entre botão de enviar (texto) e botão de áudio ===
     function toggleSendAudio() {
         if (messageInput.value.trim().length > 0) {
             sendBtn.style.display = 'inline-block';
@@ -24,21 +27,24 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Executa uma vez ao carregar a página
     toggleSendAudio();
+    // E também toda vez que o usuário digita algo
     messageInput.addEventListener('input', toggleSendAudio);
 
-    // Abrir/fechar menu de anexos
+    // === Abrir/fechar o menu de anexos ===
     attachBtn.addEventListener('click', () => {
-        attachMenu.classList.toggle('d-none');
+        attachMenu.classList.toggle('d-none'); // Alterna visibilidade
     });
 
+    // Fecha o menu se clicar fora dele
     document.addEventListener('click', (e) => {
         if (!attachBtn.contains(e.target) && !attachMenu.contains(e.target)) {
             attachMenu.classList.add('d-none');
         }
     });
 
-    // Triggers para inputs invisíveis
+    // === Função para acionar os inputs ocultos de imagem ou arquivo ===
     window.triggerFileInput = function (type) {
         attachMenu.classList.add('d-none');
         if (type === 'image') {
@@ -48,12 +54,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    // Função de pré-visualização
+    // === Função de pré-visualização de arquivos no modal ===
     function handleFileInput(input, type) {
         input.addEventListener('change', () => {
             const file = input.files[0];
             if (!file) return;
 
+            // Preenche informações no modal
             document.getElementById('modal-type').value = type;
             document.getElementById('file-name').innerText = file.name;
             document.getElementById('file-size').innerText = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
@@ -62,6 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
             previewContainer.innerHTML = '';
             previewContainer.classList.add('d-none');
 
+            // Mostra preview se for imagem ou vídeo
             if (type === 'image' && file.type.startsWith('image/')) {
                 const img = document.createElement('img');
                 img.src = URL.createObjectURL(file);
@@ -79,6 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 previewContainer.classList.remove('d-none');
             }
 
+            // Substitui o input de arquivo antigo por um novo
             const form = document.getElementById('preview-form');
             const oldInput = form.querySelector('input[name="file"]');
             if (oldInput) oldInput.remove();
@@ -94,27 +103,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
             form.insertBefore(inputHidden, form.querySelector('.modal-body'));
 
+            // Abre o modal de pré-visualização
             const modal = new bootstrap.Modal(document.getElementById('previewModal'));
             modal.show();
         });
     }
 
+    // Ativa pré-visualização para imagens e arquivos
     handleFileInput(imageInput, 'image');
     handleFileInput(fileInput, 'file');
 
     // === Emoji Picker ===
+    // Abrir e fechar emoji picker
     emojiBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'block' : 'none';
     });
 
+    // Inserir emoji no input
     emojiPicker.addEventListener('emoji-click', (event) => {
         messageInput.value += event.detail.unicode;
         messageInput.focus();
         emojiPicker.style.display = 'none';
-        messageInput.dispatchEvent(new Event('input'));
+        messageInput.dispatchEvent(new Event('input')); // Atualiza o botão de enviar
     });
 
+    // Fecha o emoji picker se clicar fora
     document.addEventListener('click', (e) => {
         if (!emojiPicker.contains(e.target) && !emojiBtn.contains(e.target)) {
             emojiPicker.style.display = 'none';
@@ -126,23 +140,27 @@ document.addEventListener('DOMContentLoaded', function () {
     let audioChunks = [];
 
     audioBtn.addEventListener('click', async () => {
+        // Se já está gravando, para a gravação
         if (mediaRecorder && mediaRecorder.state === "recording") {
             mediaRecorder.stop();
             return;
         }
 
         try {
+            // Solicita permissão do microfone
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             mediaRecorder = new MediaRecorder(stream);
 
             mediaRecorder.start();
             audioChunks = [];
-            audioBtn.classList.add('recording');
+            audioBtn.classList.add('recording'); // Adiciona efeito visual no botão
 
+            // Captura os dados do áudio
             mediaRecorder.addEventListener("dataavailable", event => {
                 audioChunks.push(event.data);
             });
 
+            // Ao parar, monta o arquivo e envia
             mediaRecorder.addEventListener("stop", () => {
                 audioBtn.classList.remove('recording');
 
@@ -156,11 +174,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 formData.append('message', '');
                 formData.append('file', audioFile);
 
+                // Envia via fetch
                 fetch(formActionUrl, {
                     method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken
-                    },
+                    headers: { 'X-CSRF-TOKEN': csrfToken },
                     body: formData
                 }).then(() => {
                     window.location.reload();
@@ -176,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // === Modal de Imagem ===
+    // === Modal de visualização de imagem ===
     window.openImage = function (url) {
         const modalImg = document.getElementById('modal-image');
         modalImg.src = url;
@@ -185,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.show();
     };
 
-    // === Captura pela Webcam ===
+    // === Captura de Foto pela Câmera ===
     let stream = null;
 
     window.openCamera = async function () {
@@ -196,6 +213,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const preview = document.getElementById('captured-image-preview');
         const form = document.getElementById('camera-form');
 
+        // Reseta estados anteriores
         preview.classList.add('d-none');
         video.classList.remove('d-none');
         form.classList.add('d-none');
@@ -203,6 +221,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('capture-btn').classList.remove('d-none');
 
         try {
+            // Solicita acesso à câmera
             stream = await navigator.mediaDevices.getUserMedia({ video: true });
             video.srcObject = stream;
         } catch (err) {
@@ -211,6 +230,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
+    // Função para parar a câmera
     window.stopCamera = function () {
         if (stream) {
             stream.getTracks().forEach(track => track.stop());
@@ -218,6 +238,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
+    // Ao clicar em capturar
     document.getElementById('capture-btn').addEventListener('click', () => {
         const video = document.getElementById('camera-stream');
         const preview = document.getElementById('captured-image-preview');
@@ -233,6 +254,7 @@ document.addEventListener('DOMContentLoaded', function () {
         capturedImg.src = imageData;
         preview.classList.remove('d-none');
 
+        // Cria um arquivo da imagem capturada
         fetch(imageData)
             .then(res => res.blob())
             .then(blob => {
@@ -244,6 +266,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 input.files = dataTransfer.files;
             });
 
+        // Alterna visibilidade
         video.classList.add('d-none');
         form.classList.remove('d-none');
         document.getElementById('capture-btn').classList.add('d-none');
@@ -251,7 +274,9 @@ document.addEventListener('DOMContentLoaded', function () {
         stopCamera();
     });
 
+    // Refazer foto
     window.retakePhoto = function () {
         openCamera();
     };
+
 });
