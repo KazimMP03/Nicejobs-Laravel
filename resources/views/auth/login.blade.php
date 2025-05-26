@@ -3,7 +3,7 @@
 
     <head>
         <meta charset="utf-8">
-        <title>NiceJobPORRA - Login</title>
+        <title>NiceJob - Login</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="keywords"
             content="serviços, contratação, autônomos, plataforma, NiceJob, prestadores">
