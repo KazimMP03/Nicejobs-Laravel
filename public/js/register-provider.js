@@ -8,6 +8,29 @@
         let isValid = true;
         const inputs = currentSection.querySelectorAll('input[required], select[required], textarea[required]');
 
+        // Validação de nascimento/fundação conforme tipo de pessoa
+const userType = document.getElementById('user_type').value;
+
+const birthDateInput = document.getElementById('birth_date');
+const foundationDateInput = document.getElementById('foundation_date');
+
+// Se PF, birth_date é obrigatório
+if (userType === 'PF' && (!birthDateInput.value || birthDateInput.value.trim() === '')) {
+    birthDateInput.classList.add('is-invalid');
+    isValid = false;
+} else {
+    birthDateInput.classList.remove('is-invalid');
+}
+
+// Se PJ, foundation_date é obrigatório
+if (userType === 'PJ' && (!foundationDateInput.value || foundationDateInput.value.trim() === '')) {
+    foundationDateInput.classList.add('is-invalid');
+    isValid = false;
+} else {
+    foundationDateInput.classList.remove('is-invalid');
+}
+
+
         inputs.forEach(input => {
             if (!input.value) {
                 input.classList.add('is-invalid');

@@ -92,7 +92,9 @@ class PasswordResetController extends Controller
             ->first();
 
         if (!$reset) {
-            return back()->withErrors(['email' => 'Token inválido ou expirado.']);
+            return back()->withErrors([
+                'email' => 'E-mail inválido para este link de redefinição ou link expirado.'
+            ]);
         }
 
         // Verifica se o usuário é provider ou custom_user
