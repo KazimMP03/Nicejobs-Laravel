@@ -59,29 +59,47 @@ Testes automatizados
 
 -   PASSOS:
 
-1. Pedir auxílio de alguma IA como ChatGPT para auxiliar na instalação e/ou atualização dos itens 1 ao 4 em sua máquina.
+1. Instalando PHP:
 
-2. Procurar o arquivo "php.ini-development" na pasta onde foi instalado o php. Renomear o arquivo para "php.ini". Abrir o arquivo como bloco de notas e tirar o ";" das seguintes linhas: ";extension=fileinfo" / ";extension=mbstring" / ";extension=openssl" / ";extension=pdo_pgsql". Salvar o arquivo.
+-   Acessar https://windows.php.net/download/ e baixar a última versão ZIP x64 Thread Safe, exemplo: VS17 x64 Thread Safe.
+-   Extraia o ZIP para um caminho direto, tipo: C:\php
+-   Pressione Win + S → digite "variáveis de ambiente" → clique em "Editar variáveis de ambiente do sistema". Clique em "Variáveis de ambiente". Em "Variáveis do sistema", ache a variável Path, clique em Editar. Clique em Novo e adicione: C:\php .Clique em OK em tudo pra fechar.
+-   Vá até C:\php. Procurar o arquivo "php.ini-development" na pasta onde foi instalado o php. Renomear o arquivo para "php.ini". Abrir o arquivo como bloco de notas e tirar o ";" das seguintes linhas: ";extension=fileinfo" / ";extension=mbstring" / ";extension=openssl" / ";extension=pdo_pgsql" / ";extension=pgsql" / ";extension=curl" / ";extension=zip". Salvar o arquivo.
+-   Para testar se instalou corretamente: Abra o terminal (cmd) e digite: php -v .Se tudo estiver certo, verá algo como: PHP 8.3.6 (cli) (built: ...)
 
-3. Criar a pasta onde rodará o sistema, por exemplo: C:\nicejob.
+2. Instalando Composer:
 
-4. (opcional) Adicionar a pasta C:\nicejob ao Workspace do VSCode.
+-   Acesse o site oficial: https://getcomposer.org/ .Clique em “Getting Started” → depois clique em “Composer-Setup.exe”.
+-   Ele vai procurar o php.exe. Você deve apontar para onde instalou o PHP (por exemplo C:\php\php.exe).
+-   Depois que instalar, abra o CMD e digite: composer . Se aparecer algo assim, tá feito: Composer version 2.x.x 202x-xx-xx
+    Se aparecer algo assim, tá feito:
 
-5. Abrir o cmd de qualquer lugar e rodar: git clone https://github.com/KazimMP03/Nicejobs-Laravel.git C:\nicejob
+3. Instalando PostgreSQL + pgAdmin 4:
 
-6. Abrir o cmd na pasta C:\nicejob e rodar: composer update
+-   Baixe no site: https://www.postgresql.org/download/windows/
+-   Execute o instalador. Durante a instalação instale os seguintes componentes: PostgreSQL Server e pgAdmin (stack builder não precisa).
+-   Depois de instalado, execute pgAdmin e quando pedir a senha, coloque 123.
 
-7. Para garantir, também rodar na pasta: composer install
+4. Criar a pasta onde rodará o sistema, por exemplo: C:\nicejob.
 
-8. Rodar na pasta: copy .env.example .env
+5. (opcional) Adicionar a pasta C:\nicejob ao Workspace do VSCode.
 
-9. Abrir o arquivo ".env" (opcionalmente no VSCode) e substituir estes valores:
-   DB_CONNECTION=pgsql
-   DB_HOST=127.0.0.1
-   DB_PORT=5432
-   DB_DATABASE=nicejob_db
-   DB_USERNAME=seu_usuario_postgres (normalmente postgres)
-   DB_PASSWORD=sua_senha_postgres (normalmente 123)
+6. Abrir o cmd de qualquer lugar e rodar: git clone https://github.com/KazimMP03/Nicejobs-Laravel.git C:\nicejob
+
+7. Abrir o cmd na pasta C:\nicejob e rodar: composer update
+
+8. Para garantir, também rodar na pasta: composer install
+
+9. Rodar na pasta: copy .env.example .env
+
+10. Abrir o arquivo ".env" (opcionalmente no VSCode) e substituir estes valores:
+
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=nicejob_db
+DB_USERNAME=seu_usuario_postgres (normalmente postgres)
+DB_PASSWORD=sua_senha_postgres (normalmente 123)
 
 MAIL_MAILER=smtp
 MAIL_HOST=smtp.gmail.com
@@ -96,14 +114,14 @@ APP_TIMEZONE=America/Sao_Paulo
 
 Salvar o arquivo.
 
-10. Na busca do windows, abrir "Serviços", procurar por "postgresql", click com botão direito e "iniciar", se já não estiver iniciado.
+11. Na busca do windows, abrir "Serviços", procurar por "postgresql", click com botão direito e "iniciar", se já não estiver iniciado.
 
-11. Abrir pgAdmin 4, "Servers", "PostgreSQL", click direito em "Databases" e "Create" e "Database..." somente colocar o nome do banco de dados "nicejob_db" e SAVE.
+12. Abrir pgAdmin 4, "Servers", "PostgreSQL", click direito em "Databases" e "Create" e "Database..." somente colocar o nome do banco de dados "nicejob_db" e SAVE.
 
-12. Abrir cmd na pasta C:\niocejob e rodar: php artisan key:generate
+13. Abrir cmd na pasta C:\niocejob e rodar: php artisan key:generate
 
-13. Também na pasta, rodar: php artisan migrate
+14. Também na pasta, rodar: php artisan migrate
 
-14. Também na pasta, rodar: php artisan serve
+15. Também na pasta, rodar: php artisan serve
 
-15. Abrir no navegador: http://localhost:8000/
+16. Abrir no navegador: http://localhost:8000/
