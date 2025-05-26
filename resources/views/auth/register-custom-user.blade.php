@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>NiceJob - Cadastro de Cliente</title>
+    <title>NiceJobs - Cadastro de Cliente</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="keywords" content="serviços, contratação, autônomos, plataforma, NiceJob, prestadores">
     <meta name="description"
