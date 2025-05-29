@@ -135,7 +135,7 @@ Route::middleware('auth:custom')->group(function () {
     Route::prefix('explore')->group(function () {
         Route::get('/', [ExploreController::class, 'index'])->name('explore.index');
         Route::get('/category/{id}', [ExploreController::class, 'byCategory'])->name('explore.byCategory');
-        Route::get('/provider/{id}', [ExploreController::class, 'showProvider'])->name('providers.show');
+        Route::get('/provider/{id}', [ExploreController::class, 'showProvider'])->name('explore.provider.show');
     });
 
     // Criar Service Request

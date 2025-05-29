@@ -47,6 +47,6 @@ class ExploreController extends Controller
             // 'reviews.customUser', // ← ativar quando Review estiver implementado
         ])->findOrFail($id);
 
-        return view('providers.show', compact('provider'));
+        return view('explore.provider.show', compact('provider'));
     }
 }
