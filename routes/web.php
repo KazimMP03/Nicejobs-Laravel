@@ -153,6 +153,13 @@ Route::middleware('auth:custom')->group(function () {
     // Aceitar ou Recusar proposta (Duplo Aceite)
     Route::put('/my-requests/{serviceRequest}/accept-proposal', [ServiceRequestController::class, 'acceptProposal'])->name('service-requests.accept-proposal');
     Route::put('/my-requests/{serviceRequest}/reject-proposal', [ServiceRequestController::class, 'rejectProposal'])->name('service-requests.reject-proposal');
+
+    // Perfil do CustomUser
+    Route::prefix('custom-user/profile')->middleware('auth:custom')->group(function () {
+        Route::get('/', fn() => view('custom_users.show', ['customUser' => auth()->user()]))->name('custom-user.profile.show');
+        Route::get('/edit', [CustomUserController::class, 'editProfile'])->name('custom-user.profile.edit');
+        Route::put('/', [CustomUserController::class, 'updateProfile'])->name('custom-user.profile.update');
+    });
 });
 
 /*

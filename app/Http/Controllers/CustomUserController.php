@@ -51,10 +51,46 @@ class CustomUserController extends Controller
         unset($data['password_confirmation'], $data['terms']);
 
         // 3) Cria o cliente
-        $customUser = CustomUser::create($data);
+        CustomUser::create($data);
 
         // 4) Redireciona ao login
         return redirect()->route('login')
                          ->with('success', 'Cadastro realizado com sucesso! Faça login para continuar.');
+    }
+
+    /**
+     * Exibe a página de edição de perfil (foto e informações gerais)
+     */
+    public function editProfile()
+    {
+        $customUser = auth()->user();
+
+        if (!($customUser instanceof CustomUser)) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        return view('custom_users.edit', compact('customUser'));
+    }
+
+    /**
+     * Atualiza as informações gerais do CustomUser (que podem ser atualizadas)
+     */
+    public function updateProfile(Request $request)
+    {
+        $customUser = auth()->user();
+
+        if (!($customUser instanceof CustomUser)) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        $data = $request->validate([
+            'user_name' => 'required|string|max:255',
+            'phone'     => 'required|string|max:20',
+        ]);
+
+        $customUser->update($data);
+
+        return redirect()->route('custom-user.profile.show')
+                        ->with('success', 'Perfil atualizado com sucesso.');
     }
 }

@@ -66,6 +66,7 @@ class ProviderController extends Controller
 
         $data = $request->validate([
             'user_name' => 'required|string|max:255',
+            'phone'     => 'required|string|max:20',
             'provider_description' => 'nullable|string|max:1000',
             'work_radius'          => 'required|integer|min:1',
             'availability'         => 'required|in:weekdays,weekends,both',

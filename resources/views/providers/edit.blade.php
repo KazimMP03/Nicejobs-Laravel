@@ -23,6 +23,14 @@
                            value="{{ old('user_name', $provider->user_name) }}"
                            class="form-control" required maxlength="255">
                 </div>
+                
+                {{-- Telefone --}}
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Telefone</label>
+                    <input type="text" name="phone" id="phone"
+                        value="{{ old('phone', $provider->phone) }}"
+                        class="form-control" required maxlength="20">
+                </div>
 
                 {{-- Descrição --}}
                 <div class="mb-3">
@@ -77,4 +85,7 @@
         </div>
     </div>
 </div>
+
+<!-- Script para adicionar máscara de telefone -->
+<script src="{{ asset('js/phone-mask.js') }}"></script>
 @endsection
