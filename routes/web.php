@@ -95,13 +95,16 @@ Route::middleware('auth:web,custom')->group(function () {
 */
 Route::middleware('auth:web')->group(function () {
     // Perfil do Provider
-    Route::get('/provider/profile', [ProviderController::class, 'editProfile'])->name('provider.profile.edit');
-    Route::post('/provider/profile/update-info', [ProviderController::class, 'updateInfo'])->name('provider.profile.updateInfo');
-    Route::post('/provider/profile/update-photo', [ProviderController::class, 'updateProfilePhoto'])->name('provider.profile.updatePhoto');
-
+    Route::prefix('provider/profile')->group(function () {
+        Route::get('/', fn() => view('providers.show', ['provider' => auth()->user()]))->name('provider.profile.show');
+        Route::get('/edit', [ProviderController::class, 'editProfile'])->name('provider.profile.edit');
+        Route::put('/', [ProviderController::class, 'updateInfo'])->name('provider.profile.update');
+        Route::post('/photo', [ProviderController::class, 'updateProfilePhoto'])->name('provider.profile.updatePhoto');
+    });
+    
     // Categorias atendidas
-    Route::get('/provider/categories', [ProviderController::class, 'showCategories'])->name('provider.categories.edit');
-    Route::post('/provider/categories', [ProviderController::class, 'updateCategories'])->name('provider.categories.update');
+    Route::get('/provider/categories', [ServiceCategoryController::class, 'showCategories'])->name('service_categories.show');
+    Route::post('/provider/categories', [ServiceCategoryController::class, 'updateCategories'])->name('provider.categories.update');
 
     // Portfólio
     Route::get('/provider/portfolio/create', [PortfolioController::class, 'create'])->name('provider.portfolio.create');

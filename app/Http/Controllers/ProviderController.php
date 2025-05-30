@@ -54,7 +54,7 @@ class ProviderController extends Controller
 
         $categories = ServiceCategory::all();
 
-        return view('providers.edit-profile', compact('provider', 'categories'));
+        return view('providers.edit', compact('provider'));
     }
 
     /**
@@ -65,6 +65,7 @@ class ProviderController extends Controller
         $provider = auth()->user();
 
         $data = $request->validate([
+            'user_name' => 'required|string|max:255',
             'provider_description' => 'nullable|string|max:1000',
             'work_radius'          => 'required|integer|min:1',
             'availability'         => 'required|in:weekdays,weekends,both',
@@ -72,7 +73,7 @@ class ProviderController extends Controller
 
         $provider->update($data);
 
-        return redirect()->route('provider.profile.edit')->with('success', 'Informações atualizadas com sucesso.');
+        return redirect()->route('provider.profile.show')->with('success', 'Informações atualizadas com sucesso.');
     }
 
     /**
@@ -90,19 +91,7 @@ class ProviderController extends Controller
 
         $provider->update(['profile_photo' => $path]);
 
-        return redirect()->route('provider.profile.edit')->with('success', 'Foto de perfil atualizada com sucesso.');
-    }
-
-    /**
-     * Exibe o formulário de seleção de categorias do Provider.
-     */
-    public function showCategories()
-    {
-        $provider = auth()->user();
-
-        $categories = ServiceCategory::all();
-
-        return view('providers.show-categories', compact('provider', 'categories'));
+        return redirect()->route('provider.profile.show')->with('success', 'Foto de perfil atualizada com sucesso.');
     }
 
     /**

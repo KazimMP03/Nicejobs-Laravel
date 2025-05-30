@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <h2>Selecionar Categorias de Serviço</h2>
-    <p>Selecione até <strong>6 categorias</strong> nas quais você atua.</p>
+    <p>Selecione até <strong>3 categorias</strong> nas quais você atua.</p>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -42,12 +42,12 @@
     </form>
 </div>
 
-{{-- Script para limitar a seleção a 6 categorias --}}
+{{-- Script para limitar a seleção a 3 categorias --}}
 <script>
     document.querySelectorAll('.category-checkbox').forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             const checkedCount = document.querySelectorAll('.category-checkbox:checked').length;
-            if (checkedCount > 6) {
+            if (checkedCount > 3) {
                 alert('Você pode selecionar no máximo 6 categorias.');
                 this.checked = false;
             }

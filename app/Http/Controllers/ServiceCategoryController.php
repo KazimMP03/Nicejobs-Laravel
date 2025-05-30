@@ -83,4 +83,33 @@ class ServiceCategoryController extends Controller
         return redirect()->route('service-categories.index')
                          ->with('success', 'Categoria removida com sucesso!');
     }
+
+    /**
+     * Exibe o formulário de seleção de categorias do Provider.
+     */
+    public function showCategories()
+    {
+        $provider = auth()->user();
+
+        $categories = ServiceCategory::all();
+
+        return view('service_categories.show', compact('provider', 'categories'));
+    }
+
+    /**
+     * Atualiza as categorias associadas ao Provider, limitado a 3.
+     */
+    public function updateCategories(Request $request)
+    {
+        $provider = auth()->user();
+
+        $data = $request->validate([
+            'categories'   => 'required|array|max:3',
+            'categories.*' => 'exists:service_categories,id',
+        ]);
+
+        $provider->categories()->sync($data['categories']);
+
+        return redirect()->route('service_categories.show')->with('success', 'Categorias atualizadas com sucesso.');
+    }
 }
