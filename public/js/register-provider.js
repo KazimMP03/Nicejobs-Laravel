@@ -6,50 +6,108 @@
 
         // Valida os campos antes de avançar
         let isValid = true;
-        const inputs = currentSection.querySelectorAll('input[required], select[required], textarea[required]');
+// Validar nome
+const nameInput = document.getElementById('user_name');
+if (!nameInput.value.trim()) {
+    nameInput.classList.add('is-invalid');
+    isValid = false;
+} else {
+    nameInput.classList.remove('is-invalid');
+}
 
-        // Validação de nascimento/fundação conforme tipo de pessoa
-const userType = document.getElementById('user_type').value;
+// Validar e-mail
+const emailInput = document.getElementById('email');
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+if (!emailRegex.test(emailInput.value.trim())) {
+    emailInput.classList.add('is-invalid');
+    isValid = false;
+} else {
+    emailInput.classList.remove('is-invalid');
+}
 
+// Validar senha (mínimo 8 caracteres)
+const passwordInput = document.getElementById('password');
+if (passwordInput.value.length < 8) {
+    passwordInput.classList.add('is-invalid');
+    isValid = false;
+} else {
+    passwordInput.classList.remove('is-invalid');
+}
+
+// Validar confirmação de senha
+const confirmPasswordInput = document.getElementById('password_confirmation');
+if (confirmPasswordInput.value !== passwordInput.value) {
+    confirmPasswordInput.classList.add('is-invalid');
+    isValid = false;
+} else {
+    confirmPasswordInput.classList.remove('is-invalid');
+}
+
+// Validar telefone (mínimo 10 dígitos)
+const phoneInput = document.getElementById('phone');
+const phoneDigits = phoneInput.value.replace(/\D/g, '');
+if (phoneDigits.length < 10) {
+    phoneInput.classList.add('is-invalid');
+    isValid = false;
+} else {
+    phoneInput.classList.remove('is-invalid');
+}
+
+// Validar tipo de pessoa
+const userTypeSelect = document.getElementById('user_type');
+if (!userTypeSelect.value) {
+    userTypeSelect.classList.add('is-invalid');
+    isValid = false;
+} else {
+    userTypeSelect.classList.remove('is-invalid');
+}
+
+// Validar CPF ou CNPJ
+const taxIdInput = document.getElementById('tax_id');
+const taxId = taxIdInput.value.replace(/\D/g, '');
+const isPF = userTypeSelect.value === 'PF';
+if ((isPF && taxId.length !== 11) || (!isPF && taxId.length !== 14)) {
+    taxIdInput.classList.add('is-invalid');
+    isValid = false;
+} else {
+    taxIdInput.classList.remove('is-invalid');
+}
+
+// Validar data de nascimento ou fundação
 const birthDateInput = document.getElementById('birth_date');
 const foundationDateInput = document.getElementById('foundation_date');
 
-// Se PF, birth_date é obrigatório
-if (userType === 'PF' && (!birthDateInput.value || birthDateInput.value.trim() === '')) {
+if (isPF && (!birthDateInput.value || birthDateInput.value.trim() === '')) {
     birthDateInput.classList.add('is-invalid');
     isValid = false;
 } else {
     birthDateInput.classList.remove('is-invalid');
 }
 
-// Se PJ, foundation_date é obrigatório
-if (userType === 'PJ' && (!foundationDateInput.value || foundationDateInput.value.trim() === '')) {
+if (!isPF && (!foundationDateInput.value || foundationDateInput.value.trim() === '')) {
     foundationDateInput.classList.add('is-invalid');
     isValid = false;
 } else {
     foundationDateInput.classList.remove('is-invalid');
 }
 
+// Validação da Seção 2: "Sobre Você"
+if (currentSection.id === 'section2') {
+    const descriptionInput = document.getElementById('provider_description');
+    const content = descriptionInput.value.trim();
+    const length = content.length;
 
-        inputs.forEach(input => {
-            if (!input.value) {
-                input.classList.add('is-invalid');
-                isValid = false;
-            } else {
-                input.classList.remove('is-invalid');
-            }
-        });
+    if (length < 50 || length > 800) {
+        descriptionInput.classList.add('is-invalid');
+        descriptionInput.setCustomValidity("A descrição deve conter entre 50 e 800 caracteres.");
+        descriptionInput.reportValidity();
+        isValid = false;
+    } else {
+        descriptionInput.classList.remove('is-invalid');
+        descriptionInput.setCustomValidity("");
+    }
+}
 
-        // Validação específica para CPF/CNPJ
-        const taxIdInput = document.getElementById('tax_id');
-        const isPF = document.getElementById('user_type').value === 'PF';
-        const taxIdValue = taxIdInput.value.replace(/\D/g, '');
-
-        if (taxIdInput.required &&
-            ((isPF && taxIdValue.length !== 11) || (!isPF && taxIdValue.length !== 14))) {
-            taxIdInput.classList.add('is-invalid');
-            isValid = false;
-        }
 
         if (isValid) {
             currentSection.style.display = 'none';
@@ -112,16 +170,38 @@ function updateReviewSection() {
 
     document.getElementById('review-phone').textContent = `Telefone: ${document.getElementById('phone').value}`;
 
+    // Data de nascimento ou fundação com formatação BR
+    const birthDateRaw = document.getElementById('birth_date').value;
+    const foundationDateRaw = document.getElementById('foundation_date').value;
+
+    const birthDate = birthDateRaw ? formatDateBR(birthDateRaw) : '';
+    const foundationDate = foundationDateRaw ? formatDateBR(foundationDateRaw) : '';
+
+    const reviewContainer = document.getElementById('review-tax-id').parentElement;
+
+    const existingDateInfo = document.getElementById('review-date');
+    if (existingDateInfo) existingDateInfo.remove();
+
+    const dateP = document.createElement('p');
+    dateP.id = 'review-date';
+    dateP.className = 'text-muted';
+    dateP.style = 'font-size: 14px; margin-bottom: 4px;';
+    dateP.textContent = isPF
+        ? `Data de Nascimento: ${birthDate}`
+        : `Data de Fundação: ${foundationDate}`;
+
+    reviewContainer.appendChild(dateP);
+
     // Dados profissionais
     document.getElementById('review-work-radius').textContent =
         `Raio de atendimento: ${document.getElementById('work_radius').value} km`;
 
     const availabilityMap = {
-        weekdays: 'Dias de semana',
-        weekends: 'Finais de semana',
-        both: 'Ambos'
+        weekdays: 'Dias Úteis',
+        weekends: 'Finais de Semana',
+        both: 'Todos os Dias'
     };
-    const availabilityValue = document.querySelector('input[name="availability"]:checked')?.value || '';
+    const availabilityValue = document.getElementById('availability').value;
     document.getElementById('review-availability').textContent =
         `Disponibilidade: ${availabilityMap[availabilityValue] || 'Não informado'}`;
 
@@ -130,6 +210,11 @@ function updateReviewSection() {
         document.getElementById('provider_description').value;
 }
 
+// Função auxiliar para formatar data no padrão brasileiro
+function formatDateBR(dateString) {
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year}`;
+}
 
 // Controle do tipo de pessoa (PF/PJ)
 document.getElementById('user_type').addEventListener('change', function () {

@@ -294,7 +294,7 @@
                             <div class="d-flex justify-content-between mt-5">
                                 <button type="button"
                                     class="btn btn-outline-secondary prev-section"
-                                    data-prev="section2">Voltar</button>
+                                    data-prev="section1">Voltar</button>
                                 <button type="submit" class="btn btn-success">
                                     <i class="fas fa-check me-1"></i> Confirmar
                                     Cadastro

@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const userTypeSelect = document.getElementById('user_type');
     const taxIdInput = document.getElementById('tax_id');
     const phoneInput = document.getElementById('phone');
+    const nameInput = document.getElementById('user_name'); // ✅ Novo
 
     // Máscaras
     function applyCPFMask(value) {
@@ -26,24 +27,27 @@ document.addEventListener('DOMContentLoaded', function () {
             : value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
     }
 
-function validatePhone() {
-    const phone = phoneInput.value.replace(/\D/g, '');
-
-    if (phone.length === 0) {
-        phoneInput.classList.remove('is-invalid');
-        return;
+    function validatePhone() {
+        const phone = phoneInput.value.replace(/\D/g, '');
+        if (phone.length === 0) {
+            phoneInput.classList.remove('is-invalid');
+            return;
+        }
+        phoneInput.classList.toggle('is-invalid', !(phone.length === 10 || phone.length === 11));
     }
 
-    phoneInput.classList.toggle('is-invalid', !(phone.length === 10 || phone.length === 11));
-}
-
-    // Alterna campos com base no tipo de pessoa
     userTypeSelect.addEventListener('change', () => {
-        const isPF = userTypeSelect.value === 'PF';
-        document.getElementById('birth_date_field').style.display = isPF ? 'block' : 'none';
-        document.getElementById('foundation_date_field').style.display = isPF ? 'none' : 'block';
-        taxIdInput.value = '';
-    });
+    const isPF = userTypeSelect.value === 'PF';
+    document.getElementById('birth_date_field').style.display = isPF ? 'block' : 'none';
+    document.getElementById('foundation_date_field').style.display = isPF ? 'none' : 'block';
+    taxIdInput.value = '';
+
+    // Atualiza o texto da label do CPF/CNPJ dinamicamente
+    const taxIdLabel = document.querySelector("label[for='tax_id']");
+    if (taxIdLabel) {
+        taxIdLabel.textContent = isPF ? 'CPF' : 'CNPJ';
+    }
+});
 
     taxIdInput.addEventListener('input', (e) => {
         const isPF = userTypeSelect.value === 'PF';
@@ -64,24 +68,71 @@ function validatePhone() {
             const nextId = btn.dataset.next;
             let valid = true;
 
-            section.querySelectorAll('input[required], select[required]').forEach(input => {
-                if (!input.value) {
-                    input.classList.add('is-invalid');
-                    valid = false;
-                } else {
-                    input.classList.remove('is-invalid');
-                }
+            // Campos
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('password_confirmation');
+            const userTypeInput = document.getElementById('user_type');
+            const birthDateInput = document.getElementById('birth_date');
+            const foundationDateInput = document.getElementById('foundation_date');
+
+            // Limpa validações anteriores
+            section.querySelectorAll('input, select').forEach(input => {
+                input.classList.remove('is-invalid');
             });
 
-            // Validação extra para telefone
-const phoneValue = phoneInput.value.replace(/\D/g, '');
-if (!phoneValue || !(phoneValue.length === 10 || phoneValue.length === 11)) {
-    phoneInput.classList.add('is-invalid');
-    valid = false;
-} else {
-    phoneInput.classList.remove('is-invalid');
-}
+            // ✅ Validação de nome
+            if (!nameInput.value.trim() || nameInput.value.trim().length < 3) {
+                nameInput.classList.add('is-invalid');
+                valid = false;
+            }
 
+            // E-mail válido
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(emailInput.value)) {
+                emailInput.classList.add('is-invalid');
+                valid = false;
+            }
+
+            // Senha mínima
+            if (passwordInput.value.length < 8) {
+                passwordInput.classList.add('is-invalid');
+                valid = false;
+            }
+
+            // Confirmação de senha
+            if (confirmPasswordInput.value !== passwordInput.value) {
+                confirmPasswordInput.classList.add('is-invalid');
+                valid = false;
+            }
+
+            // Telefone
+            const phoneValue = phoneInput.value.replace(/\D/g, '');
+            if (!(phoneValue.length === 10 || phoneValue.length === 11)) {
+                phoneInput.classList.add('is-invalid');
+                valid = false;
+            }
+
+            // Tipo de pessoa
+            if (!userTypeInput.value) {
+                userTypeInput.classList.add('is-invalid');
+                valid = false;
+            }
+
+            // CPF ou CNPJ
+            const isPF = userTypeInput.value === 'PF';
+            const taxIdValue = taxIdInput.value.replace(/\D/g, '');
+            if ((isPF && taxIdValue.length !== 11) || (!isPF && taxIdValue.length !== 14)) {
+                taxIdInput.classList.add('is-invalid');
+                valid = false;
+            }
+
+            // Data de nascimento ou fundação
+            const dateValue = isPF ? birthDateInput.value : foundationDateInput.value;
+            if (!dateValue) {
+                (isPF ? birthDateInput : foundationDateInput).classList.add('is-invalid');
+                valid = false;
+            }
 
             if (valid) {
                 section.style.display = 'none';
@@ -109,16 +160,44 @@ if (!phoneValue || !(phoneValue.length === 10 || phoneValue.length === 11)) {
     }
 
     function updateReview() {
-        document.getElementById('review-name').textContent = `Nome: ${document.getElementById('user_name').value}`;
-        document.getElementById('review-email').textContent = `E-mail: ${document.getElementById('email').value}`;
-        document.getElementById('review-phone').textContent = `Telefone: ${phoneInput.value}`;
-        const taxId = taxIdInput.value;
-        const isPF = userTypeSelect.value === 'PF';
-        document.getElementById('review-tax-id').textContent = isPF ? `CPF: ${taxId}` : `CNPJ: ${taxId}`;
+        const userName = nameInput.value;
+    const email = document.getElementById('email').value;
+    const phone = phoneInput.value;
+    const taxId = taxIdInput.value;
+    const isPF = userTypeSelect.value === 'PF';
+    const birthDate = document.getElementById('birth_date').value;
+    const foundationDate = document.getElementById('foundation_date').value;
+
+    // Função para formatar data do formato YYYY-MM-DD para DD/MM/YYYY
+    function formatDate(dateStr) {
+        if (!dateStr) return '';
+        const [year, month, day] = dateStr.split('-');
+        return `${day}/${month}/${year}`;
+    }
+
+    // Preenche os campos na revisão
+    document.getElementById('review-name').textContent = `Nome: ${userName}`;
+    document.getElementById('review-email').textContent = `E-mail: ${email}`;
+    document.getElementById('review-phone').textContent = `Telefone: ${phone}`;
+    document.getElementById('review-tax-id').textContent = isPF ? `CPF: ${taxId}` : `CNPJ: ${taxId}`;
+
+    // Insere a data de nascimento ou fundação
+    const reviewContainer = document.getElementById('review-tax-id').parentElement;
+    const existingDate = document.getElementById('review-date');
+    if (existingDate) existingDate.remove();
+
+    const dateP = document.createElement('p');
+    dateP.id = 'review-date';
+    dateP.className = 'text-muted';
+    dateP.style = 'font-size: 14px; margin-bottom: 4px;';
+    dateP.textContent = isPF
+        ? `Data de Nascimento: ${formatDate(birthDate)}`
+        : `Data de Fundação: ${formatDate(foundationDate)}`;
+
+    reviewContainer.appendChild(dateP);
     }
 
     // Inicialização
     if (userTypeSelect.value) userTypeSelect.dispatchEvent(new Event('change'));
     phoneInput.value = applyPhoneMask(phoneInput.value);
-
 });
