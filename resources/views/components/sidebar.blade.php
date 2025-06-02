@@ -36,16 +36,10 @@
         </div>
 
         <div class="navbar-nav w-100">
+            {{-- Bloco Comum: Acessível a ambos --}}
             <a href="{{ route('home') }}"
                 class="nav-item nav-link {{ request()->routeIs('provider.home') || request()->routeIs('custom-user.home') ? 'active' : '' }}">
-
                 <i class="fa fa-home me-2"></i>Home
-            </a>
-
-            <a
-                href="{{ session('user_type') === 'provider' ? route('provider.profile.show') : route('custom-user.profile.show') }}"
-                class="nav-item nav-link {{ request()->routeIs('provider.profile.show') || request()->routeIs('custom-user.profile.show') ? 'active' : '' }}">
-                <i class="fa fa-user me-2"></i>Perfil
             </a>
 
             <a href="{{ route('addresses.index') }}"
@@ -58,6 +52,62 @@
                 <i class="fa fa-comments me-2"></i>Chat
             </a>
 
+            {{-- Bloco exclusivo para Provider --}}
+            @if(session('user_type') === 'provider')
+                <a href="{{ route('provider.profile.show') }}"
+                    class="nav-item nav-link {{ request()->routeIs('provider.profile.*') ? 'active' : '' }}">
+                    <i class="fa fa-user me-2"></i>Perfil
+                </a>
+
+                {{-- Portfólio --}}
+                @php
+                    $provider = auth('web')->user();
+                    $portfolio = $provider && $provider->relationLoaded('portfolios') 
+                        ? $provider->portfolios->first() 
+                        : \App\Models\Portfolio::where('provider_id', $provider?->id)->first();
+                @endphp
+
+                @if($portfolio)
+                    <a href="{{ route('provider.portfolio.edit', $portfolio) }}"
+                    class="nav-item nav-link {{ request()->routeIs('provider.portfolio.edit') ? 'active' : '' }}">
+                        <i class="fa fa-briefcase me-2"></i>Editar Portfólio
+                    </a>
+                @else
+                    <a href="{{ route('provider.portfolio.create') }}"
+                    class="nav-item nav-link {{ request()->routeIs('provider.portfolio.create') ? 'active' : '' }}">
+                        <i class="fa fa-briefcase me-2"></i>Criar Portfólio
+                    </a>
+                @endif
+
+                <a href="{{ route('service_categories.show') }}"
+                    class="nav-item nav-link {{ request()->routeIs('service_categories.show') ? 'active' : '' }}">
+                    <i class="fa fa-list me-2"></i>Categorias
+                </a>
+
+                <a href="{{ route('service-requests.index') }}"
+                    class="nav-item nav-link {{ request()->routeIs('service-requests.index') ? 'active' : '' }}">
+                    <i class="fa fa-tasks me-2"></i>Solicitações
+                </a>
+            @endif
+            
+            {{-- Bloco exclusivo para CustomUser --}}
+            @if(session('user_type') === 'custom_user')
+                <a href="{{ route('custom-user.profile.show') }}"
+                    class="nav-item nav-link {{ request()->routeIs('custom-user.profile.*') ? 'active' : '' }}">
+                    <i class="fa fa-user me-2"></i>Perfil
+                </a>
+
+                <a href="{{ route('explore.index') }}"
+                    class="nav-item nav-link {{ request()->routeIs('explore.*') ? 'active' : '' }}">
+                    <i class="fa fa-search me-2"></i>Explorar
+                </a>
+
+                <a href="{{ route('custom-user.service-requests.index') }}"
+                    class="nav-item nav-link {{ request()->routeIs('custom-user.service-requests.*') ? 'active' : '' }}">
+                    <i class="fa fa-clipboard-list me-2"></i>Solicitações
+                </a>
+            @endif
+            
             {{-- Botão de Sair --}}
             <a href="#" class="nav-item nav-link"
                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

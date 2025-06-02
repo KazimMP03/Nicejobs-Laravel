@@ -14,7 +14,7 @@
                         <div class="card-body">
                             <h5>{{ $provider->user_name }}</h5>
                             <p>{{ Str::limit($provider->provider_description, 100) }}</p>
-                            <a href="{{ route('providers.show', $provider->id) }}" class="btn btn-primary">
+                            <a href="{{ route('explore.provider.show', $provider->id) }}" class="btn btn-primary">
                                 Ver perfil
                             </a>
                         </div>

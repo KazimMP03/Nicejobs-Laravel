@@ -119,12 +119,14 @@ Route::middleware('auth:web')->group(function () {
     Route::post('/provider/categories', [ServiceCategoryController::class, 'updateCategories'])->name('provider.categories.update');
 
     // Portfólio
-    Route::get('/provider/portfolio/create', [PortfolioController::class, 'create'])->name('provider.portfolio.create');
-    Route::post('/provider/portfolio', [PortfolioController::class, 'store'])->name('provider.portfolio.store');
-    Route::get('/provider/portfolio/{portfolio}/edit', [PortfolioController::class, 'edit'])->name('provider.portfolio.edit');
-    Route::put('/provider/portfolio/{portfolio}', [PortfolioController::class, 'update'])->name('provider.portfolio.update');
-    Route::delete('/provider/portfolio/{portfolio}', [PortfolioController::class, 'destroy'])->name('provider.portfolio.destroy');
-    Route::delete('/provider/portfolio/{portfolio}/image', [PortfolioController::class, 'deleteImage'])->name('provider.portfolio.delete-image');
+    Route::prefix('provider/portfolio')->middleware('auth:web')->group(function () {
+        Route::get('/create', [PortfolioController::class, 'create'])->name('provider.portfolio.create');
+        Route::post('/', [PortfolioController::class, 'store'])->name('provider.portfolio.store');
+        Route::get('/{portfolio}/edit', [PortfolioController::class, 'edit'])->name('provider.portfolio.edit');
+        Route::put('/{portfolio}', [PortfolioController::class, 'update'])->name('provider.portfolio.update');
+        Route::delete('/{portfolio}', [PortfolioController::class, 'destroy'])->name('provider.portfolio.destroy');
+        Route::delete('/{portfolio}/image', [PortfolioController::class, 'deleteImage'])->name('provider.portfolio.delete-image');
+    });
 
     // Service Requests Recebidas
     Route::get('/service-requests', [ServiceRequestController::class, 'index'])->name('service-requests.index');
