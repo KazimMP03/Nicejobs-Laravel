@@ -16,6 +16,7 @@ class ProviderController extends Controller
      */
     public function store(Request $request)
     {
+        // 1) Validação inicial (apenas na tabela providers)
         $data = $request->validate([
             'user_name'        => 'required|string|max:255',
             'user_type'        => 'required|in:PF,PJ',
@@ -32,10 +33,34 @@ class ProviderController extends Controller
             'work_radius'      => 'required|integer|min:1',
 
             'availability'     => ['required', Rule::in(['weekdays', 'weekends', 'both'])],
+        ], [
+            'birth_date.required_if'       => 'A data de nascimento é obrigatória para PF.',
+            'foundation_date.required_if'  => 'A data de fundação é obrigatória para PJ.',
+            'tax_id.unique'                => 'Este CPF/CNPJ já está cadastrado.',
+            'email.unique'                 => 'Este e-mail já está em uso.',
         ]);
 
+        $errors = [];
+
+        // Verifica se o e-mail já está em uso por outro usuário
+        if (\App\Models\CustomUser::where('email', $data['email'])->exists()) {
+            $errors['email'] = 'Este e-mail já está em uso.';
+        }
+
+        // Verifica se o CPF/CNPJ já está em uso por outro usuário
+        if (\App\Models\CustomUser::where('tax_id', $data['tax_id'])->exists()) {
+            $errors['tax_id'] = 'Este CPF/CNPJ já está cadastrado.';
+        }
+
+        // Se houver qualquer erro, retorna com todos
+        if (!empty($errors)) {
+            return redirect()->back()->withErrors($errors)->withInput();
+        }
+
+        // 3) Hash da senha
         $data['password'] = Hash::make($data['password']);
 
+        // 4) Criação do provider
         Provider::create($data);
 
         return redirect()->route('login')->with('success', 'Cadastro realizado com sucesso! Faça login.');

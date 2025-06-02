@@ -1,17 +1,6 @@
 (function ($) {
     "use strict";
 
-// Spinner
-var spinner = function () {
-    $(window).on('load', function () {
-        if ($('#spinner').length > 0) {
-            $('#spinner').removeClass('show').addClass('d-none');
-        }
-        $('.page-wrapper').removeClass('hidden-until-loaded');
-    });
-};
-spinner();
-    
     
     // Back to top button
     $(window).scroll(function () {
@@ -27,11 +16,47 @@ spinner();
     });
 
 
-    // Sidebar Toggler
-    $('.sidebar-toggler').click(function () {
-        $('.sidebar, .content').toggleClass("open");
-        return false;
-    });
+let sidebarIsOpen = true; // Começa como aberta
+
+function updateSidebarLogo() {
+    const logo = $('#sidebar-mini-logo');
+    const isMediumScreen = window.innerWidth < 992; // Corrigido de 768 → 992
+
+    if (isMediumScreen) {
+        // Em telas médias/pequenas, sempre mostra o logo
+        logo.removeClass('d-none');
+    } else {
+        // Em telas grandes, depende do estado da sidebar
+        if (sidebarIsOpen) {
+            logo.addClass('d-none'); // Sidebar aberta → esconde logo
+        } else {
+            logo.removeClass('d-none'); // Sidebar fechada → mostra logo
+        }
+    }
+}
+
+// Sidebar Toggler
+$('.sidebar-toggler').click(function () {
+    const sidebar = $('.sidebar');
+    const content = $('.content');
+
+    // Alterna o estado
+    sidebarIsOpen = !sidebarIsOpen;
+
+    sidebar.toggleClass("open");
+    content.toggleClass("open");
+
+    updateSidebarLogo();
+    return false;
+});
+
+// Atualiza no carregamento e redimensionamento da tela
+$(window).on('load resize', function () {
+    updateSidebarLogo();
+});
+
+
+
 
 
     // Progress Bar
@@ -242,16 +267,3 @@ function toggleConfirmaSenha() {
     icon.classList.toggle('fa-eye-slash');
 }
 
-window.addEventListener('load', function () {
-    const spinner = document.getElementById('spinner');
-    const mainContent = document.querySelector('.page-wrapper');
-
-    if (spinner) {
-        spinner.classList.remove('show');
-        spinner.classList.add('d-none'); // oculta de vez
-    }
-
-    if (mainContent) {
-        mainContent.classList.remove('hidden-until-loaded'); // mostra o conteúdo
-    }
-});

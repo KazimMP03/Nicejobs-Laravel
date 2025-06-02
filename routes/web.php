@@ -59,8 +59,16 @@ Route::middleware('auth:web,custom')->group(function () {
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Página inicial
-    Route::get('/home', fn() => view('home'))->name('home');
+    // Página inicial - redireciona para home específica de acordo com tipo de usuário
+    Route::get('/home', function () {
+        if (auth('web')->check()) {
+            return redirect()->route('provider.home');
+        }
+        if (auth('custom')->check()) {
+            return redirect()->route('custom-user.home');
+        }
+        return redirect()->route('login');
+    })->name('home');
 
     // CRUD de Endereços (Provider e CustomUser)
     Route::prefix('addresses')->group(function () {
@@ -101,7 +109,11 @@ Route::middleware('auth:web')->group(function () {
         Route::put('/', [ProviderController::class, 'updateInfo'])->name('provider.profile.update');
         Route::post('/photo', [ProviderController::class, 'updateProfilePhoto'])->name('provider.profile.updatePhoto');
     });
-    
+
+    // Página inicial do Provider
+    Route::get('/provider/home', fn() => view('providers.home'))->name('provider.home');
+
+
     // Categorias atendidas
     Route::get('/provider/categories', [ServiceCategoryController::class, 'showCategories'])->name('service_categories.show');
     Route::post('/provider/categories', [ServiceCategoryController::class, 'updateCategories'])->name('provider.categories.update');
@@ -140,6 +152,10 @@ Route::middleware('auth:custom')->group(function () {
         Route::get('/category/{id}', [ExploreController::class, 'byCategory'])->name('explore.byCategory');
         Route::get('/provider/{id}', [ExploreController::class, 'showProvider'])->name('explore.provider.show');
     });
+
+    // Página inicial do CustomUser
+    Route::get('/custom-user/home', fn() => view('custom_users.home'))->name('custom-user.home');
+
 
     // Criar Service Request
     Route::get('/provider/{provider}/request', [ServiceRequestController::class, 'create'])->name('service-requests.create');

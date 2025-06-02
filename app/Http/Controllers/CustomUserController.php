@@ -17,7 +17,7 @@ class CustomUserController extends Controller
      */
     public function store(Request $request)
     {
-        // 1) Validação dos dados do cliente e endereços
+        // 1) Validação inicial (somente na tabela custom_users)
         $validator = Validator::make($request->all(), [
             'user_name'       => 'required|string|max:255',
             'user_type'       => 'required|in:PF,PJ',
@@ -27,8 +27,8 @@ class CustomUserController extends Controller
             'phone'           => 'required|string',
 
             'birth_date'      => 'nullable|date|required_if:user_type,PF',
-            'foundation_date' => 'nullable|date|required_if:user_type,PJ',   
-            
+            'foundation_date' => 'nullable|date|required_if:user_type,PJ',
+
             'status' => 'required|boolean',
         ], [
             'birth_date.required_if'       => 'A data de nascimento é obrigatória para PF.',
@@ -37,26 +37,43 @@ class CustomUserController extends Controller
             'email.unique'                 => 'Este e-mail já está em uso.',
         ]);
 
-        // Retorna com erros se a validação falhar
         if ($validator->fails()) {
             return redirect()->back()
-                             ->withErrors($validator)
-                             ->withInput();
+                ->withErrors($validator)
+                ->withInput(); // <- preserva campos do formulário
         }
 
-        // 2) Preparar dados
+        // 2) Validação cruzada com a tabela providers
         $data = $validator->validated();
+        $errors = [];
+
+        if (\App\Models\Provider::where('email', $data['email'])->exists()) {
+            $errors['email'] = 'Este e-mail já está em uso.';
+        }
+
+        if (\App\Models\Provider::where('tax_id', $data['tax_id'])->exists()) {
+            $errors['tax_id'] = 'Este CPF/CNPJ já está cadastrado.';
+        }
+
+        if (!empty($errors)) {
+            return redirect()->back()->withErrors($errors)->withInput();
+        }
+
+        // 3) Preparar e salvar o usuário
         $data['password'] = Hash::make($data['password']);
         $data['status'] = true;
-        unset($data['password_confirmation'], $data['terms']);
 
-        // 3) Cria o cliente
+        // ⚠️ Remova apenas o que NÃO queremos manter — senão remove o que o formulário precisa recuperar
+        unset($data['password_confirmation'], $data['terms']); // não remova tax_id, email, etc.
+
         CustomUser::create($data);
 
         // 4) Redireciona ao login
         return redirect()->route('login')
-                         ->with('success', 'Cadastro realizado com sucesso! Faça login para continuar.');
+            ->with('success', 'Cadastro realizado com sucesso! Faça login para continuar.');
     }
+
+
 
     /**
      * Exibe a página de edição de perfil (foto e informações gerais)
@@ -91,6 +108,6 @@ class CustomUserController extends Controller
         $customUser->update($data);
 
         return redirect()->route('custom-user.profile.show')
-                        ->with('success', 'Perfil atualizado com sucesso.');
+            ->with('success', 'Perfil atualizado com sucesso.');
     }
 }

@@ -29,14 +29,14 @@
             href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css"
             rel="stylesheet">
 
-        <!-- Libraries Stylesheet -->
+        <!-- Libraries Stylesheet (mantido local para preservar estilos) -->
         <link href="{{ asset('lib/owlcarousel/assets/owl.carousel.min.css') }}"
             rel="stylesheet">
         <link
             href="{{ asset('lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css') }}"
             rel="stylesheet" />
 
-        <!-- Customized Bootstrap Stylesheet -->
+        <!-- Bootstrap Local (para evitar mudança visual) -->
         <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
 
         <!-- Template Stylesheet -->
@@ -45,16 +45,6 @@
 
     <body class="bg-white">
         <div class="container-xxl position-relative bg-white d-flex p-0">
-
-            <!-- Spinner Start -->
-            <div id="spinner"
-                class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-                <div class="spinner-border text-primary"
-                    style="width: 3rem; height: 3rem;" role="status">
-                    <span class="sr-only">Carregando...</span>
-                </div>
-            </div>
-            <!-- Spinner End -->
 
             <!-- Sign In Start -->
             <div class="container-fluid">
@@ -158,18 +148,28 @@
 
         </div>
 
-        <!-- JavaScript Libraries -->
-        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <!-- JavaScript Libraries via CDN -->
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
         <script
             src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="lib/chart/chart.min.js"></script>
-        <script src="lib/easing/easing.min.js"></script>
-        <script src="lib/waypoints/waypoints.min.js"></script>
-        <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-        <script src="lib/tempusdominus/js/moment.min.js"></script>
-        <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
         <script
-            src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+            src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
+
+        <!-- Bibliotecas locais mantidas por estilo/compatibilidade -->
+        <script
+            src="{{ asset('lib/owlcarousel/owl.carousel.min.js') }}"></script>
+        <script
+            src="{{ asset('lib/tempusdominus/js/moment.min.js') }}"></script>
+        <script
+            src="{{ asset('lib/tempusdominus/js/moment-timezone.min.js') }}"></script>
+        <script
+            src="{{ asset('lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js') }}"></script>
+
+        <!-- Main JS -->
         <script src="{{ asset('js/main.js') }}"></script>
     </body>
 

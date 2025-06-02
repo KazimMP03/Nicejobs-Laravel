@@ -61,8 +61,19 @@ class AuthController extends Controller
             Auth::guard($guard)->login($user, $request->filled('remember'));
             $request->session()->regenerate();
 
-            return redirect()->route('home')
-                ->with('success', 'Login realizado com sucesso!');
+            // Define o tipo de usuário na sessão
+            $request->session()->put('user_type', $guard === 'web' ? 'provider' : 'custom_user');
+
+            // Redireciona de acordo com o tipo
+            if ($guard === 'web') {
+                return redirect()->route('provider.home')
+                    ->with('success', 'Login realizado com sucesso!');
+            }
+
+            if ($guard === 'custom') {
+                return redirect()->route('custom-user.home')
+                    ->with('success', 'Login realizado com sucesso!');
+            }
         }
 
         // 6) credenciais inválidas

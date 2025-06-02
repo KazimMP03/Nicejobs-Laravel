@@ -362,22 +362,26 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
      * Atualiza o campo de documento conforme tipo selecionado (PF/PJ)
      */
-    function updateTaxIdField() {
-        const isPF = userTypeSelect.value === 'PF';
-        const currentValue = taxIdInput.value.replace(/\D/g, '');
+function updateTaxIdField() {
+    const value = userTypeSelect.value;
+    const currentValue = taxIdInput.value.replace(/\D/g, '');
 
-        if (isPF) {
-            taxIdLabel.textContent = 'CPF';
-            taxIdInput.placeholder = '000.000.000-00';
-            taxIdHint.textContent = 'Informe seu CPF (11 dígitos)';
-            taxIdInput.value = applyCPFMask(currentValue);
-        } else {
-            taxIdLabel.textContent = 'CNPJ';
-            taxIdInput.placeholder = '00.000.000/0000-00';
-            taxIdHint.textContent = 'Informe seu CNPJ (14 dígitos)';
-            taxIdInput.value = applyCNPJMask(currentValue);
-        }
+    if (value === 'PF') {
+        taxIdLabel.textContent = 'CPF';
+        taxIdInput.placeholder = '000.000.000-00';
+        taxIdHint.textContent = 'Informe seu CPF (11 dígitos)';
+        taxIdInput.value = applyCPFMask(currentValue);
+    } else if (value === 'PJ') {
+        taxIdLabel.textContent = 'CNPJ';
+        taxIdInput.placeholder = '00.000.000/0000-00';
+        taxIdHint.textContent = 'Informe seu CNPJ (14 dígitos)';
+        taxIdInput.value = applyCNPJMask(currentValue);
+    } else {
+        taxIdLabel.textContent = 'CPF/CNPJ';
+        taxIdInput.placeholder = 'CPF ou CNPJ';
+        taxIdHint.textContent = 'Informe seu documento';
     }
+}
 
     /**
      * =============================================
@@ -440,3 +444,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // [Restante do seu código JavaScript...]
     // Seus outros event listeners e funções podem vir aqui
 });
+
+    document.querySelectorAll('.toggle-password').forEach(function (el) {
+        el.addEventListener('click', function () {
+            const input = document.querySelector(this.getAttribute('toggle'));
+            const icon = this.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    });

@@ -287,7 +287,8 @@
 .stepper-wrapper::before {
     content: '';
     position: absolute;
-    top: 18px; /* agora cruza bem no meio das bolinhas (36px / 2 = 18px) */
+    top: 18px;
+    /* agora cruza bem no meio das bolinhas (36px / 2 = 18px) */
     left: 0;
     right: 0;
     height: 2px;
@@ -313,7 +314,7 @@
     margin: 0 auto;
     position: relative;
     z-index: 2;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .stepper-item.completed .step-counter {
@@ -331,4 +332,17 @@
 .stepper-item.completed .step-name {
     font-weight: bold;
     color: #495057;
+}
+
+#sidebar-mini-logo {
+    height: 100px;
+}
+
+@media (max-width: 992px) {
+
+    .search-container,
+    form[role="search"] {
+        width: 100% !important;
+        margin: 10px auto;
+    }
 }

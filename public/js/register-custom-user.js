@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const isPF = userTypeSelect.value === 'PF';
     document.getElementById('birth_date_field').style.display = isPF ? 'block' : 'none';
     document.getElementById('foundation_date_field').style.display = isPF ? 'none' : 'block';
-    taxIdInput.value = '';
+    
 
     // Atualiza o texto da label do CPF/CNPJ dinamicamente
     const taxIdLabel = document.querySelector("label[for='tax_id']");
@@ -200,4 +200,22 @@ document.addEventListener('DOMContentLoaded', function () {
     // Inicialização
     if (userTypeSelect.value) userTypeSelect.dispatchEvent(new Event('change'));
     phoneInput.value = applyPhoneMask(phoneInput.value);
+});
+
+// Mostra/esconde senha
+document.querySelectorAll('.toggle-password').forEach(toggle => {
+    toggle.addEventListener('click', function () {
+        const input = document.querySelector(this.getAttribute('toggle'));
+        const icon = this.querySelector('i');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
 });

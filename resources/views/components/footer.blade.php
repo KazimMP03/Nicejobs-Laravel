@@ -1,8 +1,12 @@
-<!-- Estilização do footer -->
-<link rel="stylesheet" href="{{ asset('css/components/footer.css') }}">
-
-<footer class="site-footer">
-    <div class="footer-content">
-        <p class="copyright">&copy; {{ date('Y') }} NiceJobs. Todos os direitos reservados.</p>
+<!-- Footer Start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-light rounded-top p-4">
+        <div class="row">
+            <div class="text-center">
+                &copy; {{ date('Y') }} <a href="#">NiceJob</a>, Todos os
+                Direitos Reservados.
+            </div>
+        </div>
     </div>
-</footer>
+</div>
+<!-- Footer End -->
