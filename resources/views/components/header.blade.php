@@ -33,9 +33,18 @@
         <div class="nav-item dropdown">
             <a href="#" class="nav-link dropdown-toggle"
                 data-bs-toggle="dropdown">
-                <img class="rounded-circle me-lg-2"
-                    src="{{ asset('images/user.png') }}" alt
+                @php
+                    $user = session('user_type') === 'provider' ? auth('web')->user() : auth('custom')->user();
+                    $profilePhoto = $user->profile_photo
+                        ? asset('storage/' . $user->profile_photo)
+                        : asset('images/user.png');
+                @endphp
+
+                <img class="rounded-circle"
+                    src="{{ $profilePhoto }}"
+                    alt="Foto de perfil"
                     style="width: 40px; height: 40px;">
+
                 <span class="d-none d-lg-inline-flex">
                     @php
                     $user = session('user_type') === 'provider' ?

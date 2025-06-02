@@ -19,6 +19,7 @@ class CustomUser extends Authenticatable
         'birth_date',
         'foundation_date',
         'status',
+        'profile_photo',
     ];
 
     protected $hidden = [

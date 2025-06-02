@@ -175,6 +175,7 @@ Route::middleware('auth:custom')->group(function () {
         Route::get('/', fn() => view('custom_users.show', ['customUser' => auth()->user()]))->name('custom-user.profile.show');
         Route::get('/edit', [CustomUserController::class, 'editProfile'])->name('custom-user.profile.edit');
         Route::put('/', [CustomUserController::class, 'updateProfile'])->name('custom-user.profile.update');
+        Route::post('/update-photo', [CustomUserController::class, 'updateProfilePhoto'])->name('custom-user.profile.updatePhoto');
     });
 });
 

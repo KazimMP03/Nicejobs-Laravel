@@ -7,6 +7,7 @@ use App\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class CustomUserController extends Controller
@@ -73,8 +74,6 @@ class CustomUserController extends Controller
             ->with('success', 'Cadastro realizado com sucesso! Faça login para continuar.');
     }
 
-
-
     /**
      * Exibe a página de edição de perfil (foto e informações gerais)
      */
@@ -109,5 +108,31 @@ class CustomUserController extends Controller
 
         return redirect()->route('custom-user.profile.show')
             ->with('success', 'Perfil atualizado com sucesso.');
+    }
+
+    /**
+     * Atualiza a foto de perfil do CustomUser.
+     */
+    public function updateProfilePhoto(Request $request)
+    {
+        $request->validate([
+            'profile_photo' => 'nullable|image|max:2048',
+        ]);
+
+        $customUser = auth('custom')->user();
+
+        if ($request->hasFile('profile_photo')) {
+            // Deleta a foto antiga, se houver
+            if ($customUser->profile_photo && Storage::exists($customUser->profile_photo)) {
+                Storage::delete($customUser->profile_photo);
+            }
+
+            // Salva a nova imagem
+            $path = $request->file('profile_photo')->store('profile_photos', 'public');
+            $customUser->profile_photo = $path;
+            $customUser->save();
+        }
+
+        return redirect()->route('custom-user.profile.edit')->with('success', 'Foto de perfil atualizada com sucesso.');
     }
 }

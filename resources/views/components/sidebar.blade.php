@@ -8,8 +8,18 @@
 
         <div class="d-flex align-items-center ms-4 mt-3 mb-4">
             <div class="position-relative">
-                <img class="rounded-circle" src="{{ asset('images/user.png') }}"
-                    alt style="width: 40px; height: 40px;">
+                @php
+                    $user = session('user_type') === 'provider' ? auth('web')->user() : auth('custom')->user();
+                    $profilePhoto = $user->profile_photo
+                        ? asset('storage/' . $user->profile_photo)
+                        : asset('images/user.png');
+                @endphp
+
+                <img class="rounded-circle"
+                    src="{{ $profilePhoto }}"
+                    alt="Foto de perfil"
+                    style="width: 40px; height: 40px;">
+
                 <div
                     class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
             </div>
