@@ -11,7 +11,10 @@
         <p><strong>Raio de atuação:</strong> {{ $provider->work_radius }} km</p>
 
         @if($provider->profile_photo)
-            <img src="{{ asset('storage/' . $provider->profile_photo) }}" alt="Foto do prestador" width="150" class="rounded mt-2">
+            <img src="{{ asset('storage/' . $provider->profile_photo) }}" 
+                 alt="Foto do prestador" 
+                 width="150" 
+                 class="rounded mt-2">
         @endif
     </div>
 
@@ -28,12 +31,25 @@
     {{-- Portfólio --}}
     <div class="mb-4">
         <h4>Portfólio</h4>
+
         @forelse($provider->portfolios as $portfolio)
             <div class="mb-3">
                 <h5>{{ $portfolio->title }}</h5>
                 <p>{{ $portfolio->description }}</p>
-                @if($portfolio->media_path)
-                    <img src="{{ asset('storage/' . $portfolio->media_path) }}" alt="Portfólio" width="300" class="img-thumbnail">
+
+                {{-- CORREÇÃO: Iterar em media_paths (array) --}}
+                @if(is_array($portfolio->media_paths) && count($portfolio->media_paths) > 0)
+                    <div class="row">
+                        @foreach($portfolio->media_paths as $imagePath)
+                            <div class="col-md-4 mb-2">
+                                <img src="{{ asset('storage/' . $imagePath) }}" 
+                                     alt="Imagem do portfólio - {{ $portfolio->title }}" 
+                                     class="img-fluid img-thumbnail">
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-muted">Nenhuma imagem disponível neste portfólio.</p>
                 @endif
             </div>
         @empty
@@ -58,7 +74,8 @@
     {{-- Botão para solicitar um serviço --}}
     @auth('custom')
         <div class="mb-4">
-            <a href="{{ route('service-requests.create', ['provider' => $provider->id]) }}" class="btn btn-primary">
+            <a href="{{ route('service-requests.create', ['provider' => $provider->id]) }}" 
+               class="btn btn-primary">
                 Solicitar Serviço
             </a>
         </div>
