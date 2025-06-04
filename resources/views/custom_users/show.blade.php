@@ -17,16 +17,23 @@
     style="flex: 1; margin-top: 80px;">
     <table class="table mx-auto shadow-sm rounded bg-white"
         style="width: auto; border-collapse: separate; border-spacing: 0.5rem 0.5rem;">
-
+        @php
+            $profilePhoto = $customUser->profile_photo
+                // Se houver um caminho armazenado no banco, assumimos que ele é relativo a storage/app/public
+                ? asset('storage/' . $customUser->profile_photo)
+                // Caso não tenha foto cadastrada, usa placeholder genérico
+                : asset('images/user.png');
+        @endphp
         <tr>
             {{-- COLUNA ESQUERDA: FOTO + NOME --}}
             <td class="text-center align-middle border-0 px-4 py-3 ms-3"
                 style="background-color: #f8f9fa; border-radius: 0.5rem 0 0 0.5rem;">
-                <img src="{{ asset('images/user.png') }}" alt="Foto do Usuário"
+                <img src="{{ $profilePhoto }}" alt="Foto do Usuário"
                     class="rounded-circle mb-3 shadow"
                     style="width: 140px; height: 140px; object-fit: cover;">
-                <h4 class="fw-bold text-dark mb-0">{{ $customUser->user_name
-                    }}</h4>
+                <h4 class="fw-bold text-dark mb-0">
+                    {!! wordwrap(e($customUser->user_name), 25, '<br>', true) !!}
+                </h4>
             </td>
 
             {{-- TÍTULOS DOS CAMPOS --}}
