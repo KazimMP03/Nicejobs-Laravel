@@ -1,79 +1,311 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h2>Meu Perfil</h2>
+<div class="w-100 d-flex justify-content-between align-items-start mb-4 px-1">
+    <h3 class="fw-bold text-primary border-bottom border-3 pb-1 mb-0"
+        style="display: inline-block; font-size: 1.8rem; border-color: #0d6efd; font-family: 'Rubik', sans-serif;">
+        MEU PERFIL
+    </h3>
 
-    {{-- Botão para editar o perfil --}}
-    <div class="mb-3">
-        <a href="{{ route('provider.profile.edit') }}" class="btn btn-outline-primary">Editar Perfil</a>
-    </div>
+    <a href="{{ route('provider.profile.edit') }}"
+        class="btn btn-primary fw-bold">
+        <i class="fas fa-edit me-2"></i> Editar Perfil
+    </a>
+</div>
 
-    {{-- Dados básicos --}}
-    <div class="mb-4">
-        <p><strong>Nome:</strong> {{ $provider->user_name }}</p>
-        <p><strong>Descrição:</strong> {{ $provider->provider_description }}</p>
-        <p><strong>Disponibilidade:</strong> {{ ucfirst($provider->availability) }}</p>
-        <p><strong>Raio de atuação:</strong> {{ $provider->work_radius }} km</p>
+<div class="d-flex justify-content-center align-items-center w-100" style="flex: 1; margin-top: 40px;">
+    <table class="table mx-auto shadow-sm rounded bg-white"
+        style="width: 800px; border-collapse: separate; border-spacing: 0.5rem 0.5rem;">
+        
+        @php
+            // Definir URL da foto de perfil (ou placeholder genérico)
+            $profilePhoto = $provider->profile_photo
+                ? asset('storage/' . $provider->profile_photo)
+                : asset('images/user.png');
+        @endphp
 
-        @if($provider->profile_photo)
-            <img src="{{ asset('storage/' . $provider->profile_photo) }}" alt="Foto de Perfil" width="150" class="rounded mt-2">
+        <tr>
+            {{-- COLUNA ESQUERDA: FOTO + NOME + DESCRIÇÃO --}}
+            <td class="text-center align-middle border-0 px-4 py-3 ms-3"
+                style="background-color: #f8f9fa; border-radius: 0.5rem 0 0 0.5rem;">
+                <img src="{{ $profilePhoto }}" alt="Foto do Prestador"
+                    class="rounded-circle mb-3 shadow"
+                    style="width: 140px; height: 140px; object-fit: cover;">
+                <h4 class="fw-bold text-dark mb-2">
+                    {!! wordwrap(e($provider->user_name), 25, '<br>', true) !!}
+                </h4>
+                @if($provider->provider_description)
+                    <p class="text-muted" style="max-width: 200px; margin: 0 auto; font-size: 0.9rem; line-height: 1.2;">
+                        {!! wordwrap(e($provider->provider_description), 25, '<br>', true) !!}
+                    </p>
+                @endif
+            </td>
+
+            {{-- TÍTULOS DOS CAMPOS --}}
+            <td class="align-middle text-center fw-bold border-0 px-4 py-3 text-secondary"
+                style="white-space: nowrap; background-color: #ffffff;">
+                <p class="mb-3 mt-3">Tipo:</p>
+                <p class="mb-3">E-mail:</p>
+                <p class="mb-3">Telefone:</p>
+                <p class="mb-3">CPF/CNPJ:</p>
+                @if($provider->user_type === 'PF')
+                    <p class="mb-3">Nascimento:</p>
+                @else
+                    <p class="mb-3">Fundação:</p>
+                @endif
+                <p class="mb-3">Disponibilidade:</p>
+                <p class="mb-3">Alcance (KM):</p>
+            </td>
+
+            {{-- VALORES DOS CAMPOS --}}
+            <td class="align-middle text-start border-0 px-4 py-3 text-dark"
+                style="background-color: #ffffff;">
+                <p class="mb-3 mt-3">{{ $provider->user_type }}</p>
+                <p class="mb-3">{{ $provider->email }}</p>
+                <p class="mb-3">{{ $provider->phone }}</p>
+                <p class="mb-3">{{ $provider->tax_id }}</p>
+                @if($provider->user_type === 'PF')
+                    <p class="mb-3">{{ $provider->birth_date?->format('d/m/Y') }}</p>
+                @else
+                    <p class="mb-3">{{ $provider->foundation_date?->format('d/m/Y') }}</p>
+                @endif
+                <p class="mb-3">{{ ucfirst($provider->availability) }}</p>
+                <p class="mb-3">{{ $provider->work_radius }}</p>
+            </td>
+        </tr>
+    </table>
+</div>
+
+{{-- Seções adicionais: Categorias, Portfólio e Avaliações --}}
+<div class="container mt-5" style="width: 850px;">
+
+    {{-- CATEGORIAS DE SERVIÇO --}}
+    <section class="mb-5 p-4 shadow-sm rounded" style="background-color: #f9fbfd;">
+        <h4 class="fw-bold mb-4 text-primary border-start border-4 border-primary ps-3 text-uppercase">
+            Categorias de serviço
+        </h4>
+
+        @if($provider->categories->isNotEmpty())
+            <div class="d-flex flex-wrap gap-3">
+                @foreach($provider->categories as $category)
+                    <span class="text-white px-4 py-2"
+                        style="
+                            background: linear-gradient(90deg, var(--bs-primary), #6610f2);
+                            border-radius: 1rem;
+                            font-size: 0.95rem;
+                            font-weight: 500;
+                        ">
+                        {{ $category->name }}
+                    </span>
+                @endforeach
+            </div>
+        @else
+            <p class="text-muted mb-0">Nenhuma categoria selecionada.</p>
         @endif
-    </div>
+    </section>
 
-    {{-- Categorias atendidas --}}
-    <div class="mb-4">
-        <h4>Categorias de Serviço</h4>
-        <ul>
-            @forelse($provider->categories as $category)
-                <li>{{ $category->name }}</li>
-            @empty
-                <p>Nenhuma categoria selecionada.</p>
-            @endforelse
-        </ul>
-    </div>
-
-    {{-- Portfólio --}}
-    <div class="mb-4">
-        <h4>Portfólio</h4>
+    {{-- PORTFÓLIO --}}
+    <section class="mb-5 p-4 shadow-sm rounded bg-light">
+        <h4 class="fw-bold mb-4 text-primary border-start border-4 border-primary ps-3 text-uppercase">
+            Portfólio
+        </h4>
 
         @php
             $portfolio = $provider->portfolios->first();
         @endphp
 
         @if($portfolio)
-            <div class="mb-3">
-                <h5>{{ $portfolio->title }}</h5>
-                <p>{{ $portfolio->description }}</p>
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold text-center">{{ $portfolio->title }}</h5>
+                    <p class="card-text text-secondary text-center">
+                        {{ $portfolio->description }}
+                    </p>
 
-                <div class="d-flex flex-wrap gap-2">
-                    @foreach($portfolio->media_paths as $path)
-                        <img src="{{ asset('storage/' . $path) }}" alt="Imagem do Portfólio" width="150" class="img-thumbnail">
-                    @endforeach
-                </div>
+                    {{-- Container cinza --}}
+                    <div
+                        class="mx-auto mt-4"
+                        style="
+                            background-color: #f8f9fa;
+                            border-radius: 0.5rem;
+                            padding: 20px;
+                            max-width: 500px;
+                        ">
+                        <div class="d-flex flex-wrap" style="gap: 20px;">
+                            @foreach($portfolio->media_paths as $path)
+                                <div
+                                    style="
+                                        width: 140px;
+                                        height: 140px;
+                                        overflow: hidden;
+                                        border-radius: 0.5rem;
+                                    ">
+                                    <img
+                                        src="{{ asset('storage/' . $path) }}"
+                                        alt="Imagem do Portfólio"
+                                        class="img-fluid"
+                                        style="width: 100%; height: 100%; object-fit: cover;"
+                                    >
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    {{-- Fim do container cinza --}}
 
-                <div class="mt-2">
-                    <a href="{{ route('provider.portfolio.edit', $portfolio) }}" class="btn btn-outline-secondary">Editar Portfólio</a>
+                    {{-- Linha separadora com menos margem inferior --}}
+                    <hr class="mt-3 mb-1" style="border-top: 1px solid #dee2e6;">
+
+                    {{-- Botão centralizado e com cor primária --}}
+                    <div class="card-footer bg-white border-0 text-center py-2">
+                        <a
+                            href="{{ route('provider.portfolio.edit', $portfolio) }}"
+                            class="btn btn-primary fw-bold">
+                            <i class="fas fa-edit me-1"></i> Editar Portfólio
+                        </a>
+                    </div>
                 </div>
             </div>
         @else
-            <p>Você ainda não adicionou um portfólio.</p>
-            <a href="{{ route('provider.portfolio.create') }}" class="btn btn-success">Criar Portfólio</a>
-        @endif
-    </div>
+            {{-- Caso o prestador ainda não tenha portfólio --}}
+            <p class="text-muted mb-3 text-center">Você ainda não adicionou um portfólio.</p>
 
-    {{-- Avaliações --}}
-    <div class="mb-4">
-        <h4>Avaliações Recebidas</h4>
-        @forelse($provider->reviews as $review)
-            <div class="border p-2 rounded mb-2">
-                <strong>{{ $review->reviewer_name }}</strong>
-                <span> - Nota: {{ $review->rating }}/5</span>
-                <p>{{ $review->comment }}</p>
+            {{-- Botão “Criar Portfólio” centralizado e primário --}}
+            <div class="text-center">
+                <a
+                    href="{{ route('provider.portfolio.create') }}"
+                    class="btn btn-primary fw-bold">
+                    <i class="fas fa-plus me-1"></i> Criar Portfólio
+                </a>
             </div>
-        @empty
-            <p>Você ainda não recebeu avaliações.</p>
-        @endforelse
-    </div>
+        @endif
+    </section>
+
+    {{-- AVALIAÇÕES RECEBIDAS (estilo iFood) --}}
+    <section class="mb-5 p-4 shadow-sm rounded" style="background-color: #f9fbfd;">
+        @php
+            // Calcula a média de rating e converge para 1 casa decimal
+            $avgRating = $provider->reviews->avg('rating') ? number_format($provider->reviews->avg('rating'), 1) : null;
+            // Total de avaliações
+            $totalReviews = $provider->reviews->count();
+            // Para exibir estrelas cheias e vazias (somente em inteiros)
+            if ($avgRating) {
+                $fullStars = floor($avgRating);
+                $hasHalf = ($avgRating - $fullStars) >= 0.5;
+                $emptyStars = 5 - $fullStars - ($hasHalf ? 1 : 0);
+            } else {
+                $fullStars = $emptyStars = 0;
+                $hasHalf = false;
+            }
+        @endphp
+
+        <h4 class="fw-bold mb-4 text-primary border-start border-4 border-primary ps-3 text-uppercase">
+            Avaliações
+        </h4>
+
+        @if($totalReviews > 0)
+            {{-- Container clicável: abre o modal ao clicar em qualquer parte deste bloco --}}
+            <div
+                class="d-flex align-items-center mb-3"
+                data-bs-toggle="modal"
+                data-bs-target="#reviewsModal"
+                style="cursor: pointer;"
+            >
+                {{-- Nome do prestador (clicável) --}}
+                <h5 class="mb-0 me-3 fw-semibold text-dark" style="font-size: 1.125rem;">
+                    {{ $provider->user_name }}
+                </h5>
+
+                {{-- Estrelas médias e número de avaliações (também clicável) --}}
+                <div class="d-flex align-items-center">
+                    @for($i = 0; $i < $fullStars; $i++)
+                        <i class="fas fa-star text-warning me-1"></i>
+                    @endfor
+
+                    @if($hasHalf)
+                        <i class="fas fa-star-half-alt text-warning me-1"></i>
+                    @endif
+
+                    @for($i = 0; $i < $emptyStars; $i++)
+                        <i class="far fa-star text-warning me-1"></i>
+                    @endfor
+
+                    {{-- Mostra a nota numérica e a quantidade de avaliações --}}
+                    <span class="ms-2 text-secondary" style="font-size: 0.95rem;">
+                        {{ $avgRating }} ({{ $totalReviews }} avaliação{{ $totalReviews > 1 ? 'ões' : '' }})
+                    </span>
+                </div>
+            </div>
+
+            {{-- Modal com todas as avaliações detalhadas (permanece inalterado) --}}
+            <div
+                class="modal fade"
+                id="reviewsModal"
+                tabindex="-1"
+                aria-labelledby="reviewsModalLabel"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        {{-- Cabeçalho do Modal --}}
+                        <div class="modal-header">
+                            <h5 class="modal-title fw-bold" id="reviewsModalLabel">
+                                Avaliações de {{ $provider->user_name }}
+                            </h5>
+                            <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Fechar"
+                            ></button>
+                        </div>
+
+                        {{-- Corpo do Modal --}}
+                        <div class="modal-body">
+                            @foreach($provider->reviews as $review)
+                                @php
+                                    // Para cada review, calculamos quantas estrelas cheias/vazias (sem meio)
+                                    $stars = $review->rating;
+                                    $empty = 5 - $stars;
+                                @endphp
+
+                                <div class="border rounded p-3 mb-3 shadow-sm" style="background-color: #ffffff;">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        {{-- Nome do avaliador --}}
+                                        <strong>{{ $review->reviewer_name }}</strong>
+
+                                        {{-- Estrelas da avaliação --}}
+                                        <div class="d-flex align-items-center">
+                                            @for($i = 0; $i < $stars; $i++)
+                                                <i class="fas fa-star text-warning me-1"></i>
+                                            @endfor
+                                            @for($i = 0; $i < $empty; $i++)
+                                                <i class="far fa-star text-warning me-1"></i>
+                                            @endfor
+                                        </div>
+                                    </div>
+                                    {{-- Comentário --}}
+                                    <p class="mb-0">{{ $review->comment }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        {{-- Rodapé do Modal --}}
+                        <div class="modal-footer">
+                            <button
+                                type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal"
+                            >
+                                Fechar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @else
+            {{-- Caso não haja avaliações --}}
+            <p class="text-muted mb-0">Você ainda não recebeu avaliações.</p>
+        @endif
+    </section>
 </div>
 @endsection
