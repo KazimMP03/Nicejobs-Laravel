@@ -117,7 +117,7 @@ class ProviderController extends Controller
 
         $provider->update(['profile_photo' => $path]);
 
-        return redirect()->route('provider.profile.show')->with('success', 'Foto de perfil atualizada com sucesso.');
+        return redirect()->route('provider.profile.edit')->with('success', 'Foto de perfil atualizada com sucesso.');
     }
 
     /**
