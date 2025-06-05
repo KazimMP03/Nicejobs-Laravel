@@ -69,6 +69,10 @@
 
             {{-- COLUNA DIREITA: FORMULÁRIO PRINCIPAL --}}
             <div class="col-md-8 px-4 py-4">
+                @if(session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
+                
                 <form id="info-form" action="{{ route('provider.profile.update') }}" method="POST">
                     @csrf
                     @method('PUT')
