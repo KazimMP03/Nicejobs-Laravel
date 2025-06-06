@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Portfolio extends Model
 {
-    protected $fillable = ['
-        provider_id',
+    protected $fillable = [
+        'provider_id',
         'title',
         'description',
-        'media_paths'
+        'media_paths',
     ];
 
     protected $casts = [
