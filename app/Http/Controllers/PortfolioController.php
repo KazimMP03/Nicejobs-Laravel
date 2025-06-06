@@ -101,8 +101,8 @@ class PortfolioController extends Controller
         $this->authorizeProvider($portfolio);
 
         $request->validate([
-            'title'       => 'required|string|max:255',
-            'description' => 'required|string',
+            'title'       => 'nullable|string|max:255',
+            'description' => 'nullable|string',
             'files'       => 'nullable|array|max:9',
             'files.*'     => 'file|mimetypes:'
                              . 'image/jpeg,image/png,image/jpg,image/gif,image/webp,'

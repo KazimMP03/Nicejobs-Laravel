@@ -1,80 +1,246 @@
+{{-- resources/views/portfolio/edit.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h1>Editar Portfólio</h1>
+    <link rel="stylesheet" href="{{ asset('css/utils.css') }}">
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-    @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
-
-    @if($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <form action="{{ route('provider.portfolio.update', $portfolio->id) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        @method('PUT')
-
-        <div class="form-group">
-            <label for="title">Título</label>
-            <input type="text" name="title" class="form-control" value="{{ $portfolio->title }}" required>
-        </div>
-
-        <div class="form-group mt-3">
-            <label for="description">Descrição</label>
-            <textarea name="description" class="form-control" rows="5" required>{{ $portfolio->description }}</textarea>
-        </div>
-
-        <div class="form-group mt-3">
-            <label for="images">Adicionar novas imagens (máx. 9)</label>
-            <input type="file" name="images[]" multiple accept="image/*" class="form-control">
-        </div>
-
-        <button type="submit" class="btn btn-primary mt-4">Atualizar Portfólio</button>
-    </form>
-
-    <hr class="my-5">
-    <h4>Imagens atuais</h4>
-    <div class="row">
-        @foreach($portfolio->media_paths as $image)
-            <div class="col-md-3 mb-4">
-                <div class="card">
-                    <img src="{{ asset('storage/' . $image) }}" class="card-img-top img-fluid">
-                    <div class="card-body text-center">
-                        <button class="btn btn-sm btn-danger delete-image-btn" data-image="{{ $image }}">Excluir</button>
-                    </div>
-                </div>
-            </div>
-        @endforeach
+    <div class="w-100 d-flex justify-content-between align-items-start mb-4 px-1">
+        <h3
+            class="fw-bold text-primary border-bottom border-3 pb-1 mb-0"
+            style="
+                display: inline-block;
+                font-size: 1.8rem;
+                border-color: #0d6efd;
+                font-family: 'Rubik', sans-serif;
+            ">
+            EDITAR PORTFÓLIO
+        </h3>
     </div>
-</div>
 
-<form id="delete-image-form" method="POST" style="display:none;">
-    @csrf
-    @method('DELETE')
-    <input type="hidden" name="image_path" id="image-path-input">
-</form>
+    <div class="w-100 d-flex flex-column align-items-center py-5">
+        <div class="shadow-sm bg-white rounded px-4 py-4 w-100" style="max-width: 800px;">
 
-<script>
-    document.querySelectorAll('.delete-image-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            const imagePath = this.dataset.image;
-            const form = document.getElementById('delete-image-form');
-            const input = document.getElementById('image-path-input');
-            input.value = imagePath;
-            form.action = `/provider/portfolio/{{ $portfolio->id }}/image`;
-            form.submit();
-        });
-    });
-</script>
+            {{-- Mensagens de sucesso/erro --}}
+            @if(session('success'))
+                <div class="alert alert-success mb-4">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger mb-4">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="alert alert-danger mb-4">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            {{-- Único formulário principal de update --}}
+            <form
+                action="{{ route('provider.portfolio.update', $portfolio) }}"
+                method="POST"
+                enctype="multipart/form-data"
+                class="portfolio-form"
+            >
+                @csrf
+                @method('PUT')
+
+                {{-- Título --}}
+                <div class="form-floating mb-4" style="margin-top: 20px;">
+                    <input
+                        id="title"
+                        type="text"
+                        name="title"
+                        class="form-control @error('title') is-invalid @enderror"
+                        placeholder="Título"
+                        value="{{ old('title', $portfolio->title) }}"
+                        required
+                    >
+                    <label for="title">Título</label>
+                    @error('title')
+                        <div class="text-danger mt-1" style="font-size: .9rem;">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                </div>
+
+                {{-- Descrição --}}
+                <div class="form-floating mb-4">
+                    <textarea
+                        id="description"
+                        name="description"
+                        class="form-control @error('description') is-invalid @enderror"
+                        placeholder="Descrição"
+                        style="height: 120px;"
+                        required
+                    >{{ old('description', $portfolio->description) }}</textarea>
+                    <label for="description">Descrição</label>
+                    @error('description')
+                        <div class="text-danger mt-1" style="font-size: .9rem;">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                </div>
+
+                {{-- Exibição dos arquivos já cadastrados --}}
+                @if(!empty($portfolio->media_paths) && count($portfolio->media_paths) > 0)
+                    <div class="mb-4">
+                        <h6 class="form-subtitle">
+                            Arquivos atuais ({{ count($portfolio->media_paths) }}/9)
+                        </h6>
+
+                        <div class="mx-auto"
+                             style="
+                                background-color: #f8f9fa;
+                                border-radius: 0.5rem;
+                                padding: 20px;
+                                max-width: 500px;
+                             ">
+                            <div class="d-flex flex-wrap justify-content-center" style="gap: 20px;">
+                                @foreach($portfolio->media_paths as $path)
+                                    @php
+                                        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                                    @endphp
+
+                                    <div class="position-relative"
+                                         style="
+                                            width: 140px;
+                                            height: 140px;
+                                            overflow: hidden;
+                                            border-radius: 0.5rem;
+                                         ">
+                                        {{-- Miniatura: vídeo ou imagem --}}
+                                        @if(in_array($extension, ['mp4', 'mov', 'avi', 'ogg']))
+                                            <video
+                                                src="{{ asset('storage/' . $path) }}"
+                                                controls
+                                                class="img-fluid"
+                                                style="
+                                                    width: 100%;
+                                                    height: 100%;
+                                                    object-fit: cover;
+                                                    position: relative;
+                                                    z-index: 1;
+                                                "
+                                            ></video>
+                                        @else
+                                            <img
+                                                src="{{ asset('storage/' . $path) }}"
+                                                alt="Mídia do portfólio"
+                                                class="img-fluid"
+                                                style="
+                                                    width: 100%;
+                                                    height: 100%;
+                                                    object-fit: cover;
+                                                    position: relative;
+                                                    z-index: 1;
+                                                "
+                                            >
+                                        @endif
+
+                                        {{-- Botão para remover este arquivo --}}
+                                        <form
+                                            action="{{ route('provider.portfolio.delete-image', $portfolio) }}"
+                                            method="POST"
+                                            class="position-absolute"
+                                            style="
+                                                top: 5px;
+                                                left: 5px;
+                                                z-index: 2; /* acima da miniatura */
+                                            "
+                                            onsubmit="return confirm('Deseja realmente excluir este arquivo?');"
+                                        >
+                                            @csrf
+                                            @method('DELETE')
+                                            <input type="hidden" name="media_path" value="{{ $path }}">
+                                            <button
+                                                type="submit"
+                                                class="btn btn-danger p-0"
+                                                style="
+                                                    width: 24px;
+                                                    height: 24px;
+                                                    border-radius: 50%;
+                                                    display: flex;
+                                                    align-items: center;
+                                                    justify-content: center;
+                                                "
+                                                title="Excluir arquivo"
+                                            >
+                                                <i class="fas fa-times" style="font-size: 12px; color: #fff;"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Upload de novos arquivos (até 9) --}}
+                @php
+                    $alreadyCount = count($portfolio->media_paths ?? []);
+                @endphp
+
+                @if($alreadyCount < 9)
+                    <div class="mb-4">
+                        <label for="files" class="form-label text-secondary d-flex align-items-center">
+                            <i class="fas fa-cloud-upload-alt me-2" aria-hidden="true"></i>
+                            Adicionar arquivos (máx: {{ 9 - $alreadyCount }} restantes)
+                        </label>
+                        <input
+                            id="files"
+                            type="file"
+                            name="files[]"
+                            multiple
+                            accept="image/*,video/*"
+                            class="form-control @error('files') is-invalid @enderror"
+                        >
+                        @error('files')
+                            <div class="text-danger mt-1" style="font-size: .9rem;">
+                                {{$message }}
+                            </div>
+                        @enderror
+                        @error('files.*')
+                            <div class="text-danger mt-1" style="font-size: .9rem;">
+                                {{$message }}
+                            </div>
+                        @enderror
+                    </div>
+
+                    {{-- Container de preview para novos arquivos --}}
+                    <div
+                        id="preview-container"
+                        class="d-flex flex-wrap gap-3 justify-content-center mt-4 bg-light rounded-3 d-none"
+                        style="padding: 20px; max-width: 500px; margin: 0 auto;"
+                    ></div>
+                @endif
+
+                {{-- Botões: Cancelar | Atualizar --}}
+                <div class="d-flex justify-content-center mt-4 gap-3">
+                    <a
+                        href="{{ route('provider.portfolio.show', $portfolio) }}"
+                        class="btn btn-cancel fw-bold"
+                        style="margin-right: 50px;"
+                    >
+                        <i class="fas fa-arrow-left me-2"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary fw-bold">
+                        <i class="fas fa-save me-2"></i> Atualizar
+                    </button>
+                </div>
+            </form>
+            {{-- Fim do formulário principal --}}
+        </div>
+    </div>
+
+    {{-- Script de preview (se desejar manter a pré-visualização) --}}
+    <script src="{{ asset('js/images-preview.js') }}"></script>
 @endsection

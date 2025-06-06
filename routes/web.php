@@ -119,12 +119,20 @@ Route::middleware('auth:web')->group(function () {
     Route::post('/provider/categories', [ServiceCategoryController::class, 'updateCategories'])->name('provider.categories.update');
 
     // Portfólio
-    Route::prefix('provider/portfolio')->middleware('auth:web')->group(function () {
+    Route::prefix('provider/portfolio')->group(function () {
+        // Rota para criar
         Route::get('/create', [PortfolioController::class, 'create'])->name('provider.portfolio.create');
+        // Rota para armazenar
         Route::post('/', [PortfolioController::class, 'store'])->name('provider.portfolio.store');
+        // **NOVA ROTA**: mostrar um portfólio específico
+        Route::get('/{portfolio}', [PortfolioController::class, 'show'])->name('provider.portfolio.show');
+        // Rota para editar
         Route::get('/{portfolio}/edit', [PortfolioController::class, 'edit'])->name('provider.portfolio.edit');
+        // Rota para atualizar
         Route::put('/{portfolio}', [PortfolioController::class, 'update'])->name('provider.portfolio.update');
+        // Rota para excluir portfólio inteiro
         Route::delete('/{portfolio}', [PortfolioController::class, 'destroy'])->name('provider.portfolio.destroy');
+        // Rota para excluir apenas UMA imagem/vídeo
         Route::delete('/{portfolio}/image', [PortfolioController::class, 'deleteImage'])->name('provider.portfolio.delete-image');
     });
 
