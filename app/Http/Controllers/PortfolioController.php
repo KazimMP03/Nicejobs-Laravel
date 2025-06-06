@@ -95,6 +95,10 @@ class PortfolioController extends Controller
 
     /**
      * Atualiza um portfólio existente (mescla novos arquivos, até 9 no total).
+     *
+     * Se vierem novos arquivos, ou seja, se o usuário adicionar mídias, redireciona
+     * de volta para a tela de edição. Caso contrário (apenas título/descrição alterados),
+     * redireciona para a tela de exibição (show).
      */
     public function update(Request $request, Portfolio $portfolio)
     {
@@ -112,8 +116,11 @@ class PortfolioController extends Controller
         // Recupera paths já existentes (cast para array no Model)
         $existingPaths = $portfolio->media_paths ?? [];
 
+        // Verifica se houve upload de novos arquivos
+        $hasNewFiles = $request->hasFile('files');
+
         // Se vierem novos arquivos, faz upload e adiciona sem exceder 9 itens
-        if ($request->hasFile('files')) {
+        if ($hasNewFiles) {
             foreach ($request->file('files') as $file) {
                 if (count($existingPaths) >= 9) {
                     break;
@@ -122,16 +129,23 @@ class PortfolioController extends Controller
             }
         }
 
+        // Atualiza título, descrição e media_paths
         $portfolio->update([
             'title'       => $request->input('title'),
             'description' => $request->input('description'),
             'media_paths' => $existingPaths,
         ]);
 
-        // Redireciona de volta para a edição deste portfólio
-        return redirect()
-            ->route('provider.portfolio.edit', $portfolio)
-            ->with('success', 'Portfólio atualizado com sucesso!');
+        // Se adicionou arquivos, volta para o edit; caso contrário, vai para show
+        if ($hasNewFiles) {
+            return redirect()
+                ->route('provider.portfolio.edit', $portfolio)
+                ->with('success', 'Portfólio atualizado com novas mídias.');
+        } else {
+            return redirect()
+                ->route('provider.portfolio.show', $portfolio)
+                ->with('success', 'Portfólio atualizado com sucesso!');
+        }
     }
 
     /**
