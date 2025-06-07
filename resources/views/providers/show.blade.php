@@ -122,17 +122,21 @@
                         {{ $portfolio->description }}
                     </p>
 
-                    {{-- Container cinza --}}
+                    {{-- Container cinza para miniaturas --}}
                     <div
-                        class="mx-auto mt-4"
+                        class="mx-auto"
                         style="
                             background-color: #f8f9fa;
                             border-radius: 0.5rem;
                             padding: 20px;
                             max-width: 500px;
                         ">
-                        <div class="d-flex flex-wrap" style="gap: 20px;">
+                        <div class="d-flex flex-wrap justify-content-center" style="gap: 20px;">
                             @foreach($portfolio->media_paths as $path)
+                                @php
+                                    $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                                @endphp
+
                                 <div
                                     style="
                                         width: 140px;
@@ -140,12 +144,23 @@
                                         overflow: hidden;
                                         border-radius: 0.5rem;
                                     ">
-                                    <img
-                                        src="{{ asset('storage/' . $path) }}"
-                                        alt="Imagem do Portfólio"
-                                        class="img-fluid"
-                                        style="width: 100%; height: 100%; object-fit: cover;"
-                                    >
+                                    @if(in_array($extension, ['mp4','mov','avi','ogg']))
+                                        {{-- Exibe vídeo --}}
+                                        <video
+                                            src="{{ asset('storage/' . $path) }}"
+                                            controls
+                                            class="img-fluid"
+                                            style="width: 100%; height: 100%; object-fit: cover;"
+                                        ></video>
+                                    @else
+                                        {{-- Exibe imagem --}}
+                                        <img
+                                            src="{{ asset('storage/' . $path) }}"
+                                            alt="Imagem do Portfólio"
+                                            class="img-fluid"
+                                            style="width: 100%; height: 100%; object-fit: cover;"
+                                        >
+                                    @endif
                                 </div>
                             @endforeach
                         </div>

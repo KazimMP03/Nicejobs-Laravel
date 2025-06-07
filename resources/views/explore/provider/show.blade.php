@@ -15,35 +15,64 @@
     @endauth
 </div>
 
-<div class="d-flex justify-content-center align-items-center w-100">
+<div class="d-flex justify-content-center align-items-center w-100" style="flex: 1; margin-top: 40px;">
     <table class="table mx-auto shadow-sm rounded bg-white"
-           style="width: 800px; border-collapse: separate; border-spacing: 0.5rem 0.5rem;">
+        style="width: 800px; border-collapse: separate; border-spacing: 0.5rem 0.5rem;">
+        
         @php
+            // Definir URL da foto de perfil (ou placeholder genérico)
             $profilePhoto = $provider->profile_photo
                 ? asset('storage/' . $provider->profile_photo)
                 : asset('images/user.png');
         @endphp
+
         <tr>
+            {{-- COLUNA ESQUERDA: FOTO + NOME + DESCRIÇÃO --}}
             <td class="text-center align-middle border-0 px-4 py-3 ms-3"
                 style="background-color: #f8f9fa; border-radius: 0.5rem 0 0 0.5rem;">
                 <img src="{{ $profilePhoto }}" alt="Foto do Prestador"
-                     class="rounded-circle mb-3 shadow"
-                     style="width: 140px; height: 140px; object-fit: cover;">
+                    class="rounded-circle mb-3 shadow"
+                    style="width: 140px; height: 140px; object-fit: cover;">
+                <h4 class="fw-bold text-dark mb-2">
+                    {!! wordwrap(e($provider->user_name), 25, '<br>', true) !!}
+                </h4>
                 @if($provider->provider_description)
                     <p class="text-muted" style="max-width: 200px; margin: 0 auto; font-size: 0.9rem; line-height: 1.2;">
-                        {{ $provider->provider_description }}
+                        {!! wordwrap(e($provider->provider_description), 25, '<br>', true) !!}
                     </p>
                 @endif
             </td>
+
+            {{-- TÍTULOS DOS CAMPOS --}}
             <td class="align-middle text-center fw-bold border-0 px-4 py-3 text-secondary"
                 style="white-space: nowrap; background-color: #ffffff;">
-                <p class="mb-3 mt-3">Disponibilidade:</p>
-                <p class="mb-3">Raio (km):</p>
+                <p class="mb-3 mt-3">Tipo:</p>
+                <p class="mb-3">E-mail:</p>
+                <p class="mb-3">Telefone:</p>
+                <p class="mb-3">CPF/CNPJ:</p>
+                @if($provider->user_type === 'PF')
+                    <p class="mb-3">Nascimento:</p>
+                @else
+                    <p class="mb-3">Fundação:</p>
+                @endif
+                <p class="mb-3">Disponibilidade:</p>
+                <p class="mb-3">Alcance (KM):</p>
             </td>
+
+            {{-- VALORES DOS CAMPOS --}}
             <td class="align-middle text-start border-0 px-4 py-3 text-dark"
                 style="background-color: #ffffff;">
-                <p class="mb-3 mt-3">{{ ucfirst($provider->availability) }}</p>
-                <p class="mb-3">{{ $provider->work_radius }} km</p>
+                <p class="mb-3 mt-3">{{ $provider->user_type }}</p>
+                <p class="mb-3">{{ $provider->email }}</p>
+                <p class="mb-3">{{ $provider->phone }}</p>
+                <p class="mb-3">{{ $provider->tax_id }}</p>
+                @if($provider->user_type === 'PF')
+                    <p class="mb-3">{{ $provider->birth_date?->format('d/m/Y') }}</p>
+                @else
+                    <p class="mb-3">{{ $provider->foundation_date?->format('d/m/Y') }}</p>
+                @endif
+                <p class="mb-3">{{ ucfirst($provider->availability) }}</p>
+                <p class="mb-3">{{ $provider->work_radius }}</p>
             </td>
         </tr>
     </table>
