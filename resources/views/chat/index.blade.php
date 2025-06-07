@@ -31,97 +31,63 @@
             </div>
 
             {{-- Listagem de Conversas --}}
-            @forelse($chats as $chat)
-                @php
-                    $sr = $chat->serviceRequest;
-                    $currentUser = auth()->user();
+            <div class="bg-white shadow-sm rounded">
+                @forelse($chats as $chat)
+                    @php
+                        $sr = $chat->serviceRequest;
+                        $currentUser = auth()->user();
+                        $otherUser = $currentUser instanceof \App\Models\Provider
+                                     ? $sr->customUser
+                                     : $sr->provider;
+                        $avatarUrl = $otherUser && $otherUser->profile_photo
+                                     ? asset('storage/' . $otherUser->profile_photo)
+                                     : asset('images/user.png');
+                    @endphp
 
-                    if ($currentUser instanceof \App\Models\Provider) {
-                        $otherUser = $sr->customUser;
-                    } else {
-                        $otherUser = $sr->provider;
-                    }
-
-                    if ($otherUser && !empty($otherUser->profile_photo)) {
-                        $avatarUrl = asset('storage/' . $otherUser->profile_photo);
-                    } else {
-                        $avatarUrl = asset('images/user.png');
-                    }
-                @endphp
-
-                <div
-                    class="shadow-sm bg-white rounded d-flex align-items-center px-3 py-2 mb-3"
-                    style="cursor: pointer;"
-                    onclick="window.location='{{ route('chat.show', $sr->id) }}'"
-                >
-                    {{-- Avatar (foto do outro usuário) --}}
-                    <div class="me-3 flex-shrink-0">
-                        <img
-                            src="{{ $avatarUrl }}"
-                            alt="Avatar de {{ $otherUser->user_name ?? 'Usuário' }}"
-                            class="rounded-circle"
-                            style="width: 70px; height: 70px; object-fit: cover;"
-                        >
-                    </div>
-
-                    {{-- Conteúdo principal (nome, status, descrição) --}}
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-start">
-                            {{-- Nome do outro usuário --}}
-                            <div>
+                    <div
+                        class="d-flex align-items-center px-3 py-2 border-bottom"
+                        style="cursor: pointer;"
+                        onclick="window.location='{{ route('chat.show', $sr->id) }}'"
+                    >
+                        <div class="me-3 flex-shrink-0">
+                            <img
+                                src="{{ $avatarUrl }}"
+                                alt="Avatar de {{ $otherUser->user_name ?? 'Usuário' }}"
+                                class="rounded-circle"
+                                style="width: 50px; height: 50px; object-fit: cover;"
+                            >
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
                                 <span class="fw-bold text-dark" style="font-size: 1rem;">
                                     {{ $otherUser->user_name }}
                                 </span>
+                                @php
+                                    $label = $sr->getStatusLabel();
+                                    if ($sr->isChatOpened())             { $badgeClass = 'bg-info'; }
+                                    elseif ($sr->isPendingAcceptance()) { $badgeClass = 'bg-warning text-dark'; }
+                                    elseif ($label === 'Concluído')     { $badgeClass = 'bg-success'; }
+                                    else                                { $badgeClass = 'bg-danger'; }
+                                @endphp
+                                <span class="badge {{ $badgeClass }}">
+                                    {{ $label }}
+                                </span>
                             </div>
-
-                            {{-- Badge de status da ServiceRequest (canto superior direito) --}}
-                            @php
-                                $label = $sr->getStatusLabel();
-
-                                if ($sr->isChatOpened()) {
-                                    // Chat aberto → azul
-                                    $badgeClass = 'bg-info';
-                                }
-                                elseif ($sr->isPendingAcceptance()) {
-                                    // Pendente de aceite → amarelo
-                                    $badgeClass = 'bg-warning text-dark';
-                                }
-                                elseif ($label === 'Concluído') {
-                                    // Quando o getStatusLabel() devolver exatamente "Concluído" → verde
-                                    $badgeClass = 'bg-success';
-                                }
-                                else {
-                                    // Qualquer outro status (Solicitado, Cancelado etc.) → cinza/escuro
-                                    $badgeClass = 'bg-danger';
-                                }
-                            @endphp
-
-                            <span class="badge {{ $badgeClass }}">
-                                {{ $label }}
-                            </span>
-
-                        </div>
-
-                        {{-- Descrição do serviço --}}
-                        <div class="mt-1">
                             <small class="text-secondary">
                                 Serviço: <strong>“{{ $sr->description }}”</strong>
                             </small>
                         </div>
                     </div>
-                </div>
-
-            @empty
-                <div class="shadow-sm bg-white rounded px-4 py-4 text-center">
-                    <p class="mb-0 text-secondary">
+                @empty
+                    <div class="p-4 text-center text-secondary">
                         Você ainda não possui conversas
                         @if($status === 'archived') arquivadas
                         @elseif($status === 'active') ativas
                         @endif
                         .
-                    </p>
-                </div>
-            @endforelse
+                    </div>
+                @endforelse
+            </div>
         </div>
     </div>
 @endsection
