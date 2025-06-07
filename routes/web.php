@@ -12,7 +12,8 @@ use App\Http\Controllers\{
     ReviewController,
     ChatController,
     PortfolioController,
-    PasswordResetController
+    PasswordResetController,
+    HomeController
 };
 
 /*
@@ -164,8 +165,7 @@ Route::middleware('auth:custom')->group(function () {
     });
 
     // Página inicial do CustomUser
-    Route::get('/custom-user/home', fn() => view('custom_users.home'))->name('custom-user.home');
-
+    Route::get('/custom-user/home', [HomeController::class, 'index'])->name('custom-user.home');
 
     // Criar Service Request
     Route::get('/provider/{provider}/request', [ServiceRequestController::class, 'create'])->name('service-requests.create');

@@ -115,3 +115,9 @@
   align-items: center;
   transition: background 0.2s ease; /* removido transform da transição */
 }
+
+/* Colorindo estrelas conforme rating */
+.provider-card .card-footer i.fa-star,
+.provider-card .card-footer i.fa-star-half-alt {
+  color: #ffc107; /* Amarelo padrão do Bootstrap para estrelas */
+}
