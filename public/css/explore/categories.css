@@ -1,0 +1,65 @@
+.category-card {
+    position: relative;
+    z-index: 1;
+    background-color: #ffffff !important;
+    /* força fundo branco */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-height: 160px;
+}
+
+.category-card::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(13, 110, 253, 0.1), transparent 70%);
+    transform: rotate(45deg);
+    transition: background 0.3s ease;
+    pointer-events: none;
+}
+
+.icon-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.1), rgba(13, 110, 253, 0.2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+    z-index: 2;
+}
+
+.icon-wrapper i {
+    font-size: 1.8rem;
+    color: #0d6efd;
+    transition: transform 0.3s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.category-card:hover::before {
+    background: radial-gradient(circle at center, rgba(13, 110, 253, 0.2), transparent 60%);
+}
+
+.category-card:hover .icon-wrapper {
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.2), rgba(13, 110, 253, 0.3));
+}
+
+.category-card:hover .icon-wrapper i {
+    transform: scale(1.1) rotate(10deg);
+}
+
+.category-card h5 {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 500;
+    word-break: break-word;
+    z-index: 2;
+}

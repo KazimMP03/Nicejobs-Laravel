@@ -1,0 +1,117 @@
+/* public/css/explore/providers.css */
+
+/* Container geral */
+.explore-category {
+  background: #f0f4ff;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+/* Cabeçalho (inline no Blade) */
+
+/* Grid responsiva */
+.row.gy-4 {
+  margin-top: 1rem;
+}
+
+/* Card do prestador */
+.provider-card {
+  position: relative;
+  background: #ffffff;
+  border-radius: 1rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.provider-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Ribbon de “Em alta” */
+.provider-card::before {
+  content: 'Em alta';
+  position: absolute;
+  top: 12px;
+  left: -40px;
+  background: #ff6b6b;
+  color: #fff;
+  padding: 4px 60px;
+  transform: rotate(-45deg);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+@media (max-width: 576px) {
+  .provider-card::before {
+    display: none;
+  }
+}
+
+/* Header do card */
+.provider-card .card-header {
+  background: #0d6efd; /* azul principal */
+  background: linear-gradient(135deg, #0d6efd 0%, #0d6efd 100%);
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+.provider-card .avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #fff;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+.provider-card:hover .avatar {
+  transform: scale(1.1) rotate(5deg);
+}
+.provider-card .card-header h5 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #fff;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Corpo do card */
+.provider-card .card-body {
+  padding: 0.75rem;
+  flex-grow: 1;
+  font-size: 0.95rem;
+  color: #333;
+  position: relative;
+}
+.provider-card .card-body p {
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+.provider-card .card-body::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(13,110,253,0.02);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.provider-card:hover .card-body::after {
+  opacity: 1;
+}
+
+/* Footer do card */
+.provider-card .btn-explore {
+  background: #0d6efd;
+  color: #fff;
+  font-weight: 500;
+  padding: 0.5rem 1.25rem;
+  border-radius: 50px;
+  display: inline-flex;
+  align-items: center;
+  transition: background 0.2s ease; /* removido transform da transição */
+}
