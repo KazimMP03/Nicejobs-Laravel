@@ -121,7 +121,7 @@
             @if($serviceRequest->canAcceptProposal())
                 <form action="{{ route('service-requests.accept-proposal', $serviceRequest) }}" method="POST" class="me-3 mb-2">
                     @csrf @method('PUT')
-                    <button class="btn btn-success fw-bold d-flex align-items-center" style="margin-right: 50px;">
+                    <button class="btn btn-success fw-bold" style="margin-right: 50px;">
                         <i class="fas fa-check me-2"></i> Aceitar
                     </button>
                 </form>
@@ -130,7 +130,7 @@
             @if($serviceRequest->canRejectProposal())
                 <form action="{{ route('service-requests.reject-proposal', $serviceRequest) }}" method="POST" class="me-3 mb-2">
                     @csrf @method('PUT')
-                    <button class="btn btn-cancel fw-bold d-flex align-items-center" style="margin-right: 50px;">
+                    <button class="btn btn-cancel fw-bold" style="margin-right: 50px;">
                         <i class="fas fa-times me-2"></i> Recusar
                     </button>
                 </form>
@@ -140,7 +140,7 @@
                 <form action="{{ route('service-requests.update', $serviceRequest) }}" method="POST" class="me-3 mb-2">
                     @csrf @method('PUT')
                     <input type="hidden" name="status" value="completed">
-                    <button class="btn btn-sucess fw-bold d-flex align-items-center" style="margin-right: 50px;">
+                    <button class="btn btn-sucess fw-bold" style="margin-right: 50px;">
                         <i class="fas fa-check-circle me-2"></i> Concluir
                     </button>
                 </form>
@@ -152,7 +152,7 @@
                             : 'custom-user.service-requests.cancel', 
                             $serviceRequest) }}" method="POST" class="me-3 mb-2">
                     @csrf @method('PUT')
-                    <button class="btn btn-danger fw-bold d-flex align-items-center" style="margin-right: 50px;">
+                    <button class="btn btn-danger fw-bold" style="margin-right: 50px;">
                         <i class="fas fa-arrow-left me-2"></i> Cancelar
                     </button>
                 </form>
@@ -160,7 +160,7 @@
 
             @if($serviceRequest->chat)
                 <a href="{{ route('chat.show', $serviceRequest->id) }}" 
-                class="btn btn-info fw-bold d-flex align-items-center mb-2" 
+                class="btn btn-info fw-bold" 
                 style="margin-right: 50px;">
                     <i class="fas fa-comments me-2"></i> Abrir Chat
                 </a>
