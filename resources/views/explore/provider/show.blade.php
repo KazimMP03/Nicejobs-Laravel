@@ -1,84 +1,195 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h2>{{ $provider->user_name }}</h2>
+<div class="w-100 d-flex justify-content-between align-items-start mb-4 px-1">
+    <h3 class="fw-bold text-primary border-bottom border-3 pb-1 mb-0"
+        style="display: inline-block; font-size: 1.8rem; border-color: #0d6efd; font-family: 'Rubik', sans-serif;">
+        {{ $provider->user_name }}
+    </h3>
 
-    {{-- Dados básicos --}}
-    <div class="mb-4">
-        <p><strong>Descrição:</strong> {{ $provider->provider_description }}</p>
-        <p><strong>Disponibilidade:</strong> {{ ucfirst($provider->availability) }}</p>
-        <p><strong>Raio de atuação:</strong> {{ $provider->work_radius }} km</p>
+    @auth('custom')
+    <a href="{{ route('service-requests.create', ['provider' => $provider->id]) }}"
+    class="btn btn-primary fw-bold">
+        <i class="fas fa-paper-plane me-2"></i> Solicitar Serviço
+    </a>
+    @endauth
+</div>
 
-        @if($provider->profile_photo)
-            <img src="{{ asset('storage/' . $provider->profile_photo) }}" 
-                 alt="Foto do prestador" 
-                 width="150" 
-                 class="rounded mt-2">
+<div class="d-flex justify-content-center align-items-center w-100">
+    <table class="table mx-auto shadow-sm rounded bg-white"
+           style="width: 800px; border-collapse: separate; border-spacing: 0.5rem 0.5rem;">
+        @php
+            $profilePhoto = $provider->profile_photo
+                ? asset('storage/' . $provider->profile_photo)
+                : asset('images/user.png');
+        @endphp
+        <tr>
+            <td class="text-center align-middle border-0 px-4 py-3 ms-3"
+                style="background-color: #f8f9fa; border-radius: 0.5rem 0 0 0.5rem;">
+                <img src="{{ $profilePhoto }}" alt="Foto do Prestador"
+                     class="rounded-circle mb-3 shadow"
+                     style="width: 140px; height: 140px; object-fit: cover;">
+                @if($provider->provider_description)
+                    <p class="text-muted" style="max-width: 200px; margin: 0 auto; font-size: 0.9rem; line-height: 1.2;">
+                        {{ $provider->provider_description }}
+                    </p>
+                @endif
+            </td>
+            <td class="align-middle text-center fw-bold border-0 px-4 py-3 text-secondary"
+                style="white-space: nowrap; background-color: #ffffff;">
+                <p class="mb-3 mt-3">Disponibilidade:</p>
+                <p class="mb-3">Raio (km):</p>
+            </td>
+            <td class="align-middle text-start border-0 px-4 py-3 text-dark"
+                style="background-color: #ffffff;">
+                <p class="mb-3 mt-3">{{ ucfirst($provider->availability) }}</p>
+                <p class="mb-3">{{ $provider->work_radius }} km</p>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="container mt-5" style="width: 850px;">
+
+    {{-- Categorias de Serviço --}}
+    <section class="mb-5 p-4 shadow-sm rounded" style="background-color: #f9fbfd;">
+        <h4 class="fw-bold mb-4 text-primary border-start border-4 border-primary ps-3 text-uppercase">
+            Categorias de Serviço
+        </h4>
+
+        @if($provider->categories->isNotEmpty())
+            <div class="d-flex flex-wrap gap-3">
+                @foreach($provider->categories as $category)
+                    <span class="text-white px-4 py-2"
+                          style="background: linear-gradient(90deg, var(--bs-primary), #6610f2);
+                                 border-radius: 1rem; font-size: 0.95rem; font-weight: 500;">
+                        {{ $category->name }}
+                    </span>
+                @endforeach
+            </div>
+        @else
+            <p class="text-muted mb-0">Nenhuma categoria selecionada.</p>
         @endif
-    </div>
-
-    {{-- Categorias atendidas --}}
-    <div class="mb-4">
-        <h4>Categorias de Serviço</h4>
-        <ul>
-            @foreach($provider->categories as $category)
-                <li>{{ $category->name }}</li>
-            @endforeach
-        </ul>
-    </div>
+    </section>
 
     {{-- Portfólio --}}
-    <div class="mb-4">
-        <h4>Portfólio</h4>
+    <section class="mb-5 p-4 shadow-sm rounded bg-light">
+        <h4 class="fw-bold mb-4 text-primary border-start border-4 border-primary ps-3 text-uppercase">
+            Portfólio
+        </h4>
 
-        @forelse($provider->portfolios as $portfolio)
-            <div class="mb-3">
-                <h5>{{ $portfolio->title }}</h5>
-                <p>{{ $portfolio->description }}</p>
+        @php $portfolio = $provider->portfolios->first(); @endphp
 
-                {{-- CORREÇÃO: Iterar em media_paths (array) --}}
-                @if(is_array($portfolio->media_paths) && count($portfolio->media_paths) > 0)
-                    <div class="row">
-                        @foreach($portfolio->media_paths as $imagePath)
-                            <div class="col-md-4 mb-2">
-                                <img src="{{ asset('storage/' . $imagePath) }}" 
-                                     alt="Imagem do portfólio - {{ $portfolio->title }}" 
-                                     class="img-fluid img-thumbnail">
-                            </div>
-                        @endforeach
+        @if($portfolio)
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold text-center">{{ $portfolio->title }}</h5>
+                    <p class="card-text text-secondary text-center">{{ $portfolio->description }}</p>
+                    <div class="mx-auto mt-4" style="background-color: #f8f9fa; border-radius: 0.5rem; padding: 20px; max-width: 500px;">
+                        <div class="d-flex flex-wrap justify-content-center" style="gap: 20px;">
+                            @foreach($portfolio->media_paths as $path)
+                                @php
+                                    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                                @endphp
+                                <div style="width: 140px; height: 140px; overflow: hidden; border-radius: 0.5rem;">
+                                    @if(in_array($ext, ['mp4','mov','avi','ogg']))
+                                        <video src="{{ asset('storage/' . $path) }}"
+                                               controls
+                                               class="img-fluid"
+                                               style="width: 100%; height: 100%; object-fit: cover;">
+                                        </video>
+                                    @else
+                                        <img src="{{ asset('storage/' . $path) }}"
+                                             alt="Portfólio"
+                                             class="img-fluid"
+                                             style="width: 100%; height: 100%; object-fit: cover;">
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
-                @else
-                    <p class="text-muted">Nenhuma imagem disponível neste portfólio.</p>
-                @endif
+                </div>
             </div>
-        @empty
-            <p>Este prestador ainda não adicionou portfólios.</p>
-        @endforelse
-    </div>
+        @else
+            <p class="text-muted mb-3 text-center">Este prestador ainda não adicionou um portfólio.</p>
+        @endif
+    </section>
 
     {{-- Avaliações --}}
-    <div class="mb-4">
-        <h4>Avaliações</h4>
-        @forelse($provider->reviews as $review)
-            <div class="border p-2 rounded mb-2">
-                <strong>{{ $review->reviewer_name }}</strong>
-                <span> - Nota: {{ $review->rating }}/5</span>
-                <p>{{ $review->comment }}</p>
-            </div>
-        @empty
-            <p>Este prestador ainda não recebeu avaliações.</p>
-        @endforelse
-    </div>
+    <section class="mb-5 p-4 shadow-sm rounded" style="background-color: #f9fbfd;">
+        @php
+            $avgRating = $provider->reviews->avg('rating') ? number_format($provider->reviews->avg('rating'),1) : null;
+            $totalReviews = $provider->reviews->count();
+            $fullStars = $avgRating ? floor($avgRating) : 0;
+            $hasHalf   = $avgRating ? ($avgRating - $fullStars) >= 0.5 : false;
+            $emptyStars= 5 - $fullStars - ($hasHalf ? 1 : 0);
+        @endphp
 
-    {{-- Botão para solicitar um serviço --}}
-    @auth('custom')
-        <div class="mb-4">
-            <a href="{{ route('service-requests.create', ['provider' => $provider->id]) }}" 
-               class="btn btn-primary">
-                Solicitar Serviço
-            </a>
-        </div>
-    @endauth
+        <h4 class="fw-bold mb-4 text-primary border-start border-4 border-primary ps-3 text-uppercase">
+            Avaliações
+        </h4>
+
+        @if($totalReviews > 0)
+            <div class="d-flex align-items-center mb-3" data-bs-toggle="modal" data-bs-target="#reviewsModal" style="cursor: pointer;">
+                <h5 class="mb-0 me-3 fw-semibold text-dark" style="font-size: 1.125rem;">
+                    {{ $provider->user_name }}
+                </h5>
+                <div class="d-flex align-items-center">
+                    @for($i=0; $i<$fullStars; $i++)
+                        <i class="fas fa-star text-warning me-1"></i>
+                    @endfor
+                    @if($hasHalf)
+                        <i class="fas fa-star-half-alt text-warning me-1"></i>
+                    @endif
+                    @for($i=0; $i<$emptyStars; $i++)
+                        <i class="far fa-star text-warning me-1"></i>
+                    @endfor
+                    <span class="ms-2 text-secondary" style="font-size: 0.95rem;">
+                        {{ $avgRating }} ({{ $totalReviews }} avaliação{{ $totalReviews>1?'ões':'' }})
+                    </span>
+                </div>
+            </div>
+
+            {{-- Modal de Avaliações --}}
+            <div class="modal fade" id="reviewsModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title fw-bold">Avaliações de {{ $provider->user_name }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            @foreach($provider->reviews as $review)
+                                @php
+                                    $stars = $review->rating;
+                                    $empty = 5 - $stars;
+                                @endphp
+                                <div class="border rounded p-3 mb-3 shadow-sm" style="background-color: #ffffff;">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <strong>{{ $review->reviewer_name }}</strong>
+                                        <div class="d-flex align-items-center">
+                                            @for($i=0; $i<$stars; $i++)
+                                                <i class="fas fa-star text-warning me-1"></i>
+                                            @endfor
+                                            @for($i=0; $i<$empty; $i++)
+                                                <i class="far fa-star text-warning me-1"></i>
+                                            @endfor
+                                        </div>
+                                    </div>
+                                    <p class="mb-0">{{ $review->comment }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @else
+            <p class="text-muted mb-0">Este prestador ainda não recebeu avaliações.</p>
+        @endif
+    </section>
+
 </div>
 @endsection
