@@ -1,112 +1,187 @@
 @extends('layouts.app')
 
 @section('content')
+<link rel="stylesheet" href="{{ asset('css/utils.css') }}">
+
 <div class="container">
-    <h2>Minha Solicitação</h2>
 
-    {{-- Dados do serviço --}}
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5>Prestador: <strong>{{ $serviceRequest->provider->user_name }}</strong></h5>
-            <p><strong>Descrição:</strong> {{ $serviceRequest->description }}</p>
-
-            <p><strong>Orçamento Inicial:</strong> 
-                R$ {{ number_format($serviceRequest->initial_budget, 2, ',', '.') }}
-            </p>
-
-            @if($serviceRequest->final_price)
-                <p><strong>Valor Final Proposto:</strong> 
-                    R$ {{ number_format($serviceRequest->final_price, 2, ',', '.') }}
-                </p>
-            @endif
-
-            @if($serviceRequest->service_date)
-                <p><strong>Data do Serviço:</strong> 
-                    {{ \Carbon\Carbon::parse($serviceRequest->service_date)->format('d/m/Y') }}
-                </p>
-            @endif
-
-            <p><strong>Status:</strong> 
-                <span class="badge bg-{{ 
-                    $serviceRequest->isRequested() ? 'secondary' : 
-                    ($serviceRequest->isChatOpened() ? 'info' : 
-                    ($serviceRequest->isPendingAcceptance() ? 'warning' : 
-                    ($serviceRequest->isAccepted() ? 'success' : 'dark'))) }}">
-                    {{ $serviceRequest->getStatusLabel() }}
-                </span>
-            </p>
-        </div>
+    {{-- Cabeçalho --}}
+    <div class="w-100 d-flex justify-content-between align-items-center mb-4 px-1">
+        <h3 class="fw-bold text-primary border-bottom border-3 pb-1 mb-0"
+            style="display: inline-block; font-size: 1.8rem; border-color: #0d6efd; font-family: 'Rubik',sans-serif;">
+            MINHA SOLICITAÇÃO
+        </h3>
     </div>
 
-    {{-- Endereço --}}
-    <div class="card mb-4">
-        <div class="card-header">Endereço do Serviço</div>
-        <div class="card-body">
-            <p>{{ $serviceRequest->address->logradouro }}, {{ $serviceRequest->address->numero }}</p>
-            <p>{{ $serviceRequest->address->bairro }} - {{ $serviceRequest->address->cidade }}/{{ $serviceRequest->address->estado }}</p>
-            <p>CEP: {{ $serviceRequest->address->cep }}</p>
-            @if($serviceRequest->address->complemento)
-                <p>Complemento: {{ $serviceRequest->address->complemento }}</p>
-            @endif
-        </div>
-    </div>
+    {{-- Seção: Dados do Serviço --}}
+    <section class="mb-5 p-4 shadow-sm rounded" style="background-color: #f9fbfd;">
+       @php
+            // Mapeamento de status para label e cor
+            switch ($serviceRequest->status) {
+                case 'requested':
+                    $badgeClass = 'bg-secondary';
+                    $label      = 'Solicitado';
+                    break;
+                case 'chat_opened':
+                    $badgeClass = 'bg-info';
+                    $label      = 'Chat Aberto';
+                    break;
+                case 'pending_acceptance':
+                    $badgeClass = 'bg-warning text-dark';
+                    $label      = 'Pendente de Aceitar';
+                    break;
+                case 'accepted':
+                    $badgeClass = 'bg-success';
+                    $label      = 'Aceito';
+                    break;
+                case 'rejected':
+                    $badgeClass = 'bg-danger';
+                    $label      = 'Recusado';
+                    break;
+                case 'cancelled':
+                    $badgeClass = 'bg-danger';
+                    $label      = 'Cancelado';
+                    break;
+                case 'completed':
+                    $badgeClass = 'bg-success';
+                    $label      = 'Concluído';
+                    break;
+                default:
+                    $badgeClass = 'bg-light text-dark';
+                    $label      = ucfirst(str_replace('_', ' ', $serviceRequest->status));
+            }
+        @endphp
 
-    {{-- Ações --}}
+        <div class="d-flex justify-content-between align-items-start mb-4">
+            <h4 class="fw-bold text-primary border-start border-4 border-primary ps-3 text-uppercase mb-0">
+                Dados do Serviço
+            </h4>
+            <span class="badge fs-6 {{ $badgeClass }}">
+                {{ $label }}
+            </span>
+        </div>
+
+        <div class="card border-0 bg-white">
+            <div class="card-body">
+                <h5 class="fw-semibold mb-3">
+                    {{ $label }}: <span class="text-dark">
+                        {{ auth()->user() instanceof \App\Models\Provider 
+                            ? $serviceRequest->customUser->user_name 
+                            : $serviceRequest->provider->user_name }}
+                    </span>
+                </h5>
+
+                <p class="mb-3"><strong>Descrição:</strong> {{ $serviceRequest->description }}</p>
+                <p class="mb-3"><strong>Orçamento Inicial:</strong>
+                    R$ {{ number_format($serviceRequest->initial_budget, 2, ',', '.') }}
+                </p>
+
+                @if($serviceRequest->final_price)
+                    <p class="mb-3"><strong>Valor Final Proposto:</strong>
+                        R$ {{ number_format($serviceRequest->final_price, 2, ',', '.') }}
+                    </p>
+                @endif
+
+                @if($serviceRequest->service_date)
+                    <p class="mb-0"><strong>Data do Serviço:</strong>
+                        {{ \Carbon\Carbon::parse($serviceRequest->service_date)->format('d/m/Y') }}
+                    </p>
+                @endif
+            </div>
+        </div>
+    </section>
+
+    {{-- Seção: Endereço do Serviço --}}
+    <section class="mb-5 p-4 shadow-sm rounded" style="background-color: #f9fbfd;">
+        <h4 class="fw-bold mb-4 text-primary border-start border-4 border-primary ps-3 text-uppercase">
+            Endereço do Serviço
+        </h4>
+        <div class="card border-0 bg-white">
+            <div class="card-body">
+                <h5 class="fw-semibold mb-3">
+                    <span class="text-dark">{{ $serviceRequest->address->logradouro }}, {{ $serviceRequest->address->numero }}</span>
+                </h5>
+                <p class="mb-1">{{ $serviceRequest->address->bairro }} - {{ $serviceRequest->address->cidade }}/{{ $serviceRequest->address->estado }}</p>
+                <p class="mb-1">CEP: {{ $serviceRequest->address->cep }}</p>
+                @if($serviceRequest->address->complemento)
+                    <p class="mb-0">Complemento: {{ $serviceRequest->address->complemento }}</p>
+                @endif
+            </div>
+        </div>
+    </section>
+
+    {{-- Seção: Ações Disponíveis --}}
     @if(!$serviceRequest->isFinalized())
-        <div class="d-flex gap-2 flex-wrap">
+    <section class="mb-5 p-4 shadow-sm rounded" style="background-color: #f9fbfd;">
+        <h4 class="fw-bold mb-4 text-primary border-start border-4 border-primary ps-3 text-uppercase">
+            Ações Disponíveis
+        </h4>
+        <div class="d-flex justify-content-center flex-wrap">
 
-            {{-- Aceitar Proposta --}}
             @if($serviceRequest->canAcceptProposal())
-                <form action="{{ route('service-requests.accept-proposal', $serviceRequest) }}" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <button class="btn btn-success">Aceitar Proposta</button>
+                <form action="{{ route('service-requests.accept-proposal', $serviceRequest) }}" method="POST" class="me-3 mb-2">
+                    @csrf @method('PUT')
+                    <button class="btn btn-success fw-bold d-flex align-items-center" style="margin-right: 50px;">
+                        <i class="fas fa-check me-2"></i> Aceitar
+                    </button>
                 </form>
             @endif
 
-            {{-- Recusar Proposta --}}
             @if($serviceRequest->canRejectProposal())
-                <form action="{{ route('service-requests.reject-proposal', $serviceRequest) }}" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <button class="btn btn-warning">Recusar Proposta</button>
+                <form action="{{ route('service-requests.reject-proposal', $serviceRequest) }}" method="POST" class="me-3 mb-2">
+                    @csrf @method('PUT')
+                    <button class="btn btn-cancel fw-bold d-flex align-items-center" style="margin-right: 50px;">
+                        <i class="fas fa-times me-2"></i> Recusar
+                    </button>
                 </form>
             @endif
 
-            {{-- Concluir (Aparece apenas se está aceito) --}}
             @if($serviceRequest->isAccepted())
-                <form action="{{ route('service-requests.update', $serviceRequest) }}" method="POST">
-                    @csrf
-                    @method('PUT')
+                <form action="{{ route('service-requests.update', $serviceRequest) }}" method="POST" class="me-3 mb-2">
+                    @csrf @method('PUT')
                     <input type="hidden" name="status" value="completed">
-                    <button class="btn btn-primary">Concluir Serviço</button>
+                    <button class="btn btn-sucess fw-bold d-flex align-items-center" style="margin-right: 50px;">
+                        <i class="fas fa-check-circle me-2"></i> Concluir
+                    </button>
                 </form>
             @endif
 
-            {{-- Cancelar --}}
             @if($serviceRequest->canCancel())
-                <form action="{{ route('custom-user.service-requests.cancel', $serviceRequest) }}" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <button class="btn btn-outline-warning">Cancelar</button>
+                <form action="{{ route(auth()->user() instanceof \App\Models\Provider 
+                            ? 'provider.service-requests.cancel' 
+                            : 'custom-user.service-requests.cancel', 
+                            $serviceRequest) }}" method="POST" class="me-3 mb-2">
+                    @csrf @method('PUT')
+                    <button class="btn btn-danger fw-bold d-flex align-items-center" style="margin-right: 50px;">
+                        <i class="fas fa-arrow-left me-2"></i> Cancelar
+                    </button>
                 </form>
             @endif
 
-            {{-- Ir para o Chat --}}
             @if($serviceRequest->chat)
-                <a href="{{ route('chat.show', $serviceRequest->id) }}" class="btn btn-secondary">
-                    Ir para o Chat
+                <a href="{{ route('chat.show', $serviceRequest->id) }}" 
+                class="btn btn-info fw-bold d-flex align-items-center mb-2" 
+                style="margin-right: 50px;">
+                    <i class="fas fa-comments me-2"></i> Abrir Chat
                 </a>
             @endif
+
         </div>
+    </section>
     @endif
 
+    {{-- Seção: Avaliação --}}
     @if($serviceRequest->isCompleted() && !$serviceRequest->wasReviewedBy(auth()->user()))
-        <div class="mt-3">
-            <a href="{{ route('service-requests.review', $serviceRequest) }}" class="btn btn-outline-primary">
-                Avaliar {{ auth()->user() instanceof \App\Models\Provider ? 'Cliente' : 'Prestador' }}
-            </a>
-        </div>
+    <section class="mb-5 p-4 shadow-sm rounded bg-white text-center">
+        <h4 class="fw-bold mb-4 text-primary border-start border-4 border-primary ps-3 text-uppercase">
+            Avaliação
+        </h4>
+        <a href="{{ route('service-requests.review', $serviceRequest) }}" class="btn btn-outline-primary fw-bold">
+            <i class="fas fa-star me-1"></i>
+            Avaliar {{ auth()->user() instanceof \App\Models\Provider ? 'Cliente' : 'Prestador' }}
+        </a>
+    </section>
     @endif
+
 </div>
 @endsection
