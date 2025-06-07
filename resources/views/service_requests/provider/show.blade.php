@@ -52,7 +52,7 @@
             }
         @endphp
 
-        <div class="d-flex justify-content-between align-items-start mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="fw-bold text-primary border-start border-4 border-primary ps-3 text-uppercase mb-0">
                 Dados do Serviço
             </h4>
@@ -61,25 +61,93 @@
             </span>
         </div>
 
-        <div class="card border-0 bg-white">
-            <div class="card-body">
-                <h5 class="fw-semibold mb-3">
-                    Solicitante: <span class="text-dark">{{ $serviceRequest->customUser->user_name }}</span>
-                </h5>
-                <p class="mb-3"><strong>Descrição:</strong> {{ $serviceRequest->description }}</p>
-                <p class="mb-3"><strong>Orçamento Inicial:</strong> R$ {{ number_format($serviceRequest->initial_budget, 2, ',', '.') }}</p>
+        {{-- Novo bloco estilizado do Solicitante --}}
+        <div class="d-flex align-items-center mb-4 p-3 bg-white rounded shadow-sm border-start border-4 border-info">
+            @php
+                $currentUser = auth()->user();
+                // Se for Provider, pega o CustomUser; senão, pega o Provider
+                $otherUser = $currentUser instanceof \App\Models\Provider
+                            ? $serviceRequest->customUser
+                            : $serviceRequest->provider;
 
-                @if($serviceRequest->final_price)
-                    <p class="mb-3"><strong>Valor Final Proposto:</strong> R$ {{ number_format($serviceRequest->final_price, 2, ',', '.') }}</p>
-                @endif
+                // Se tiver foto de perfil armazenada, usa ela; caso contrário, fallback genérico
+                $avatarUrl = $otherUser && $otherUser->profile_photo
+                            ? asset('storage/' . $otherUser->profile_photo)
+                            : asset('images/user.png');
+            @endphp
 
-                @if($serviceRequest->service_date)
-                    <p class="mb-3"><strong>Data do Serviço:</strong> {{ \Carbon\Carbon::parse($serviceRequest->service_date)->format('d/m/Y') }}</p>
-                @endif
+            <img
+                src="{{ $avatarUrl }}"
+                alt="Avatar de {{ $otherUser->user_name ?? 'Usuário' }}"
+                class="rounded-circle border border-2 border-light"
+                style="width: 40px; height: 40px; object-fit: cover; margin-right: 20px;"
+            >
+
+            <h5 class="fw-semibold mb-0">
+                Solicitante: <span class="text-dark">{{ $serviceRequest->customUser->user_name }}</span>
+            </h5>
+        </div>
+
+        <div class="card border-0">
+            <div class="card-body bg-white">
+                <div class="row gx-4 gy-3 align-items-center">
+                    {{-- Descrição --}}
+                    <div class="col-12 col-md-6">
+                        <div class="d-flex align-items-start bg-white p-3 rounded shadow-sm border-start border-4 border-primary">
+                            <i class="fas fa-align-left fa-lg text-primary me-3 mt-1"></i>
+                            <div>
+                                <h6 class="mb-1 text-primary fw-semibold">Descrição</h6>
+                                <p class="mb-0 text-muted small">{{ $serviceRequest->description }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Orçamento Inicial --}}
+                    <div class="col-12 col-md-3">
+                        <div class="d-flex align-items-start bg-white p-3 rounded shadow-sm border-start border-4 border-warning">
+                            <i class="fas fa-wallet fa-lg text-warning me-3 mt-1"></i>
+                            <div>
+                                <h6 class="mb-1 text-warning fw-semibold">Orçamento</h6>
+                                <p class="mb-0 text-muted small">
+                                    R$ {{ number_format($serviceRequest->initial_budget, 2, ',', '.') }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Data do Serviço --}}
+                    <div class="col-12 col-md-3">
+                        <div class="d-flex align-items-start bg-white p-3 rounded shadow-sm border-start border-4 border-info">
+                            <i class="fas fa-calendar-alt fa-lg text-info me-3 mt-1"></i>
+                            <div>
+                                <h6 class="mb-1 text-info fw-semibold">Data</h6>
+                                <p class="mb-0 text-muted small">
+                                    {{ $serviceRequest->service_date
+                                        ? \Carbon\Carbon::parse($serviceRequest->service_date)->format('d/m/Y')
+                                        : 'NÃO INFORMADO' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Valor Final Proposto --}}
+                    @if($serviceRequest->final_price)
+                    <div class="col-12 col-md-3">
+                        <div class="d-flex align-items-start bg-white p-3 rounded shadow-sm border-start border-4 border-success">
+                            <i class="fas fa-dollar-sign fa-lg text-success me-3 mt-1"></i>
+                            <div>
+                                <h6 class="mb-1 text-success fw-semibold">Valor Final</h6>
+                                <p class="mb-0 text-muted small">
+                                    R$ {{ number_format($serviceRequest->final_price, 2, ',', '.') }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                </div>
             </div>
         </div>
     </section>
-
 
     {{-- Seção: Endereço do Serviço --}}
     <section class="mb-5 p-4 shadow-sm rounded" style="background-color: #f9fbfd;">
