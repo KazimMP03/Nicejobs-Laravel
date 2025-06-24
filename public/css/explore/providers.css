@@ -121,3 +121,57 @@
 .provider-card .card-footer i.fa-star-half-alt {
   color: #ffc107; /* Amarelo padrão do Bootstrap para estrelas */
 }
+
+/* Container de categorias dentro do card: reduz gap */
+.provider-card .provider-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem; /* menor espaço entre badges */
+  justify-content: center; /* ou flex-start, conforme preferir */
+  margin-top: 0.25rem; /* menos margem superior */
+}
+
+/* Badge de categoria mais compacta */
+.provider-card .category-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.7rem;               /* menor fonte */
+  font-weight: 500;
+  color: #0d6efd;
+  background: rgba(13, 110, 253, 0.08); /* fundo ainda mais sutil */
+  border: 1px solid #0d6efd;
+  border-radius: 0.5rem;           /* pílula menor */
+  padding: 0.15rem 0.5rem;         /* padding reduzido */
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease;
+  cursor: default;
+  max-width: 80px;                 /* opcional: limitar largura para nomes longos */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Remover ícone se quiser mais compacto ainda (no Blade) */
+/* Se mantiver o ícone, considere removê-lo: <i class="fas fa-tag"> ocupa espaço. */
+
+/* Hover mais sutil */
+.provider-card .category-badge:hover {
+  background: #0d6efd;
+  color: #fff;
+  transform: scale(1.03); /* leve aumento */
+}
+
+/* Em telas muito pequenas, mais compacto ainda */
+@media (max-width: 576px) {
+  .provider-card .provider-categories {
+    gap: 0.2rem;
+    margin-top: 0.2rem;
+  }
+  .provider-card .category-badge {
+    font-size: 0.65rem;
+    padding: 0.1rem 0.4rem;
+    max-width: 60px;
+  }
+}

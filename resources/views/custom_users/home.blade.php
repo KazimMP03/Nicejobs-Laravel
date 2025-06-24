@@ -26,65 +26,75 @@
         </h5>
     </div>
 
-    @if($topProviders->isEmpty())
+   @if($topProviders->isEmpty())
     <p class="text-center text-muted">Nenhum prestador encontrado.</p>
     @else
-    <div class="row gy-4">
-        @foreach($topProviders as $provider)
-        <div class="col-12 col-sm-6 col-lg-4 d-flex">
-            <div class="provider-card flex-fill d-flex flex-column">
-                {{-- HEADER --}}
-                <div class="card-header d-flex align-items-center">
-                    @php
-                    $photo = $provider->profile_photo
-                    ? asset('storage/' . $provider->profile_photo)
-                    : asset('images/user.png');
-                    @endphp
-                    <img src="{{ $photo }}"
-                        alt="Foto de {{ $provider->user_name }}"
-                        class="avatar me-3">
-                    <h5 class="mb-0">{{ $provider->user_name }}</h5>
-                </div>
+        <div class="row gy-4">
+            @foreach($topProviders as $provider)
+            <div class="col-12 col-sm-6 col-lg-4 d-flex">
+                <div class="provider-card flex-fill d-flex flex-column">
+                    {{-- HEADER --}}
+                    <div class="card-header d-flex align-items-center">
+                        @php
+                        $photo = $provider->profile_photo
+                            ? asset('storage/' . $provider->profile_photo)
+                            : asset('images/user.png');
+                        @endphp
+                        <img src="{{ $photo }}"
+                            alt="Foto de {{ $provider->user_name }}"
+                            class="avatar me-3">
+                        <h5 class="mb-0">{{ $provider->user_name }}</h5>
+                    </div>
 
-                {{-- BODY --}}
-                <div class="card-body flex-grow-1">
-                    <p>{{ Str::limit($provider->provider_description, 100)
-                        }}</p>
-                </div>
+                    {{-- BODY --}}
+                    <div class="card-body flex-grow-1">
+                        <p>{{ Str::limit($provider->provider_description, 100) }}</p>
 
-                {{-- FOOTER: estrelas + quantidade --}}
-                <div class="card-footer text-center">
-                    @php
-                    $avg = round($provider->reviews_avg_rating * 2) / 2;
-                    $fullStars = floor($avg);
-                    $halfStar = ($avg - $fullStars) === 0.5;
-                    $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
-                    @endphp
+                        @if($provider->categories->isNotEmpty())
+                        <div class="provider-categories mt-2">
+                            @foreach($provider->categories as $category)
+                                <span class="category-badge">
+                                    <i class="fas fa-tag me-1"></i>{{ $category->name }}
+                                </span>
+                            @endforeach
+                        </div>
+                        @endif
+                    </div>
 
-                    @for($i = 0; $i < $fullStars; $i++)
-                    <i class="fas fa-star"></i>
-                    @endfor
-                    @if($halfStar)
-                    <i class="fas fa-star-half-alt"></i>
-                    @endif
-                    @for($i = 0; $i < $emptyStars; $i++)
-                    <i class="far fa-star"></i>
-                    @endfor
+                    {{-- FOOTER: estrelas + quantidade --}}
+                    <div class="card-footer text-center">
+                        @php
+                        $avg = $provider->reviews_avg_rating
+                            ? round($provider->reviews_avg_rating * 2) / 2
+                            : 0;
+                        $fullStars = floor($avg);
+                        $halfStar = ($avg - $fullStars) === 0.5;
+                        $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
+                        @endphp
 
-                    <span class="ms-2">({{ $provider->reviews_count }})</span>
+                        @for($i = 0; $i < $fullStars; $i++)
+                            <i class="fas fa-star"></i>
+                        @endfor
+                        @if($halfStar)
+                            <i class="fas fa-star-half-alt"></i>
+                        @endif
+                        @for($i = 0; $i < $emptyStars; $i++)
+                            <i class="far fa-star"></i>
+                        @endfor
 
-                    <div class="mt-3">
-                        <a
-                            href="{{ route('explore.provider.show', $provider->id) }}"
-                            class="btn btn-primary btn-explore">
-                            <i class="fas fa-eye me-2"></i> Ver perfil
-                        </a>
+                        <span class="ms-2">({{ $provider->reviews_count }})</span>
+
+                        <div class="mt-3">
+                            <a href="{{ route('explore.provider.show', $provider->id) }}"
+                                class="btn btn-primary btn-explore">
+                                <i class="fas fa-eye me-2"></i> Ver perfil
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
+            @endforeach
         </div>
-        @endforeach
-    </div>
     @endif
 </div>
 @endsection
