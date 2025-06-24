@@ -9,30 +9,67 @@ use Illuminate\Http\Request;
 
 class ChatController extends Controller
 {
+
     /**
-     * Lista os chats do usuário autenticado.
+     * Lista os chats do usuário autenticado, ordenando pelo status da ServiceRequest (PostgreSQL).
      */
     public function index(Request $request)
     {
-        $user = auth()->user();
-        $status = $request->input('status', 'all');
+        $user         = auth()->user();
+        $statusFilter = $request->input('status', 'all');
 
-        $chats = Chat::whereHas('serviceRequest', function ($q) use ($user, $status) {
-            if ($user instanceof \App\Models\Provider) {
-                $q->where('provider_id', $user->id);
-            } else {
-                $q->where('custom_user_id', $user->id);
-            }
+        // 1) Obtém a ordem de status definida no Model
+        $orderList = ServiceRequest::statusOrder(); 
+        // Exemplo: ['accepted', 'requested', 'chat_opened', ...] ou qualquer outra ordem que você tenha definido.
 
-            // Filtro de status
-            if ($status === 'active') {
-                $q->whereIn('status', ['chat_opened', 'accepted']);
-            } elseif ($status === 'archived') {
-                $q->whereIn('status', ['completed', 'cancelled', 'rejected']);
-            }
-        })->with('serviceRequest')->get();
+        // 2) Monta expressão CASE WHEN para PostgreSQL
+        $cases = [];
+        foreach ($orderList as $idx => $st) {
+            // Atenção: certifique-se de que $st não contenha apóstrofos inesperados.
+            $cases[] = "WHEN service_requests.status = '{$st}' THEN {$idx}";
+        }
+        // Se surgir status inesperado, ficará por último (índice = count($orderList))
+        $elseIndex = count($orderList);
+        $caseExpr = "(CASE " . implode(' ', $cases) . " ELSE {$elseIndex} END)";
 
-        return view('chat.index', compact('chats', 'status'));
+        // 3) Inicia query com join para permitir ordenar pelo campo de service_requests
+        $query = Chat::select('chats.*')
+            ->join('service_requests', 'chats.service_request_id', '=', 'service_requests.id');
+
+        // 4) Filtra apenas chats onde o usuário é provider ou custom_user na ServiceRequest
+        if ($user instanceof \App\Models\Provider) {
+            $query->where('service_requests.provider_id', $user->id);
+        } else {
+            $query->where('service_requests.custom_user_id', $user->id);
+        }
+
+        // 5) Filtro de status (“active” / “archived”), ajustando conforme o que considerar “ativo”
+        if ($statusFilter === 'active') {
+            $query->whereIn('service_requests.status', [
+                ServiceRequest::STATUS_CHAT_OPENED,
+                ServiceRequest::STATUS_PENDING_ACCEPT,
+                ServiceRequest::STATUS_ACCEPTED,
+            ]);
+        } elseif ($statusFilter === 'archived') {
+            $query->whereIn('service_requests.status', [
+                ServiceRequest::STATUS_COMPLETED,
+                ServiceRequest::STATUS_CANCELLED,
+                ServiceRequest::STATUS_REJECTED,
+            ]);
+        }
+        // Se $statusFilter for 'all', não aplica whereIn adicional.
+
+        // 6) Ordena pelo CASE WHEN de status. Opcionalmente, depois ordena por data de atualização do chat:
+        $query->orderByRaw($caseExpr)
+              ->orderBy('chats.updated_at', 'desc');
+
+        // 7) Carrega relacionamento para evitar N+1
+        $chats = $query->with('serviceRequest')->get();
+
+        return view('chat.index', [
+            'chats'  => $chats,
+            'status' => $statusFilter,
+        ]);
     }
 
     /**

@@ -16,10 +16,21 @@ class ServiceRequestController extends Controller
     public function index()
     {
         $user = auth()->user();
+        $orderList = ServiceRequest::statusOrder();
+
+        // Montar expressão CASE WHEN status = ... THEN índice
+        $cases = [];
+        foreach ($orderList as $idx => $status) {
+            // CASE WHEN status = 'requested' THEN 0, etc.
+            $cases[] = "WHEN status = '{$status}' THEN {$idx}";
+        }
+        // Monta: CASE WHEN status = 'requested' THEN 0 WHEN status = 'chat_opened' THEN 1 ... ELSE N END
+        $caseExpression = "(CASE " . implode(' ', $cases) . " ELSE " . count($orderList) . " END)";
 
         if ($user instanceof Provider) {
             $requests = ServiceRequest::where('provider_id', $user->id)
                 ->with(['customUser', 'address'])
+                ->orderByRaw($caseExpression)
                 ->get();
 
             return view('service_requests.provider.index', compact('requests'));
@@ -28,6 +39,7 @@ class ServiceRequestController extends Controller
         if ($user instanceof CustomUser) {
             $requests = ServiceRequest::where('custom_user_id', $user->id)
                 ->with(['provider', 'address'])
+                ->orderByRaw($caseExpression)
                 ->get();
 
             return view('service_requests.custom_user.index', compact('requests'));

@@ -215,6 +215,23 @@ class ServiceRequest extends Model
         };
     }
 
+    /**
+     * Retorna array de status na ordem desejada para listagem.
+     */
+    public static function statusOrder(): array
+    {
+        return [
+            self::STATUS_REQUESTED,         // solicitado
+            self::STATUS_CHAT_OPENED,       // chat aberto
+            self::STATUS_PENDING_ACCEPT,    // pendente de aceitação
+            self::STATUS_ACCEPTED,          // aceito
+            // talvez concluir antes de cancelado/rejeitado, depende do fluxo
+            self::STATUS_COMPLETED,         // concluído
+            self::STATUS_CANCELLED,         // cancelado
+            self::STATUS_REJECTED,          // rejeitado
+        ];
+    }
+
     // === Método auxiliar para avaliação de usuário === //
     public function wasReviewedBy($user)
     {
