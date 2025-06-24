@@ -215,6 +215,19 @@ class ServiceRequest extends Model
         };
     }
 
+    public static function statusLabels(): array
+    {
+        return [
+            self::STATUS_REQUESTED      => 'Solicitado',
+            self::STATUS_CHAT_OPENED    => 'Chat Aberto',
+            self::STATUS_PENDING_ACCEPT => 'Pendente de Aceitação',
+            self::STATUS_ACCEPTED       => 'Aceito',
+            self::STATUS_COMPLETED      => 'Concluído',
+            self::STATUS_CANCELLED      => 'Cancelado',
+            self::STATUS_REJECTED       => 'Rejeitado',
+        ];
+    }
+
     /**
      * Retorna array de status na ordem desejada para listagem.
      */

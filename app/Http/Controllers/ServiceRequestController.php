@@ -11,43 +11,87 @@ use Illuminate\Http\Request;
 class ServiceRequestController extends Controller
 {
     /**
-     * Lista as solicitações do usuário autenticado.
+     * Lista as solicitações do usuário autenticado, com filtro e ordenação por status.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $user = auth()->user();
-        $orderList = ServiceRequest::statusOrder();
+        $user         = auth()->user();
+        $statusFilter = $request->input('status', 'all');
 
-        // Montar expressão CASE WHEN status = ... THEN índice
+        // 1) Obter arrays estáticos do Model
+        $orderList = ServiceRequest::statusOrder();    // ex: ['requested','chat_opened',...]
+        $labelMap  = ServiceRequest::statusLabels();   // ex: ['requested'=>'Solicitado', ...]
+
+        // 2) Montar expressão CASE WHEN para ordenação por status (PostgreSQL)
         $cases = [];
-        foreach ($orderList as $idx => $status) {
-            // CASE WHEN status = 'requested' THEN 0, etc.
-            $cases[] = "WHEN status = '{$status}' THEN {$idx}";
+        foreach ($orderList as $idx => $st) {
+            // Como st vem de constantes fixas, sem risco de injeção externa
+            $cases[] = "WHEN status = '{$st}' THEN {$idx}";
         }
-        // Monta: CASE WHEN status = 'requested' THEN 0 WHEN status = 'chat_opened' THEN 1 ... ELSE N END
-        $caseExpression = "(CASE " . implode(' ', $cases) . " ELSE " . count($orderList) . " END)";
+        $elseIndex      = count($orderList);
+        $caseExpression = "(CASE " . implode(' ', $cases) . " ELSE {$elseIndex} END)";
 
+        // 3) Iniciar query base filtrando por provider ou custom user
         if ($user instanceof Provider) {
-            $requests = ServiceRequest::where('provider_id', $user->id)
-                ->with(['customUser', 'address'])
-                ->orderByRaw($caseExpression)
-                ->get();
-
-            return view('service_requests.provider.index', compact('requests'));
+            $query = ServiceRequest::where('provider_id', $user->id);
+        } elseif ($user instanceof CustomUser) {
+            $query = ServiceRequest::where('custom_user_id', $user->id);
+        } else {
+            abort(403, 'Acesso não autorizado.');
         }
 
-        if ($user instanceof CustomUser) {
-            $requests = ServiceRequest::where('custom_user_id', $user->id)
-                ->with(['provider', 'address'])
-                ->orderByRaw($caseExpression)
-                ->get();
+        // 4) Aplicar filtro de status conforme $statusFilter
+        if ($statusFilter === 'active') {
+            // Ajuste conforme necessidade de negócio: quais status são considerados “ativos”?
+            // Exemplo incluindo solicitações ainda em negociação:
+            $query->whereIn('status', [
+                ServiceRequest::STATUS_REQUESTED,      // opcional: inclua se quiser ver solicitações sem chat inicial
+                ServiceRequest::STATUS_CHAT_OPENED,
+                ServiceRequest::STATUS_PENDING_ACCEPT,
+                ServiceRequest::STATUS_ACCEPTED,
+            ]);
+        } elseif ($statusFilter === 'archived') {
+            $query->whereIn('status', [
+                ServiceRequest::STATUS_COMPLETED,
+                ServiceRequest::STATUS_CANCELLED,
+                ServiceRequest::STATUS_REJECTED,
+            ]);
+        } elseif (in_array($statusFilter, $orderList, true)) {
+            // Status específico selecionado
+            $query->where('status', $statusFilter);
+        }
+        // Se 'all' ou valor inválido, não aplica filtro de status: lista tudo do usuário.
 
-            return view('service_requests.custom_user.index', compact('requests'));
+        // 5) Ordenar por status conforme CASE, depois por created_at desc (ou outro critério)
+        $query->orderByRaw($caseExpression)
+              ->orderBy('created_at', 'desc');
+
+        // 6) Carregar relações necessárias para evitar N+1
+        if ($user instanceof Provider) {
+            $requests = $query->with(['customUser', 'address'])->get();
+        } else {
+            $requests = $query->with(['provider', 'address'])->get();
         }
 
-        abort(403, 'Acesso não autorizado.');
+        // 7) Passar variáveis para a view: requests, status atual, e listas para select
+        //    As views devem usar $statusOrder e $statusLabels para montar o dropdown de filtros.
+        if ($user instanceof Provider) {
+            return view('service_requests.provider.index', [
+                'requests'     => $requests,
+                'status'       => $statusFilter,
+                'statusOrder'  => $orderList,
+                'statusLabels' => $labelMap,
+            ]);
+        } else {
+            return view('service_requests.custom_user.index', [
+                'requests'     => $requests,
+                'status'       => $statusFilter,
+                'statusOrder'  => $orderList,
+                'statusLabels' => $labelMap,
+            ]);
+        }
     }
-
+    
     /**
      * Exibe o formulário para criar uma nova ServiceRequest.
      */

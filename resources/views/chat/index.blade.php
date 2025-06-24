@@ -25,6 +25,12 @@
                             <option value="all" {{ $status === 'all' ? 'selected' : '' }}>Todos</option>
                             <option value="active" {{ $status === 'active' ? 'selected' : '' }}>Ativos</option>
                             <option value="archived" {{ $status === 'archived' ? 'selected' : '' }}>Arquivados</option>
+                            {{-- Opções individuais de status --}}
+                            @foreach($statusOrder as $st)
+                                <option value="{{ $st }}" {{ $status === $st ? 'selected' : '' }}>
+                                    {{ $statusLabels[$st] ?? $st }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                 </form>

@@ -20,6 +20,7 @@ class ChatController extends Controller
 
         // 1) Obtém a ordem de status definida no Model
         $orderList = ServiceRequest::statusOrder(); 
+        $labelMap    = ServiceRequest::statusLabels();
         // Exemplo: ['accepted', 'requested', 'chat_opened', ...] ou qualquer outra ordem que você tenha definido.
 
         // 2) Monta expressão CASE WHEN para PostgreSQL
@@ -56,6 +57,9 @@ class ChatController extends Controller
                 ServiceRequest::STATUS_CANCELLED,
                 ServiceRequest::STATUS_REJECTED,
             ]);
+        } elseif (in_array($statusFilter, $orderList, true)) {
+            // Status específico: exato match
+            $query->where('service_requests.status', $statusFilter);
         }
         // Se $statusFilter for 'all', não aplica whereIn adicional.
 
@@ -66,9 +70,12 @@ class ChatController extends Controller
         // 7) Carrega relacionamento para evitar N+1
         $chats = $query->with('serviceRequest')->get();
 
+        // **Aqui é crucial passar statusOrder e statusLabels para a view**
         return view('chat.index', [
-            'chats'  => $chats,
-            'status' => $statusFilter,
+            'chats'        => $chats,
+            'status'       => $statusFilter,
+            'statusOrder'  => $orderList,
+            'statusLabels' => $labelMap,
         ]);
     }
 

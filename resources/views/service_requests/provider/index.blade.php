@@ -12,6 +12,30 @@
 
     <div class="d-flex justify-content-center w-100">
         <div class="w-100" style="max-width: 800px;">
+            {{-- Filtro --}}
+            <div class="mb-4">
+                <form method="GET" class="d-flex gap-2 flex-wrap align-items-center">
+                    <div class="input-group" style="max-width: 250px;">
+                        <span class="input-group-text">
+                            <i class="fas fa-filter text-secondary"></i>
+                        </span>
+                        <select name="status"
+                                class="form-select"
+                                onchange="this.form.submit()">
+                            <option value="all" {{ $status === 'all' ? 'selected' : '' }}>Todos</option>
+                            <option value="active" {{ $status === 'active' ? 'selected' : '' }}>Ativos</option>
+                            <option value="archived" {{ $status === 'archived' ? 'selected' : '' }}>Arquivados</option>
+                            {{-- Opções individuais de status --}}
+                            @foreach($statusOrder as $st)
+                                <option value="{{ $st }}" {{ $status === $st ? 'selected' : '' }}>
+                                    {{ $statusLabels[$st] ?? $st }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </form>
+            </div>
+            
             @if($requests->isEmpty())
                 <div class="p-4 text-center text-secondary">
                     Nenhuma solicitação recebida.
