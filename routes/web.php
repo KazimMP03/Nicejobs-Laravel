@@ -111,8 +111,9 @@ Route::middleware('auth:web')->group(function () {
         Route::post('/photo', [ProviderController::class, 'updateProfilePhoto'])->name('provider.profile.updatePhoto');
     });
 
-    // Página inicial do Provider
-    Route::get('/provider/home', fn() => view('providers.home'))->name('provider.home');
+    // Página inicial do Provider com Controller
+    Route::get('/provider/home', [\App\Http\Controllers\ProviderHomeController::class, 'index'])->name('provider.home');
+
 
 
     // Categorias atendidas
