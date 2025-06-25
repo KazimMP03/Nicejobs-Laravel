@@ -7,10 +7,10 @@
     <img src="{{ asset('images/logo_big_rect_round.png') }}"
         id="sidebar-mini-logo" class="d-none ms-2" style="height: 30px;">
 
-    <form class="d-flex ms-4 w-100" style="max-width: 400px;">
+    <!-- <form class="d-flex ms-4 w-100" style="max-width: 400px;">
         <input class="form-control border-0" type="search"
             placeholder="Buscar serviços...">
-    </form>
+    </form> -->
 
     <div class="navbar-nav align-items-center ms-auto">
         {{-- Dropdown Navegar --}}
